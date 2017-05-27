@@ -20,7 +20,7 @@
           <url>http://repository.jetbrains.com/all</url>
       </pluginRepository>
       <pluginRepository>
-          <id>JetBrains</id>
+          <id>TeamCity</id>
           <url>http://download.jetbrains.com/teamcity-repository</url>
       </pluginRepository>
   </pluginRepositories>
