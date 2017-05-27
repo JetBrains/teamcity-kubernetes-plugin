@@ -78,5 +78,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.testng:testng:6.8.21" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.beanshell:bsh:2.0b4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.beust:jcommander:1.27" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity:cloud-interface:2017.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity:cloud-shared:2017.1" level="project" />
   </component>
 </module>
