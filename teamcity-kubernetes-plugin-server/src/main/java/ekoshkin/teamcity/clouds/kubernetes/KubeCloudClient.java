@@ -17,6 +17,15 @@ public class KubeCloudClient implements CloudClientEx {
         myCloudClientParameters = cloudClientParameters;
     }
 
+    @Override
+    public boolean isInitialized() {
+        return true;
+    }
+
+    @Override
+    public void dispose() {
+    }
+
     @NotNull
     @Override
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
@@ -31,16 +40,6 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public void terminateInstance(@NotNull CloudInstance cloudInstance) {
 
-    }
-
-    @Override
-    public void dispose() {
-
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return false;
     }
 
     @Nullable

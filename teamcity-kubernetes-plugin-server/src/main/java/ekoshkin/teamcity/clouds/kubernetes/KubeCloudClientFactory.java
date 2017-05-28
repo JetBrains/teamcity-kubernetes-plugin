@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
@@ -41,7 +42,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @Nullable
     @Override
     public String getEditProfileUrl() {
-        return myPluginDescriptor.getPluginResourcesPath("editKube.html");
+        return myPluginDescriptor.getPluginResourcesPath(KubeProfileEditController.EDIT_KUBE_HTML);
     }
 
     @NotNull
