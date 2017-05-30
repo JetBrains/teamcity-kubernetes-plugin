@@ -1,5 +1,7 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
+import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
@@ -65,6 +67,8 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @NotNull
     @Override
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
-        return new KubeCloudClient(cloudClientParameters);
+        KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
+        KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams);
+        return new KubeCloudClient(apiConnector);
     }
 }

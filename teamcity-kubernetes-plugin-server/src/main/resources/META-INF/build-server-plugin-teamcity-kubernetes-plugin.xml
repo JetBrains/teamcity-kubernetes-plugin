@@ -5,4 +5,5 @@
        default-autowire="constructor">
     <bean id="kubeCloudClientFactory" class="ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientFactory" />
     <bean id="kubeProfileEditController" class="ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController" />
+    <bean id="kubeApiConnectorImpl" class="ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl" />
 </beans>
