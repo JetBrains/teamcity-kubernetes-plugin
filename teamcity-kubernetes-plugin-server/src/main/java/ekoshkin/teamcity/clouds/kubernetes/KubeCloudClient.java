@@ -54,7 +54,7 @@ public class KubeCloudClient implements CloudClientEx {
 
     @Override
     public void restartInstance(@NotNull CloudInstance cloudInstance) {
-
+        throw new UnsupportedOperationException("Restart not implemented");
     }
 
     @Override
