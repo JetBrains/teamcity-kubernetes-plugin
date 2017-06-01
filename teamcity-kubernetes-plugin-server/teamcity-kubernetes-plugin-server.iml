@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -41,7 +46,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: joda-time:joda-time:2.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.commons:commons-compress:1.9" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity.xstream:xstream:1.4.8" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-log4j12:1.7.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.tukaani:xz:1.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: xerces:xercesImpl:2.9.1" level="project" />
@@ -80,5 +84,22 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.beust:jcommander:1.27" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity:cloud-interface:2017.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.jetbrains.teamcity:cloud-shared:2017.1" level="project" />
+    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-client:2.2.0" level="project" />
+    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-model:1.0.67" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.5" level="project" />
+    <orderEntry type="library" name="Maven: javax.validation:validation-api:1.1.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.6.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.11.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:logging-interceptor:3.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.13" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:jul-to-slf4j:1.7.13" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.7.7" level="project" />
+    <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.15" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.7.7" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.7.7" level="project" />
+    <orderEntry type="library" name="Maven: io.fabric8:zjsonpatch:0.3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.github.mifmif:generex:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: dk.brics.automaton:automaton:1.11-8" level="project" />
   </component>
 </module>

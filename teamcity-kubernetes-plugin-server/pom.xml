@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <properties>
+    <kubernetes-client.version>2.2.0</kubernetes-client.version>
+  </properties>
   <parent>
     <artifactId>teamcity-kubernetes-plugin</artifactId>
     <groupId>ekoshkin</groupId>
@@ -9,7 +12,6 @@
   <artifactId>teamcity-kubernetes-plugin-server</artifactId>
   <packaging>jar</packaging>
   <dependencies>
-
     <dependency>
       <groupId>ekoshkin</groupId>
       <artifactId>teamcity-kubernetes-plugin-common</artifactId>
@@ -52,6 +54,12 @@
           <version>${teamcity-version}</version>
           <scope>provided</scope>
       </dependency>
+
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>kubernetes-client</artifactId>
+      <version>${kubernetes-client.version}</version>
+    </dependency>
 
   </dependencies>
 </project>
