@@ -6,9 +6,10 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
-<%@ include file="/include-internal.jsp" %>
+<%@ include file="/include.jsp" %>
 
 <jsp:useBean id="cons" class="ekoshkin.teamcity.clouds.kubernetes.KubeConstants"/>
+<jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 
 </table>
 
@@ -35,20 +36,41 @@
         </td>
     </tr>
     <tr>
+        <th></th>
+        <td>
+            <forms:button id="kubeTestConnectionButton" onclick="BS.Kube.ProfileSettingsForm.testConnection();">Test connection</forms:button>
+        </td>
+    </tr>
+    <tr>
         <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
         <td><props:passwordProperty name="${cons.kubernetesNamespace}" className="longField"/>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
             <span class="smallNote">Kubernetes namespace to use. Leave blanc to use default namespace.</span>
         </td>
     </tr>
+    <tr>
+        <th><label for="${cons.profileInstanceLimit}">Maximum instances count:</label></th>
+        <td>
+            <props:textProperty name="${cons.profileInstanceLimit}" className="settings"/>
+            <span id="error_${cons.profileInstanceLimit}" class="error"></span>
+            <span class="smallNote">Maximum number of instances that can be started. Use blank to have no limit</span>
+        </td>
+    </tr>
 </table>
 
-<forms:submit id="testConnectionButton" type="button" label="Test connection" onclick="BS.KubeSettings.testConnection();"/>
+<bs:dialog dialogId="testConnectionDialog" dialogClass="vcsRootTestConnectionDialog" title="Test Connection" closeCommand="BS.TestConnectionDialog.close();"
+           closeAttrs="showdiscardchangesmessage='false'">
+    <div id="testConnectionStatus"></div>
+    <div id="testConnectionDetails" class="mono"></div>
+</bs:dialog>
 
 <script type="text/javascript">
     $j.ajax({
         url: "<c:url value="${teamcityPluginResourcesPath}kubeSettings.js"/>",
         dataType: "script",
-        cache: true
+        cache: true,
+        success: function () {
+            BS.Kube.ProfileSettingsForm.testConnectionUrl = '<c:url value="${testConnectionUrl}"/>';
+        }
     });
 </script>

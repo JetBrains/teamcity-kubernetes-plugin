@@ -19,4 +19,7 @@ public interface KubeApiConnector {
     boolean deleteDeployment(String name);
 
     boolean deletePod(String name);
+
+    @NotNull
+    KubeApiConnectionCheckResult testConnection(@NotNull KubeApiConnectionSettings connectionSettings);
 }
