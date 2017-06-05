@@ -1,11 +1,11 @@
-package jetbrains.buildServer.controllers.admin.projects;
+package ekoshkin.teamcity.clouds.internal;
 
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 
 import javax.servlet.http.HttpServletRequest;
 
-//NOTE: copy pasted from jetbrains.buildServer.controllers.admin.projects.PluginPropertiesUtil
+//NOTE: copy pasted from ekoshkin.teamcity.clouds.internal.PluginPropertiesUtil
 public class PluginPropertiesUtil {
     private final static String PROPERTY_PREFIX = "prop:";
     private static final String ENCRYPTED_PROPERTY_PREFIX = "prop:encrypted:";

@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes.web;
 
+import ekoshkin.teamcity.clouds.internal.PluginPropertiesUtil;
 import ekoshkin.teamcity.clouds.kubernetes.KubeConstants;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectionCheckResult;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectionSettings;
@@ -8,7 +9,6 @@ import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
-import jetbrains.buildServer.controllers.admin.projects.PluginPropertiesUtil;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
