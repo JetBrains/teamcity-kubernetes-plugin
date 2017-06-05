@@ -60,7 +60,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
             KubeApiConnectionCheckResult connectionCheckResult = myApiConnector.testConnection(new KubeApiConnectionSettings(apiServerUrl, accountName, accountToken));
             if(!connectionCheckResult.isSuccess()){
                 final ActionErrors errors = new ActionErrors();
-                errors.addError("connection-error", connectionCheckResult.getMessage());
+                errors.addError("connection", connectionCheckResult.getMessage());
                 writeErrors(xmlResponse, errors);
             }
         }

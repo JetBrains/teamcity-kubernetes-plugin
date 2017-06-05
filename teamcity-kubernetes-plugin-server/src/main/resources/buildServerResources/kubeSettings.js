@@ -12,7 +12,14 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 BS.TestConnectionDialog.show(false, response, null);
             }.bind(this),
             onSuccess: function (response) {
-                BS.TestConnectionDialog.show(true, "", null);
+                var wereErrors = BS.XMLResponse.processErrors(response.responseXML, {
+                    onConnectionError: function(elem) {
+                        BS.TestConnectionDialog.show(false, elem.firstChild.nodeValue, null);
+                    }
+                }, BS.PluginPropertiesForm.propertiesErrorsHandler);
+                if(!wereErrors){
+                    BS.TestConnectionDialog.show(true, "", null);
+                }
             }.bind(this)
         });
     }
