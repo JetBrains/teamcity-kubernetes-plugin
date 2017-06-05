@@ -30,6 +30,9 @@
                     <includes>
                          <include>*</include>
                     </includes>
+                   <excludes>
+                       <exclude>org.slf4j:*</exclude>
+                   </excludes>
                </dependencySet>
            </dependencySets>
        </binaries>
