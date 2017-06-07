@@ -65,7 +65,8 @@ public class KubeCloudClientFactory implements CloudClientFactory {
 
     @Override
     public boolean canBeAgentOfType(@NotNull AgentDescription agentDescription) {
-        return true;
+        final Map<String, String> map = agentDescription.getAvailableParameters();
+        return map.containsKey(KubeAgentProperties.IMAGE_NAME) && map.containsKey(KubeAgentProperties.INSTANCE_NAME);
     }
 
     @NotNull
