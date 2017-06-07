@@ -1,28 +1,21 @@
 package ekoshkin.teamcity.clouds.kubernetes.connector;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 01.06.17.
  */
-public class KubeApiConnectionSettings {
-    private String myApiServerUrl;
-    private final String myAccountName;
-    private final String myAccountToken;
+public interface KubeApiConnectionSettings {
+    @NotNull
+    String getApiServerUrl();
 
-    public KubeApiConnectionSettings(String apiServerUrl, String accountName, String accountToken) {
-        myApiServerUrl = apiServerUrl;
-        myAccountName = accountName;
-        myAccountToken = accountToken;
-    }
+    @NotNull
+    String getPassword();
 
-    public String getApiServerUrl() {
-        return myApiServerUrl;
-    }
+    @NotNull
+    String getUsername();
 
-    public String getAccountToken() {
-        return myAccountToken;
-    }
-
-    public String getAccountName() {
-        return myAccountName;
-    }
+    @Nullable
+    String getNamespace();
 }

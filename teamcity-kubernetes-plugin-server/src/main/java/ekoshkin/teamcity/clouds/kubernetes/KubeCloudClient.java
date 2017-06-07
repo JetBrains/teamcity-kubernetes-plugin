@@ -1,11 +1,11 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
-import ekoshkin.teamcity.clouds.kubernetes.connector.Deployment;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiException;
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeObjectPatches;
+import io.fabric8.kubernetes.api.model.*;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
+import jetbrains.buildServer.serverSide.ServerSettings;
+import jetbrains.buildServer.util.CollectionsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,15 +13,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.*;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 27.05.17.
  */
 public class KubeCloudClient implements CloudClientEx {
     private final KubeApiConnector myApiConnector;
+    @NotNull
+    private final ServerSettings myServerSettings;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>();
 
-    public KubeCloudClient(KubeApiConnector apiConnector) {
+    public KubeCloudClient(@NotNull KubeApiConnector apiConnector, @NotNull ServerSettings serverSettings) {
         myApiConnector = apiConnector;
+        myServerSettings = serverSettings;
     }
 
     @Override
@@ -36,20 +41,39 @@ public class KubeCloudClient implements CloudClientEx {
     @NotNull
     @Override
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
-        KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
-        String deploymentName = kubeCloudImage.getDeploymentName();
-        Deployment deployment;
-        try {
-            deployment = myApiConnector.findDeployment(deploymentName);
-            //TODO: sync block
-            if(deployment == null){
-                myApiConnector.createDeployment(deploymentName, kubeCloudImage.getImage());
-            }
-            deployment = myApiConnector.patchDeployment(deploymentName, KubeObjectPatches.forDeploymentReplicas(deployment.getReplicas() + 1));
-            return new KubeCloudInstanceImpl(kubeCloudImage);
-        } catch (KubeApiException ex){
-            throw new CloudException("Failed to start new cloud instance for image " + cloudImage.getName(), ex);
-        }
+        final KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
+
+        final String agentName = cloudInstanceUserData.getAgentName(); //TODO: review agent name generation
+
+        Container container = new ContainerBuilder()
+                .withName(agentName) //TODO: review
+                .withImage(kubeCloudImage.getContainerImage())
+                .withImagePullPolicy(kubeCloudImage.isAlwaysPullImage() ? ALWAYS_PULL_IMAGE_POLICY : IF_NOT_PRESENT_PULL_IMAGE_POLICY)
+                .withArgs(kubeCloudImage.getContainerArguments())
+                .withCommand(kubeCloudImage.getContainerCommand())
+                .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))
+                .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, cloudInstanceUserData.getServerAddress(), null))
+                .withEnv(new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null))
+                .withEnv(new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null)) //TODO: review
+                .build();
+
+        final Pod podTemplate = new PodBuilder()
+                .withNewMetadata()
+                .withName(agentName) //TODO: review
+                .withLabels(CollectionsUtil.asMap(
+                        KubeLabels.TEAMCITY_AGENT_LABEL,
+                        KubeLabels.getServerLabel(myServerSettings.getServerUUID()),
+                        KubeLabels.getProfileLabel(cloudInstanceUserData.getProfileId()),
+                        KubeLabels.getImageLabel(kubeCloudImage.getId())))
+                .endMetadata()
+                .withNewSpec()
+                .withContainers(Collections.singletonList(container))
+                .withRestartPolicy(NEVER_RESTART_POLICY)
+                .endSpec()
+                .build();
+
+        final Pod newPod = myApiConnector.createPod(podTemplate);
+        return new KubeCloudInstanceImpl(kubeCloudImage, newPod);
     }
 
     @Override
@@ -60,7 +84,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public void terminateInstance(@NotNull CloudInstance cloudInstance) {
         KubeCloudInstance kubeCloudInstance = (KubeCloudInstance) cloudInstance;
-        myApiConnector.deletePod(kubeCloudInstance.getPodName());
+        myApiConnector.deletePod(kubeCloudInstance.getPod());
         //TODO: update instance counter
     }
 

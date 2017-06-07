@@ -6,6 +6,7 @@ import ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,10 +23,13 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     public static final String ID = "kubernetes";
 
     private final PluginDescriptor myPluginDescriptor;
+    private final ServerSettings myServerSettings;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
-                                  @NotNull final PluginDescriptor pluginDescriptor) {
+                                  @NotNull final PluginDescriptor pluginDescriptor,
+                                  @NotNull final ServerSettings serverSettings) {
         myPluginDescriptor = pluginDescriptor;
+        myServerSettings = serverSettings;
         registrar.registerCloudFactory(this);
     }
 
@@ -68,7 +72,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @Override
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
         KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
-        KubeApiConnector apiConnector = new KubeApiConnectorImpl();
-        return new KubeCloudClient(apiConnector);
+        KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams);
+        return new KubeCloudClient(apiConnector, myServerSettings);
     }
 }

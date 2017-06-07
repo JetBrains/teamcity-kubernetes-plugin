@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import io.fabric8.kubernetes.api.model.Pod;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.InstanceStatus;
@@ -17,9 +18,11 @@ import static ekoshkin.teamcity.clouds.kubernetes.KubeAgentProperties.INSTANCE_N
  */
 public class KubeCloudInstanceImpl implements KubeCloudInstance {
     private final KubeCloudImage myKubeCloudImage;
+    private final Pod myPod;
 
-    public KubeCloudInstanceImpl(KubeCloudImage kubeCloudImage) {
+    public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage, @NotNull Pod pod) {
         myKubeCloudImage = kubeCloudImage;
+        myPod = pod;
     }
 
     @NotNull
@@ -37,7 +40,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public String getImageId() {
-        return null;
+        return myKubeCloudImage.getId();
     }
 
     @NotNull
@@ -76,8 +79,9 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         return getInstanceId().equals(configParams.get(INSTANCE_NAME));
     }
 
+    @NotNull
     @Override
-    public String getPodName() {
-        return null;
+    public Pod getPod() {
+        return myPod;
     }
 }

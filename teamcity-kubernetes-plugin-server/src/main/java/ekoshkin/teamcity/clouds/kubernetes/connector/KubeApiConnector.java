@@ -1,25 +1,21 @@
 package ekoshkin.teamcity.clouds.kubernetes.connector;
 
+import io.fabric8.kubernetes.api.model.Pod;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public interface KubeApiConnector {
-    @NotNull
-    Deployment createDeployment(String deploymentName, String image) throws KubeApiException;
+    public static final String NEVER_RESTART_POLICY = "Never";
+    public static final String ALWAYS_PULL_IMAGE_POLICY = "Always";
+    public static final String IF_NOT_PRESENT_PULL_IMAGE_POLICY = "IfNotPresent";
 
     @NotNull
-    Deployment patchDeployment(String deploymentName, KubeObjectPatch patch) throws KubeApiException;
-
-    @Nullable
-    Deployment findDeployment(@NotNull String name);
-
-    boolean deleteDeployment(String name);
-
-    boolean deletePod(String name);
+    KubeApiConnectionCheckResult testConnection();
 
     @NotNull
-    KubeApiConnectionCheckResult testConnection(@NotNull KubeApiConnectionSettings connectionSettings);
+    Pod createPod(@NotNull Pod podTemplate);
+
+    boolean deletePod(@NotNull Pod pod);
 }
