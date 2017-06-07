@@ -1,6 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectionSettings;
+import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.CloudClientParameters;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +9,7 @@ import static ekoshkin.teamcity.clouds.kubernetes.KubeConstants.*;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 29.05.17.
  */
-public class KubeCloudClientParameters implements KubeApiConnectionSettings {
+public class KubeCloudClientParameters implements KubeApiConnection {
     private final CloudClientParameters myParameters;
 
     public KubeCloudClientParameters(CloudClientParameters parameters) {

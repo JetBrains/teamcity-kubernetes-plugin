@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 01.06.17.
  */
-public interface KubeApiConnectionSettings {
+public interface KubeApiConnection {
     @NotNull
     String getApiServerUrl();
 

@@ -2,8 +2,8 @@ package ekoshkin.teamcity.clouds.kubernetes.web;
 
 import ekoshkin.teamcity.clouds.internal.PluginPropertiesUtil;
 import ekoshkin.teamcity.clouds.kubernetes.KubeConstants;
+import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectionCheckResult;
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectionSettings;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
@@ -56,7 +56,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         final String accountToken = props.get(KubeConstants.SERVICE_ACCOUNT_TOKEN);
 
         if(Boolean.parseBoolean(request.getParameter("testConnection"))){
-            KubeApiConnectionSettings connectionSettings = new KubeApiConnectionSettings() {
+            KubeApiConnection connectionSettings = new KubeApiConnection() {
                 @NotNull
                 @Override
                 public String getApiServerUrl() {

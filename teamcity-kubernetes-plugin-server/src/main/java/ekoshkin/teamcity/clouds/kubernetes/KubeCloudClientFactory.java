@@ -74,6 +74,6 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
         KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
         KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams);
-        return new KubeCloudClient(apiConnector, myServerSettings);
+        return new KubeCloudClient(apiConnector, myServerSettings, kubeClientParams);
     }
 }

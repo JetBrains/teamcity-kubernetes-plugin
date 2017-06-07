@@ -12,10 +12,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public class KubeApiConnectorImpl implements KubeApiConnector {
     @NotNull
-    private final KubeApiConnectionSettings myConnectionSettings;
+    private final KubeApiConnection myConnectionSettings;
     private KubernetesClient myKubernetesClient;
 
-    public KubeApiConnectorImpl(@NotNull KubeApiConnectionSettings connectionSettings) {
+    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings) {
         myConnectionSettings = connectionSettings;
         myKubernetesClient = createClient(myConnectionSettings);
     }
@@ -45,7 +45,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         return createClient(myConnectionSettings).pods().delete(pod);
     }
 
-    private static KubernetesClient createClient(KubeApiConnectionSettings connectionSettings)  {
+    private static KubernetesClient createClient(KubeApiConnection connectionSettings)  {
         ConfigBuilder builder = new ConfigBuilder()
                 .withMasterUrl(connectionSettings.getApiServerUrl())
                 .withUsername(connectionSettings.getUsername())

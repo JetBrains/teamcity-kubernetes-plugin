@@ -24,7 +24,9 @@ public class KubeCloudClient implements CloudClientEx {
     private final ServerSettings myServerSettings;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>();
 
-    public KubeCloudClient(@NotNull KubeApiConnector apiConnector, @NotNull ServerSettings serverSettings) {
+    public KubeCloudClient(@NotNull KubeApiConnector apiConnector,
+                           @NotNull ServerSettings serverSettings,
+                           @NotNull KubeCloudClientParameters kubeCloudClientParameters) {
         myApiConnector = apiConnector;
         myServerSettings = serverSettings;
     }
