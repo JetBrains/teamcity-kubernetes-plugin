@@ -42,36 +42,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
         final KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
-
-        final String agentName = cloudInstanceUserData.getAgentName(); //TODO: review agent name generation
-
-        Container container = new ContainerBuilder()
-                .withName(agentName) //TODO: review
-                .withImage(kubeCloudImage.getContainerImage())
-                .withImagePullPolicy(kubeCloudImage.isAlwaysPullImage() ? ALWAYS_PULL_IMAGE_POLICY : IF_NOT_PRESENT_PULL_IMAGE_POLICY)
-                .withArgs(kubeCloudImage.getContainerArguments())
-                .withCommand(kubeCloudImage.getContainerCommand())
-                .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))
-                .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, cloudInstanceUserData.getServerAddress(), null))
-                .withEnv(new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null))
-                .withEnv(new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null)) //TODO: review
-                .build();
-
-        final Pod podTemplate = new PodBuilder()
-                .withNewMetadata()
-                .withName(agentName) //TODO: review
-                .withLabels(CollectionsUtil.asMap(
-                        KubeLabels.TEAMCITY_AGENT_LABEL,
-                        KubeLabels.getServerLabel(myServerSettings.getServerUUID()),
-                        KubeLabels.getProfileLabel(cloudInstanceUserData.getProfileId()),
-                        KubeLabels.getImageLabel(kubeCloudImage.getId())))
-                .endMetadata()
-                .withNewSpec()
-                .withContainers(Collections.singletonList(container))
-                .withRestartPolicy(NEVER_RESTART_POLICY)
-                .endSpec()
-                .build();
-
+        final Pod podTemplate = getPodTemplate(cloudInstanceUserData, kubeCloudImage);
         final Pod newPod = myApiConnector.createPod(podTemplate);
         return new KubeCloudInstanceImpl(kubeCloudImage, newPod);
     }
@@ -130,5 +101,36 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public String generateAgentName(@NotNull AgentDescription agentDescription) {
         return agentDescription.getAvailableParameters().get(KubeAgentProperties.INSTANCE_NAME);
+    }
+
+    private Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, KubeCloudImage kubeCloudImage) {
+        final String agentName = cloudInstanceUserData.getAgentName(); //TODO: review agent name generation
+
+        Container container = new ContainerBuilder()
+                .withName(agentName) //TODO: review
+                .withImage(kubeCloudImage.getContainerImage())
+                .withImagePullPolicy(kubeCloudImage.isAlwaysPullImage() ? ALWAYS_PULL_IMAGE_POLICY : IF_NOT_PRESENT_PULL_IMAGE_POLICY)
+                .withArgs(kubeCloudImage.getContainerArguments())
+                .withCommand(kubeCloudImage.getContainerCommand())
+                .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))
+                .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, cloudInstanceUserData.getServerAddress(), null))
+                .withEnv(new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null))
+                .withEnv(new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null)) //TODO: review
+                .build();
+
+        return new PodBuilder()
+                .withNewMetadata()
+                .withName(agentName) //TODO: review
+                .withLabels(CollectionsUtil.asMap(
+                        KubeLabels.TEAMCITY_AGENT_LABEL,
+                        KubeLabels.getServerLabel(myServerSettings.getServerUUID()),
+                        KubeLabels.getProfileLabel(cloudInstanceUserData.getProfileId()),
+                        KubeLabels.getImageLabel(kubeCloudImage.getId())))
+                .endMetadata()
+                .withNewSpec()
+                .withContainers(Collections.singletonList(container))
+                .withRestartPolicy(NEVER_RESTART_POLICY)
+                .endSpec()
+                .build();
     }
 }
