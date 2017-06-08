@@ -8,7 +8,7 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
-<jsp:useBean id="cons" class="ekoshkin.teamcity.clouds.kubernetes.KubeConstants"/>
+<jsp:useBean id="cons" class="ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants"/>
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 

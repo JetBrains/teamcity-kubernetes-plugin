@@ -4,7 +4,7 @@ import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.CloudClientParameters;
 import org.jetbrains.annotations.NotNull;
 
-import static ekoshkin.teamcity.clouds.kubernetes.KubeConstants.*;
+import static ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 29.05.17.

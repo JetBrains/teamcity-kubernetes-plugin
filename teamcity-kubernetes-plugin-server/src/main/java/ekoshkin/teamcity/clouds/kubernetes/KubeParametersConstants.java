@@ -3,7 +3,7 @@ package ekoshkin.teamcity.clouds.kubernetes;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
-public class KubeConstants {
+public class KubeParametersConstants {
     public static final String API_SERVER_URL = "api-server-url";
     public static final String SERVICE_ACCOUNT_NAME = "service-account-name";
     public static final String SERVICE_ACCOUNT_TOKEN = "service-account-token";
