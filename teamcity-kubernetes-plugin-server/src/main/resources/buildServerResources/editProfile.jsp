@@ -10,6 +10,11 @@
 
 <jsp:useBean id="cons" class="ekoshkin.teamcity.clouds.kubernetes.KubeConstants"/>
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
+<jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+
+<script type="text/javascript">
+    BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
+</script>
 
 </table>
 
@@ -58,6 +63,26 @@
     </tr>
 </table>
 
+<h2 class="noBorder section-header">Agent images</h2>
+
+<div class="buttonsWrapper">
+    <div class="imagesTableWrapper hidden">
+        <table id="kubeImagesTable" class="settings imagesTable hidden">
+            <tbody>
+            <tr>
+                <th class="name">Source</th>
+                <th class="name">Max #</th>
+                <th class="name" colspan="2"></th>
+            </tr>
+            </tbody>
+        </table>
+        <c:set var="sourceImagesJson" value="${propertiesBean.properties['source_images_json']}"/>
+        <input type="hidden" class="jsonParam" name="prop:source_images_json" id="source_images_json" value="<c:out value='${sourceImagesJson}'/>"/>
+        <input type="hidden" id="initial_images_list"/>
+    </div>
+    <forms:addButton title="Add image" id="addKubeImageDialogButton">Add image</forms:addButton>
+</div>
+
 <bs:dialog dialogId="testConnectionDialog" dialogClass="vcsRootTestConnectionDialog" title="Test Connection" closeCommand="BS.TestConnectionDialog.close();"
            closeAttrs="showdiscardchangesmessage='false'">
     <div id="testConnectionStatus"></div>
@@ -65,12 +90,14 @@
 </bs:dialog>
 
 <script type="text/javascript">
+    $j('#addKubeImageDialogButton').attr('disabled', 'disabled');
     $j.ajax({
         url: "<c:url value="${teamcityPluginResourcesPath}kubeSettings.js"/>",
         dataType: "script",
         cache: true,
         success: function () {
             BS.Kube.ProfileSettingsForm.testConnectionUrl = '<c:url value="${testConnectionUrl}"/>';
+            BS.Kube.ProfileSettingsForm.initialize();
         }
     });
 </script>
