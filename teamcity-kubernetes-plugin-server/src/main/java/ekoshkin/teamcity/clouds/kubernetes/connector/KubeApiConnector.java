@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface KubeApiConnector {
     String NEVER_RESTART_POLICY = "Never";
-    String ALWAYS_PULL_IMAGE_POLICY = "Always";
-    String IF_NOT_PRESENT_PULL_IMAGE_POLICY = "IfNotPresent";
 
     @NotNull
     KubeApiConnectionCheckResult testConnection();

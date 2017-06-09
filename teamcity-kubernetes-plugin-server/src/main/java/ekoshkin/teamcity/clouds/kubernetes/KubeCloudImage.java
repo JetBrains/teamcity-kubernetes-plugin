@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.CloudImage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +12,8 @@ public interface KubeCloudImage extends CloudImage {
     @NotNull
     String getContainerImage();
 
-    boolean isAlwaysPullImage();
+    @NotNull
+    ImagePullPolicy getImagePullPolicy();
 
     @Nullable
     String getContainerArguments();

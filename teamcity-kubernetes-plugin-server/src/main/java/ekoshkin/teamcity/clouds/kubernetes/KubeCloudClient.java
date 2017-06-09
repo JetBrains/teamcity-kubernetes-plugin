@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.*;
+import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.NEVER_RESTART_POLICY;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 27.05.17.
@@ -111,7 +111,7 @@ public class KubeCloudClient implements CloudClientEx {
         Container container = new ContainerBuilder()
                 .withName(agentName) //TODO: review
                 .withImage(kubeCloudImage.getContainerImage())
-                .withImagePullPolicy(kubeCloudImage.isAlwaysPullImage() ? ALWAYS_PULL_IMAGE_POLICY : IF_NOT_PRESENT_PULL_IMAGE_POLICY)
+                .withImagePullPolicy(kubeCloudImage.getImagePullPolicy().getName())
                 .withArgs(kubeCloudImage.getContainerArguments())
                 .withCommand(kubeCloudImage.getContainerCommand())
                 .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))

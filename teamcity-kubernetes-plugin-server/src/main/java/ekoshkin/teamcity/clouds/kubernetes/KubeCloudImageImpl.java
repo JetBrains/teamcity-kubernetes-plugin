@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
@@ -24,9 +25,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return null;
     }
 
+    @NotNull
     @Override
-    public boolean isAlwaysPullImage() {
-        return false;
+    public ImagePullPolicy getImagePullPolicy() {
+        return null;
     }
 
     @Nullable
