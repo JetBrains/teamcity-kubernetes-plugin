@@ -9,6 +9,7 @@ import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -28,21 +29,27 @@ public class KubeProfileEditController extends BaseFormXmlController {
     public static final String EDIT_KUBE_HTML = "editKube.html";
     private final String myPath;
 
-    private PluginDescriptor myPluginDescriptor;
+    private final PluginDescriptor myPluginDescriptor;
+    private final AgentPoolManager myAgentPoolManager;
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
                                      @NotNull final WebControllerManager web,
-                                     @NotNull final PluginDescriptor pluginDescriptor) {
+                                     @NotNull final PluginDescriptor pluginDescriptor,
+                                     @NotNull final AgentPoolManager agentPoolManager) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myPath = pluginDescriptor.getPluginResourcesPath(EDIT_KUBE_HTML);
+        myAgentPoolManager = agentPoolManager;
         web.registerController(myPath, this);
     }
 
     @Override
     protected ModelAndView doGet(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("editProfile.jsp"));
-        modelAndView.getModel().put("testConnectionUrl", myPath + "?testConnection=true");
+        Map<String, Object> model = modelAndView.getModel();
+        model.put("testConnectionUrl", myPath + "?testConnection=true");
+        final String projectId = httpServletRequest.getParameter("projectId");
+        model.put("agentPools", myAgentPoolManager.getProjectOwnedAgentPools(projectId));
         return modelAndView;
     }
 

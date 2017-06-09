@@ -1,3 +1,4 @@
+<%@ page import="ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy" %>
 <%@ include file="/include.jsp" %>
 
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
@@ -11,6 +12,7 @@
 <jsp:useBean id="cons" class="ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants"/>
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+<jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -41,16 +43,16 @@
         </td>
     </tr>
     <tr>
-        <th></th>
-        <td>
-            <forms:button id="kubeTestConnectionButton" onclick="BS.Kube.ProfileSettingsForm.testConnection();">Test connection</forms:button>
-        </td>
-    </tr>
-    <tr>
         <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
         <td><props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
             <span class="smallNote">Kubernetes namespace to use. Leave blanc to use default namespace.</span>
+        </td>
+    </tr>
+    <tr>
+        <th></th>
+        <td>
+            <forms:button id="kubeTestConnectionButton" onclick="BS.Kube.ProfileSettingsForm.testConnection();">Test connection</forms:button>
         </td>
     </tr>
     <tr>
@@ -72,7 +74,7 @@
             <tr>
                 <th class="name">Name</th>
                 <th class="name">Container Image</th>
-                <th class="name">Max #</th>
+                <th class="name">Max # of instances</th>
                 <th class="name" colspan="2"></th>
             </tr>
             </tbody>
@@ -81,7 +83,7 @@
         <input type="hidden" class="jsonParam" name="prop:source_images_json" id="source_images_json" value="<c:out value='${sourceImagesJson}'/>"/>
         <input type="hidden" id="initial_images_list"/>
     </div>
-    <forms:addButton title="Add image" id="addKubeImageDialogButton">Add image</forms:addButton>
+    <forms:addButton title="Add image" id="showAddImageDialogButton">Add image</forms:addButton>
 </div>
 
 <bs:dialog dialogId="testConnectionDialog" dialogClass="vcsRootTestConnectionDialog" title="Test Connection" closeCommand="BS.TestConnectionDialog.close();"
@@ -90,8 +92,85 @@
     <div id="testConnectionDetails" class="mono"></div>
 </bs:dialog>
 
+<bs:dialog dialogId="KubeImageDialog" title="Add Kubernetes Cloud Image" closeCommand="BS.Kube.ImageDialog.close()"
+           dialogClass="KubeImageDialog kubeOptions" titleId="KubeImageDialogTitle">
+    <table class="runnerFormTable paramsTable">
+        <tr>
+            <th>Docker image:&nbsp;<l:star/></th>
+            <td>
+                <div>
+                    <input type="text" id="containerImage" value="" class="longField" data-id="containerImage" data-err-id="containerImage"/>
+                    <div class="smallNoteAttention">Docker image name to use.</div>
+                    <span class="error option-error option-error_containerImage"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Image pull policy:</th>
+            <td>
+                <div>
+                    <select name="imagePullPolicy" id="imagePullPolicy" data-id="imagePullPolicy" data-err-id="imagePullPolicy">
+                        <c:forEach var="policy" items="<%= ImagePullPolicy.values() %>">
+                            <props:option value="${policy.name}"><c:out value="${policy.displayName}"/></props:option>
+                        </c:forEach>
+                    </select>
+                    <div class="smallNoteAttention">Policy to use by Kubelet to pull an image.
+                        &nbsp;<a href="https://kubernetes.io/docs/concepts/containers/images/#updating-images"><bs:helpIcon/></a></div>
+                    <span class="error option-error option-error_imagePullPolicy"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Docker command:</th>
+            <td>
+                <div>
+                    <input type="text" id="dockerCommand" value="" class="longField" data-id="dockerCommand" data-err-id="dockerCommand"/>
+                    <div class="smallNoteAttention">Docker entrypoint to use. The docker image's ENTRYPOINT is used if this is not provided.
+                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a></div>
+                    <span class="error option-error option-error_dockerCommand"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Docker Arguments:</th>
+            <td>
+                <div>
+                    <input type="text" id="dockerArgs" value="" class="longField" data-id="dockerArgs" data-err-id="dockerArgs"/>
+                    <div class="smallNoteAttention">Arguments for docker entrypoint. The docker image's CMD is used if this is not provided.
+                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a></div>
+                    <span class="error option-error option-error_dockerArgs"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Max number of instances:></th>
+            <td>
+                <div>
+                    <input type="text" id="maxInstances" value="" class="longField" data-id="maxInstances" data-err-id="maxInstances"/>
+                </div>
+                <span class="error option-error option-error_maxInstances"></span>
+            </td>
+        </tr>
+        <tr class="advancedSetting">
+            <th><label for="${cons.agentPoolIdField}">Agent pool:</label></th>
+            <td>
+                <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
+                    <props:option value=""><c:out value="<Please select agent pool>"/></props:option>
+                    <c:forEach var="ap" items="${agentPools}">
+                        <props:option value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
+                    </c:forEach>
+                </select>
+                <span id="error_${cons.agentPoolIdField}" class="error"></span>
+            </td>
+        </tr>
+    </table>
+    <div class="popupSaveButtonsBlock">
+        <forms:submit label="Add" type="button" id="kubeAddImageButton"/>
+        <forms:button title="Cancel" id="kubeCancelAddImageButton">Cancel</forms:button>
+    </div>
+</bs:dialog>
+
 <script type="text/javascript">
-    $j('#addKubeImageDialogButton').attr('disabled', 'disabled');
     $j.ajax({
         url: "<c:url value="${teamcityPluginResourcesPath}kubeSettings.js"/>",
         dataType: "script",

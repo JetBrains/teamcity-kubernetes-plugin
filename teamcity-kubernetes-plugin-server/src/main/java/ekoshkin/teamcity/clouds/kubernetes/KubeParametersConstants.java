@@ -1,5 +1,7 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import jetbrains.buildServer.clouds.CloudImageParameters;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
@@ -28,5 +30,9 @@ public class KubeParametersConstants {
 
     public String getProfileInstanceLimit() {
         return PROFILE_INSTANCE_LIMIT;
+    }
+
+    public String getAgentPoolIdField() {
+        return CloudImageParameters.AGENT_POOL_ID_FIELD;
     }
 }
