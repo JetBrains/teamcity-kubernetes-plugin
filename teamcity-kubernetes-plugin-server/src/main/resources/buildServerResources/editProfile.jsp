@@ -143,7 +143,7 @@
             </td>
         </tr>
         <tr>
-            <th>Max number of instances:></th>
+            <th>Max number of instances:</th>
             <td>
                 <div>
                     <input type="text" id="maxInstances" value="" class="longField" data-id="maxInstances" data-err-id="maxInstances"/>
