@@ -5,6 +5,24 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     testConnectionUrl: '',
 
+    templates: {
+        imagesTableRow: $j('<tr class="imagesTableRow">\
+<td class="imageName highlight"><div class="sourceIcon sourceIcon_unknown">?</div><span class="imageName"></span></td>\
+<td class="containerImage highlight"></td>\
+<td class="maxInstances highlight"></td>\
+<td class="edit highlight"><span class="editVmImageLink_disabled" title="Editing is available after successful retrieval of data">edit</span><a href="#" class="editVmImageLink hidden">edit</a></td>\
+<td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
+        </tr>')},
+
+    _dataKeys: [ 'containerImage', 'pool', 'maxInstances' ],
+
+    selectors: {
+        imagesSelect: '#image',
+        rmImageLink: '.removeVmImageLink',
+        editImageLink: '.editVmImageLink',
+        imagesTableRow: '.imagesTableRow'
+    },
+
     initialize: function(){
         this.$imagesTable = $j('#kubeImagesTable');
 
@@ -28,9 +46,21 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             Object.keys(this.imagesData).forEach(function (imageId) {
                 var src = this.data[imageId]['source-id'];
                 $j('#initial_images_list').val($j('#initial_images_list').val() + src + ",");
-                // this._renderImageRow(this.data[imageId], imageId);
+                this._renderImageRow(this.data[imageId], imageId);
             }.bind(this));
         }
+    },
+
+    _renderImageRow: function (props, id) {
+        var $row = this.templates.imagesTableRow.clone().attr('data-image-id', id);
+
+        this._dataKeys.forEach(function (className) {
+            $row.find('.' + className).text(props[className]);
+        });
+
+        $row.find(this.selectors.rmImageLink).data('image-id', id);
+        $row.find(this.selectors.editImageLink).data('image-id', id);
+        this.$imagesTable.append($row);
     },
 
     _clearImagesTable: function () {

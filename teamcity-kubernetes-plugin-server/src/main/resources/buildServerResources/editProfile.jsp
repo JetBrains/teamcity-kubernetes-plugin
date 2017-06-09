@@ -70,7 +70,8 @@
         <table id="kubeImagesTable" class="settings imagesTable hidden">
             <tbody>
             <tr>
-                <th class="name">Source</th>
+                <th class="name">Name</th>
+                <th class="name">Container Image</th>
                 <th class="name">Max #</th>
                 <th class="name" colspan="2"></th>
             </tr>
