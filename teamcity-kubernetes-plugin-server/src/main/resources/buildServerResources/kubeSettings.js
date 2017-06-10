@@ -8,16 +8,15 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
 <td class="imageName highlight"><div class="sourceIcon sourceIcon_unknown">?</div><span class="imageName"></span></td>\
-<td class="containerImage highlight"></td>\
+<td class="dockerImage highlight"></td>\
 <td class="maxInstances highlight"></td>\
 <td class="edit highlight"><span class="editVmImageLink_disabled" title="Editing is available after successful retrieval of data">edit</span><a href="#" class="editVmImageLink hidden">edit</a></td>\
 <td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
         </tr>')},
 
-    _dataKeys: [ 'containerImage', 'pool', 'maxInstances' ],
+    _dataKeys: [ 'dockerImage', 'pool', 'maxInstances' ],
 
     selectors: {
-        imagesSelect: '#image',
         rmImageLink: '.removeVmImageLink',
         editImageLink: '.editVmImageLink',
         imagesTableRow: '.imagesTableRow'
@@ -28,14 +27,19 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
         this.$addImageButton = $j('#kubeAddImageButton');
         this.$cancelAddImageButton = $j('#kubeCancelAddImageButton');
+        this.$emptyImagesListMessage = $j('.emptyImagesListMessage');
+        this.$imagesTableWrapper = $j('.imagesTableWrapper');
 
-        var rawImagesData = $j('#source_images_json').val() || '[]';
+        this.$imagesDataElem = $j('#' + 'source_images_json');
+        var rawImagesData = this.$imagesDataElem.val() || '[]';
         try {
             this.imagesData = JSON.parse(rawImagesData);
         } catch (e) {
             this.imagesData = [];
             BS.Log.error('bad images data: ' + rawImagesData);
         }
+        this._lastImageId = this._imagesDataLength = 0;
+
         this._bindHandlers();
         this._renderImagesTable();
         this.$addImageButton.removeAttr('disabled');
@@ -52,7 +56,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagesTable.on('click', this.selectors.rmImageLink, function () {
             var $this = $j(this),
                 id = $this.data('image-id'),
-                name = self.imagesData[id].sourceVmName;
+                name = self.imagesData[id].dockerImage;
 
             if (confirm('Are you sure you want to remove the image "' + name + '"?')) {
                 self.removeImage($this);
@@ -63,7 +67,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         var that = this;
         this.$imagesTable.on('click', editDelegates, function () {
             if (!that.$addImageButton.prop('disabled')) {
-                self.showEditDialog($j(this));
+                self.showEditImageDialog($j(this));
             }
             return false;
         });
@@ -122,12 +126,21 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagesTable.find('.imagesTableRow').remove();
     },
 
+    _toggleImagesTable: function () {
+        var toggle = !!this._imagesDataLength;
+        this.$imagesTableWrapper.removeClass('hidden');
+        this.$emptyImagesListMessage.toggleClass('hidden', toggle);
+        this.$imagesTable.toggleClass('hidden', !toggle);
+    },
+
     validateOptions: function (options){
-      //TODO: implement
+        //TODO: implement
+        return true;
     },
 
     validateImages: function (){
         //TODO: implement
+        return true;
     },
 
     testConnection: function() {
@@ -149,14 +162,29 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         });
     },
 
-    showAddImageDialog: function (action, imageId) {
-        $j('#KubeImageDialogTitle').text((action ? 'Edit' : 'Add') + ' Kubernetes Cloud Image');
+    showAddImageDialog: function () {
+        $j('#KubeImageDialogTitle').text('Add Kubernetes Cloud Image');
+
+        //TODO: enable this
+        // BS.Hider.addHideFunction('KubeImageDialog', this.resetDataAndDialog.bind(this));
+
+        this._image = {
+            maxInstances: 1
+        };
+
+        BS.Kube.ImageDialog.showCentered();
+    },
+
+    showEditImageDialog: function ($elem) {
+        var imageId = $elem.parents(this.selectors.imagesTableRow).data('image-id');
+
+        $j('#KubeImageDialogTitle').text('Edit Kubernetes Cloud Image');
 
         //TODO: enable this
         // BS.Hider.addHideFunction('KubeImageDialog', this.resetDataAndDialog.bind(this));
 
         typeof imageId !== 'undefined' && (this._image = $j.extend({}, this.imagesData[imageId]));
-        this.$addImageButton.val(action ? 'Save' : 'Add').data('image-id', imageId);
+        this.$addImageButton.val('Edit').data('image-id', imageId);
         if (imageId === 'undefined'){
             this.$addImageButton.removeData('image-id');
         }
@@ -167,7 +195,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     addImage: function () {
         var newImageId = this._lastImageId++,
             newImage = this._image;
-        this.setupSourceId(this._image);
         this._renderImageRow(newImage, newImageId);
         this.imagesData[newImageId] = newImage;
         this._imagesDataLength += 1;
@@ -180,7 +207,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.imagesData[id] = this._image;
         this.saveImagesData();
         this.$imagesTable.find(this.selectors.imagesTableRow).remove();
-        this.renderImagesTable();
+        this._renderImagesTable();
     },
 
     removeImage: function ($elem) {
@@ -189,6 +216,19 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         $elem.parents(this.selectors.imagesTableRow).remove();
         this.saveImagesData();
         this._toggleImagesTable();
+    },
+
+    saveImagesData: function () {
+        var imageData = Object.keys(this.imagesData).reduce(function (accumulator, id) {
+            var _val = $j.extend({}, this.imagesData[id]);
+
+            delete _val.$image;
+            accumulator.push(_val);
+
+            return accumulator;
+        }.bind(this), []);
+
+        this.$imagesDataElem.val(JSON.stringify(imageData));
     }
 });
 

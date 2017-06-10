@@ -73,7 +73,7 @@
             <tbody>
             <tr>
                 <th class="name">Name</th>
-                <th class="name">Container Image</th>
+                <th class="name">Docker Image</th>
                 <th class="name">Max # of instances</th>
                 <th class="name" colspan="2"></th>
             </tr>
@@ -99,9 +99,9 @@
             <th>Docker image:&nbsp;<l:star/></th>
             <td>
                 <div>
-                    <input type="text" id="containerImage" value="" class="longField" data-id="containerImage" data-err-id="containerImage"/>
+                    <input type="text" id="dockerImage" value="" class="longField" data-id="dockerImage" data-err-id="dockerImage"/>
                     <div class="smallNoteAttention">Docker image name to use.</div>
-                    <span class="error option-error option-error_containerImage"></span>
+                    <span class="error option-error option-error_dockerImage"></span>
                 </div>
             </td>
         </tr>
