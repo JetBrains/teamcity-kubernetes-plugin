@@ -326,6 +326,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     addImage: function () {
         var newImageId = this._lastImageId++,
             newImage = this._image;
+        newImage['source-id'] = newImageId;
         this._renderImageRow(newImage, newImageId);
         this.imagesData[newImageId] = newImage;
         console.info('add image with id ' + newImageId + ' value ' + newImage);
@@ -335,7 +336,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     editImage: function (id) {
-        this.setupSourceId(this._image);
+        this._image['source-id'] = id;
         this.imagesData[id] = this._image;
         this.saveImagesData();
         this.$imagesTable.find(this.selectors.imagesTableRow).remove();
