@@ -46,14 +46,22 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$maxInstances = $j('#maxInstances');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
+
+        var self = this;
         var rawImagesData = this.$imagesDataElem.val() || '[]';
+        console.info("images data loaded :" + rawImagesData);
+        this._lastImageId = this._imagesDataLength = 0;
         try {
-            this.imagesData = JSON.parse(rawImagesData);
+            var imagesData = JSON.parse(rawImagesData);
+            this.imagesData = imagesData.reduce(function (accumulator, imageDataStr) {
+                accumulator[self._lastImageId++] = imageDataStr;
+                self._imagesDataLength++;
+                return accumulator;
+            }, {});
         } catch (e) {
             this.imagesData = [];
             BS.Log.error('bad images data: ' + rawImagesData);
         }
-        this._lastImageId = this._imagesDataLength = 0;
 
         this._bindHandlers();
         this._renderImagesTable();
@@ -160,18 +168,25 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _renderImagesTable: function () {
+        console.info('_imagesDataLength before cleanup: ' + this._imagesDataLength);
         this._clearImagesTable();
 
+        console.info('_imagesDataLength after cleanup: ' + this._imagesDataLength);
         if (this._imagesDataLength) {
+            console.info("this.imagesData before render " + this.imagesData);
             Object.keys(this.imagesData).forEach(function (imageId) {
-                var src = this.data[imageId]['source-id'];
+                var src = this.imagesData[imageId]['source-id'];
                 $j('#initial_images_list').val($j('#initial_images_list').val() + src + ",");
-                this._renderImageRow(this.data[imageId], imageId);
+                this._renderImageRow(this.imagesData[imageId], imageId);
             }.bind(this));
         }
+
+        this._toggleImagesTable();
+        BS.Clouds.Admin.CreateProfileForm.checkIfModified();
     },
 
     _renderImageRow: function (props, id) {
+        console.info("render image row for id " + id + " with props " + props);
         var $row = this.templates.imagesTableRow.clone().attr('data-image-id', id);
 
         this._dataKeys.forEach(function (className) {
