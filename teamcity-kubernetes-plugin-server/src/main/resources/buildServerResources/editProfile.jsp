@@ -93,7 +93,7 @@
 </bs:dialog>
 
 <bs:dialog dialogId="KubeImageDialog" title="Add Kubernetes Cloud Image" closeCommand="BS.Kube.ImageDialog.close()"
-           dialogClass="KubeImageDialog kubeOptions" titleId="KubeImageDialogTitle">
+           dialogClass="KubeImageDialog" titleId="KubeImageDialogTitle">
     <table class="runnerFormTable paramsTable">
         <tr>
             <th>Docker image:&nbsp;<l:star/></th>

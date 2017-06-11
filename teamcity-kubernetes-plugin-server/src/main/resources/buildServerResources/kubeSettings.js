@@ -22,13 +22,28 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         imagesTableRow: '.imagesTableRow'
     },
 
+    _errors: {
+        badParam: 'Bad parameter',
+        required: 'This field cannot be blank',
+        nonNegative: 'Must be non-negative number'
+    },
+
+    _displayedErrors: {},
+
     initialize: function(){
         this.$imagesTable = $j('#kubeImagesTable');
+        this.$imagesTableWrapper = $j('.imagesTableWrapper');
+        this.$emptyImagesListMessage = $j('.emptyImagesListMessage');
+
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
         this.$addImageButton = $j('#kubeAddImageButton');
         this.$cancelAddImageButton = $j('#kubeCancelAddImageButton');
-        this.$emptyImagesListMessage = $j('.emptyImagesListMessage');
-        this.$imagesTableWrapper = $j('.imagesTableWrapper');
+
+        this.$dockerImage = $j('#dockerImage');
+        this.$imagePullPolicy = $j('#imagePullPolicy');
+        this.$dockerCommand = $j('#dockerCommand');
+        this.$dockerArgs = $j('#dockerArgs');
+        this.$maxInstances = $j('#maxInstances');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
         var rawImagesData = this.$imagesDataElem.val() || '[]';
@@ -71,6 +86,52 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             }
             return false;
         });
+
+        ///// Change handlers
+        this.$dockerImage.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image.dockerImage = this.$dockerImage.val();
+            } else {
+                this.$dockerImage.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$imagePullPolicy.on('change', function(e, value) {
+            if (arguments.length === 1) {
+                this._image.imagePullPolicy = this.$imagePullPolicy.val();
+            } else {
+                this.$imagePullPolicy.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$dockerCommand.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image.dockerCommand = this.$dockerCommand.val();
+            } else {
+                this.$dockerCommand.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$dockerArgs.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image.dockerArgs = this.$dockerArgs.val();
+            } else {
+                this.$dockerArgs.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$maxInstances.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image.maxInstances = this.$maxInstances.val();
+            } else {
+                this.$maxInstances.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
     },
 
     _showDialogClickHandler: function () {
@@ -134,8 +195,78 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     validateOptions: function (options){
-        //TODO: implement
-        return true;
+        var isValid = true;
+        var maxInstances = this._image.maxInstances;
+
+        var validators = {
+            dockerImage : function () {
+                if (!this._image.dockerImage) {
+                    this.addOptionError('required', 'dockerImage');
+                    isValid = false;
+                }
+            }.bind(this),
+
+            maxInstances: function () {
+                if (!$j.isNumeric(maxInstances) || maxInstances < 0 ) {
+                    this.addOptionError('nonNegative', 'maxInstances');
+                    isValid = false;
+                }
+            }.bind(this)
+        };
+
+        if (options && ! $j.isArray(options)) {
+            options = [options];
+        }
+
+        this.clearOptionsErrors(options);
+
+        (options || this._dataKeys).forEach(function(option) {
+            if(validators[option]) validators[option]();
+        });
+
+        return isValid;
+    },
+
+    addOptionError: function (errorKey, optionName) {
+        var html;
+
+        if (errorKey && optionName) {
+            this._displayedErrors[optionName] = this._displayedErrors[optionName] || [];
+
+            if (typeof errorKey !== 'string') {
+                html = this._errors[errorKey.key];
+                Object.keys(errorKey.props).forEach(function(key) {
+                    html = html.replace('%%'+key+'%%', errorKey.props[key]);
+                });
+                errorKey = errorKey.key;
+            } else {
+                html = this._errors[errorKey];
+            }
+
+            if (this._displayedErrors[optionName].indexOf(errorKey) === -1) {
+                this._displayedErrors[optionName].push(errorKey);
+                this.addError(html, $j('.option-error_' + optionName));
+            }
+        }
+    },
+
+    addError: function (errorHTML, target) {
+        (target || this.$fetchOptionsError)
+            .append($j('<div>').html(errorHTML));
+    },
+
+    clearOptionsErrors: function (options) {
+        (options || this._dataKeys).forEach(function (optionName) {
+            this.clearErrors(optionName);
+        }.bind(this));
+    },
+
+    clearErrors: function (errorId) {
+        var target = $j('.option-error_' + errorId);
+        if (errorId) {
+            delete this._displayedErrors[errorId];
+        }
+        target.empty();
     },
 
     validateImages: function (){
@@ -197,6 +328,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             newImage = this._image;
         this._renderImageRow(newImage, newImageId);
         this.imagesData[newImageId] = newImage;
+        console.info('add image with id ' + newImageId + ' value ' + newImage);
         this._imagesDataLength += 1;
         this.saveImagesData();
         this._toggleImagesTable();
@@ -227,8 +359,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
             return accumulator;
         }.bind(this), []);
-
-        this.$imagesDataElem.val(JSON.stringify(imageData));
+        console.info(imageData);
+        var a = JSON.stringify(imageData);
+        console.info(a);
+        this.$imagesDataElem.val(a);
     }
 });
 
