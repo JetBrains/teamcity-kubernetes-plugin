@@ -1,5 +1,7 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import io.fabric8.kubernetes.api.model.*;
 import jetbrains.buildServer.clouds.*;
@@ -11,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.NEVER_RESTART_POLICY;
@@ -20,15 +23,21 @@ import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.NEV
  */
 public class KubeCloudClient implements CloudClientEx {
     private final KubeApiConnector myApiConnector;
-    @NotNull
     private final ServerSettings myServerSettings;
-    private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>();
+    private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
 
-    public KubeCloudClient(@NotNull KubeApiConnector apiConnector,
+    public KubeCloudClient(@NotNull final KubeApiConnector apiConnector,
                            @NotNull ServerSettings serverSettings,
-                           @NotNull KubeCloudClientParameters kubeCloudClientParameters) {
+                           @NotNull List<KubeCloudImage> images) {
         myApiConnector = apiConnector;
         myServerSettings = serverSettings;
+        myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>(Maps.uniqueIndex(images, new Function<KubeCloudImage, String>() {
+            @NotNull
+            @Override
+            public String apply(@javax.annotation.Nullable KubeCloudImage kubeCloudImage) {
+                return kubeCloudImage.getId();
+            }
+        }));
     }
 
     @Override

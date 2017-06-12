@@ -99,9 +99,9 @@
             <th>Docker image:&nbsp;<l:star/></th>
             <td>
                 <div>
-                    <input type="text" id="dockerImage" value="" class="longField" data-id="dockerImage" data-err-id="dockerImage"/>
+                    <input type="text" id="${cons.dockerImage}" value="" class="longField" data-id="${cons.dockerImage}" data-err-id="${cons.dockerImage}"/>
                     <div class="smallNoteAttention">Docker image name to use.</div>
-                    <span class="error option-error option-error_dockerImage"></span>
+                    <span class="error option-error option-error_${cons.dockerImage}"></span>
                 </div>
             </td>
         </tr>
@@ -109,14 +109,14 @@
             <th>Image pull policy:</th>
             <td>
                 <div>
-                    <select name="imagePullPolicy" id="imagePullPolicy" data-id="imagePullPolicy" data-err-id="imagePullPolicy">
+                    <select name="${cons.imagePullPolicy}" id="${cons.imagePullPolicy}" data-id="${cons.imagePullPolicy}" data-err-id="${cons.imagePullPolicy}">
                         <c:forEach var="policy" items="<%= ImagePullPolicy.values() %>">
                             <props:option value="${policy.name}"><c:out value="${policy.displayName}"/></props:option>
                         </c:forEach>
                     </select>
                     <div class="smallNoteAttention">Policy to use by Kubelet to pull an image.
                         &nbsp;<a href="https://kubernetes.io/docs/concepts/containers/images/#updating-images"><bs:helpIcon/></a></div>
-                    <span class="error option-error option-error_imagePullPolicy"></span>
+                    <span class="error option-error option-error_${cons.imagePullPolicy}"></span>
                 </div>
             </td>
         </tr>
@@ -124,10 +124,10 @@
             <th>Docker command:</th>
             <td>
                 <div>
-                    <input type="text" id="dockerCommand" value="" class="longField" data-id="dockerCommand" data-err-id="dockerCommand"/>
+                    <input type="text" id="${cons.dockerCommand}" value="" class="longField" data-id="${cons.dockerCommand}" data-err-id="${cons.dockerCommand}"/>
                     <div class="smallNoteAttention">Docker entrypoint to use. The docker image's ENTRYPOINT is used if this is not provided.
                         &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a></div>
-                    <span class="error option-error option-error_dockerCommand"></span>
+                    <span class="error option-error option-error_${cons.dockerCommand}"></span>
                 </div>
             </td>
         </tr>
@@ -135,10 +135,10 @@
             <th>Docker Arguments:</th>
             <td>
                 <div>
-                    <input type="text" id="dockerArgs" value="" class="longField" data-id="dockerArgs" data-err-id="dockerArgs"/>
+                    <input type="text" id="${cons.dockerArguments}" value="" class="longField" data-id="${cons.dockerArguments}" data-err-id="${cons.dockerArguments}"/>
                     <div class="smallNoteAttention">Arguments for docker entrypoint. The docker image's CMD is used if this is not provided.
                         &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a></div>
-                    <span class="error option-error option-error_dockerArgs"></span>
+                    <span class="error option-error option-error_${cons.dockerArguments}"></span>
                 </div>
             </td>
         </tr>

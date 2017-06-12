@@ -2,7 +2,12 @@ package ekoshkin.teamcity.clouds.kubernetes;
 
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.CloudClientParameters;
+import jetbrains.buildServer.clouds.CloudImageParameters;
+import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.Converter;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 import static ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants.*;
 
@@ -41,5 +46,14 @@ public class KubeCloudClientParameters implements KubeApiConnection {
 
     public String getNamespace(){
         return myParameters.getParameter(KUBERNETES_NAMESPACE);
+    }
+
+    public Collection<KubeCloudImageData> getImages(){
+        return CollectionsUtil.convertCollection(myParameters.getCloudImages(), new Converter<KubeCloudImageData, CloudImageParameters>() {
+            @Override
+            public KubeCloudImageData createFrom(@NotNull CloudImageParameters cloudImageParameters) {
+                return new KubeCloudImageData(cloudImageParameters);
+            }
+        });
     }
 }

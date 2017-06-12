@@ -7,11 +7,14 @@ import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.ServerSettings;
+import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.Converter;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,7 +76,13 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @Override
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
         KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
-        KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams);
-        return new KubeCloudClient(apiConnector, myServerSettings, kubeClientParams);
+        final KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams);
+        List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), new Converter<KubeCloudImage, KubeCloudImageData>() {
+            @Override
+            public KubeCloudImage createFrom(@NotNull KubeCloudImageData kubeCloudImageData) {
+                return new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
+            }
+        });
+        return new KubeCloudClient(apiConnector, myServerSettings, images);
     }
 }

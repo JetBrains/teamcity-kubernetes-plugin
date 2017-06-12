@@ -8,57 +8,60 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
  */
 public class KubeCloudImageImpl implements KubeCloudImage {
     private final KubeApiConnector myApiConnector;
+    private final KubeCloudImageData myImageData;
 
-    public KubeCloudImageImpl(@NotNull final KubeApiConnector apiConnector) {
+    public KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData, @NotNull final KubeApiConnector apiConnector) {
+        myImageData = kubeCloudImageData;
         myApiConnector = apiConnector;
     }
 
     @NotNull
     @Override
     public String getContainerImage() {
-        return null;
+        return myImageData.getDockerImage();
     }
 
     @NotNull
     @Override
     public ImagePullPolicy getImagePullPolicy() {
-        return null;
+        return myImageData.getImagePullPolicy();
     }
 
     @Nullable
     @Override
     public String getContainerArguments() {
-        return null;
+        return myImageData.getDockerArguments();
     }
 
     @Nullable
     @Override
     public String getContainerCommand() {
-        return null;
+        return myImageData.getDockerCommand();
     }
 
     @NotNull
     @Override
     public String getId() {
-        return null;
+        return myImageData.getId();
     }
 
     @NotNull
     @Override
     public String getName() {
-        return null;
+        return myImageData.getName();
     }
 
     @NotNull
     @Override
     public Collection<? extends CloudInstance> getInstances() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Nullable
@@ -70,7 +73,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @Nullable
     @Override
     public Integer getAgentPoolId() {
-        return null;
+        return myImageData.getAgentPoolId();
     }
 
     @Nullable
