@@ -28,7 +28,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myImageData.getDockerImage();
     }
 
-    @NotNull
+    @Nullable
     @Override
     public ImagePullPolicy getImagePullPolicy() {
         return myImageData.getImagePullPolicy();

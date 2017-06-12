@@ -12,7 +12,7 @@ public interface KubeCloudImage extends CloudImage {
     @NotNull
     String getDockerImage();
 
-    @NotNull
+    @Nullable
     ImagePullPolicy getImagePullPolicy();
 
     @Nullable

@@ -2,6 +2,7 @@ package ekoshkin.teamcity.clouds.kubernetes;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
+import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import io.fabric8.kubernetes.api.model.*;
 import jetbrains.buildServer.clouds.*;
@@ -117,10 +118,11 @@ public class KubeCloudClient implements CloudClientEx {
     private Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, KubeCloudImage kubeCloudImage) {
         final String agentName = cloudInstanceUserData.getAgentName(); //TODO: review agent name generation
 
+        ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
         Container container = new ContainerBuilder()
                 .withName(agentName) //TODO: review
                 .withImage(kubeCloudImage.getDockerImage())
-                .withImagePullPolicy(kubeCloudImage.getImagePullPolicy().getName())
+                .withImagePullPolicy(imagePullPolicy == null ? ImagePullPolicy.IfNotPresent.getName() : imagePullPolicy.getName())
                 .withArgs(kubeCloudImage.getDockerArguments())
                 .withCommand(kubeCloudImage.getDockerCommand())
                 .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))
