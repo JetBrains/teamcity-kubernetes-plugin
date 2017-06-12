@@ -74,8 +74,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public InstanceStatus getStatus() {
-        //TODO: publish actual status
-        return InstanceStatus.SCHEDULED_TO_START;
+        return InstanceStatusUtils.mapPodPhase(myApiConnector.getPodPhase(myPod));
     }
 
     @Nullable

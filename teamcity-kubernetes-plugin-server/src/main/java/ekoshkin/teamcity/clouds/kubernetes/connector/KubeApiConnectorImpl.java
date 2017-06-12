@@ -61,6 +61,12 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         return pods.list().getItems();
     }
 
+    @NotNull
+    @Override
+    public PodPhase getPodPhase(@NotNull Pod pod) {
+        return PodPhase.valueOf(myKubernetesClient.pods().withName(pod.getMetadata().getName()).get().getStatus().getPhase());
+    }
+
     private static KubernetesClient createClient(KubeApiConnection connectionSettings)  {
         ConfigBuilder builder = new ConfigBuilder()
                 .withMasterUrl(connectionSettings.getApiServerUrl())

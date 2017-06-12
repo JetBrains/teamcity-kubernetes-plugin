@@ -21,4 +21,7 @@ public interface KubeApiConnector {
 
     @NotNull
     Collection<Pod> listPods(String... labels);
+
+    @NotNull
+    PodPhase getPodPhase(@NotNull Pod pod);
 }
