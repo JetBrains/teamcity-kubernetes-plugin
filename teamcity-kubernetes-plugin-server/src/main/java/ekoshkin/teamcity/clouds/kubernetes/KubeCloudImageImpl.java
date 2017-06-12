@@ -2,9 +2,11 @@ package ekoshkin.teamcity.clouds.kubernetes;
 
 import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
+import jetbrains.buildServer.util.CollectionsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,18 +19,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class KubeCloudImageImpl implements KubeCloudImage {
     private final KubeApiConnector myApiConnector;
-    @NotNull
-    private final KubeCloudClientParameters myKubeClientParams;
     private final KubeCloudImageData myImageData;
     private Map<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<String, KubeCloudInstance>();
     private CloudErrorInfo myCurrentError;
 
     public KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
-                              @NotNull final KubeApiConnector apiConnector,
-                              @NotNull final KubeCloudClientParameters kubeClientParams) {
+                              @NotNull final KubeApiConnector apiConnector) {
         myImageData = kubeCloudImageData;
         myApiConnector = apiConnector;
-        myKubeClientParams = kubeClientParams;
     }
 
     @NotNull
@@ -103,7 +101,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     public void populateInstances(){
         try{
-            myApiConnector.listPods(KubeLabels.getImageLabel(myImageData.getId()));
+            for (Pod pod : myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()))){
+                KubeCloudInstanceImpl cloudInstance = new KubeCloudInstanceImpl(this, pod, myApiConnector);
+                myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance);
+            }
             myCurrentError = null;
         } catch (KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed populate instances", ex.getMessage(), ex);

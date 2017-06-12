@@ -4,6 +4,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
@@ -20,7 +21,7 @@ public interface KubeApiConnector {
     boolean deletePod(@NotNull Pod pod);
 
     @NotNull
-    Collection<Pod> listPods(String... labels);
+    Collection<Pod> listPods(@NotNull Map<String, String> labels);
 
     @NotNull
     PodPhase getPodPhase(@NotNull Pod pod);

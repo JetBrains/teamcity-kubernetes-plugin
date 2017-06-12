@@ -80,7 +80,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
         List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), new Converter<KubeCloudImage, KubeCloudImageData>() {
             @Override
             public KubeCloudImage createFrom(@NotNull KubeCloudImageData kubeCloudImageData) {
-                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, kubeClientParams);
+                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
                 //TODO: defer this
                 kubeCloudImage.populateInstances();
                 return kubeCloudImage;

@@ -31,7 +31,7 @@ import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.NEV
 public class KubeCloudClient implements CloudClientEx {
     private final KubeApiConnector myApiConnector;
     private final ServerSettings myServerSettings;
-    private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
+    private final ConcurrentHashMap<String, KubeCloudImage> myImageNameToImageMap;
     private final KubeCloudClientParameters myKubeClientParams;
     private CloudErrorInfo myCurrentError = null;
 
@@ -41,11 +41,11 @@ public class KubeCloudClient implements CloudClientEx {
                            @NotNull KubeCloudClientParameters kubeClientParams) {
         myApiConnector = apiConnector;
         myServerSettings = serverSettings;
-        myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>(Maps.uniqueIndex(images, new Function<KubeCloudImage, String>() {
+        myImageNameToImageMap = new ConcurrentHashMap<String, KubeCloudImage>(Maps.uniqueIndex(images, new Function<KubeCloudImage, String>() {
             @NotNull
             @Override
             public String apply(@javax.annotation.Nullable KubeCloudImage kubeCloudImage) {
-                return kubeCloudImage.getId();
+                return kubeCloudImage.getName();
             }
         }));
         myKubeClientParams = kubeClientParams;
@@ -94,7 +94,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public CloudImage findImageById(@NotNull String imageId) throws CloudException {
-        return myImageIdToImageMap.get(imageId);
+        return myImageNameToImageMap.get(imageId);
     }
 
     @Nullable
@@ -102,7 +102,7 @@ public class KubeCloudClient implements CloudClientEx {
     public CloudInstance findInstanceByAgent(@NotNull AgentDescription agentDescription) {
         final String imageName = agentDescription.getAvailableParameters().get(KubeAgentProperties.IMAGE_NAME);
         if (imageName != null) {
-            final KubeCloudImage cloudImage = myImageIdToImageMap.get(imageName);
+            final KubeCloudImage cloudImage = myImageNameToImageMap.get(imageName);
             if (cloudImage != null) {
                 return cloudImage.findInstanceById(agentDescription.getAvailableParameters().get(KubeAgentProperties.INSTANCE_NAME));
             }
@@ -113,7 +113,7 @@ public class KubeCloudClient implements CloudClientEx {
     @NotNull
     @Override
     public Collection<? extends CloudImage> getImages() throws CloudException {
-        return Collections.unmodifiableCollection(myImageIdToImageMap.values());
+        return Collections.unmodifiableCollection(myImageNameToImageMap.values());
     }
 
     @Nullable
@@ -160,10 +160,10 @@ public class KubeCloudClient implements CloudClientEx {
                 .withName(agentName)
                 .withNamespace(myKubeClientParams.getNamespace())
                 .withLabels(CollectionsUtil.asMap(
-                        KubeLabels.TEAMCITY_AGENT_LABEL,
-                        KubeLabels.getServerLabel(myServerSettings.getServerUUID()),
-                        KubeLabels.getProfileLabel(cloudInstanceUserData.getProfileId()),
-                        KubeLabels.getImageLabel(kubeCloudImage.getId())))
+                        KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
+                        KubeTeamCityLabels.TEAMCITY_SERVER_UUID, myServerSettings.getServerUUID(),
+                        KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudInstanceUserData.getProfileId(),
+                        KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, kubeCloudImage.getId()))
                 .endMetadata()
                 .withNewSpec()
                 .withContainers(Collections.singletonList(containerBuilder.build()))

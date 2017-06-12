@@ -1,17 +1,14 @@
 package ekoshkin.teamcity.clouds.kubernetes.connector;
 
-import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.dsl.MixedOperation;
-import io.fabric8.kubernetes.client.dsl.PodResource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
@@ -53,12 +50,8 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @NotNull
     @Override
-    public Collection<Pod> listPods(String... labels) {
-        MixedOperation<Pod, PodList, DoneablePod, PodResource<Pod, DoneablePod>> pods = myKubernetesClient.pods();
-        for (String label : labels){
-            pods.withLabel(label);
-        }
-        return pods.list().getItems();
+    public Collection<Pod> listPods(Map<String, String> labels) {
+        return myKubernetesClient.pods().withLabels(labels).list().getItems();
     }
 
     @NotNull
