@@ -1,6 +1,8 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.InstanceStatus;
@@ -18,23 +20,30 @@ import static ekoshkin.teamcity.clouds.kubernetes.KubeAgentProperties.INSTANCE_N
  */
 public class KubeCloudInstanceImpl implements KubeCloudInstance {
     private final KubeCloudImage myKubeCloudImage;
+    @NotNull
+    private final KubeApiConnector myApiConnector;
     private final Pod myPod;
+    private CloudErrorInfo myCurrentError;
+    private Date myStartedTime = new Date();
 
-    public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage, @NotNull Pod pod) {
+    public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage,
+                                 @NotNull Pod pod,
+                                 @NotNull KubeApiConnector apiConnector) {
         myKubeCloudImage = kubeCloudImage;
+        myApiConnector = apiConnector;
         myPod = pod;
     }
 
     @NotNull
     @Override
     public String getInstanceId() {
-        return null;
+        return myPod.getMetadata().getUid();
     }
 
     @NotNull
     @Override
     public String getName() {
-        return null;
+        return myPod.getMetadata().getName();
     }
 
     @NotNull
@@ -52,25 +61,27 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public Date getStartedTime() {
-        return null;
+        //TODO: make this work => return new Date(myPod.getStatus().getStartTime());
+        return myStartedTime;
     }
 
     @Nullable
     @Override
     public String getNetworkIdentity() {
-        return null;
+        return myPod.getStatus().getPodIP();
     }
 
     @NotNull
     @Override
     public InstanceStatus getStatus() {
-        return null;
+        //TODO: publish actual status
+        return InstanceStatus.SCHEDULED_TO_START;
     }
 
     @Nullable
     @Override
     public CloudErrorInfo getErrorInfo() {
-        return null;
+        return myCurrentError;
     }
 
     @Override
@@ -79,9 +90,15 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         return getInstanceId().equals(configParams.get(INSTANCE_NAME));
     }
 
-    @NotNull
     @Override
-    public Pod getPod() {
-        return myPod;
+    public void terminate() {
+        try{
+            myApiConnector.deletePod(myPod);
+            myCurrentError = null;
+            myKubeCloudImage.deleteInstance(this);
+            //TODO: update status
+        } catch (KubernetesClientException ex){
+            myCurrentError = new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex);
+        }
     }
 }

@@ -20,4 +20,8 @@ public interface KubeCloudImage extends CloudImage {
 
     @Nullable
     String getDockerCommand();
+
+    void addInstance(@NotNull KubeCloudInstance instance);
+
+    boolean deleteInstance(@NotNull KubeCloudInstance instance);
 }

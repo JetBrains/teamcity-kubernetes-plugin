@@ -4,7 +4,10 @@ import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
-import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.ContainerBuilder;
+import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
@@ -50,6 +53,7 @@ public class KubeCloudClient implements CloudClientEx {
 
     @Override
     public boolean isInitialized() {
+        //TODO: wait while all images populate list of their instances
         return true;
     }
 
@@ -65,7 +69,10 @@ public class KubeCloudClient implements CloudClientEx {
 
         try {
             final Pod newPod = myApiConnector.createPod(podTemplate);
-            return new KubeCloudInstanceImpl(kubeCloudImage, newPod);
+            myCurrentError = null;
+            final KubeCloudInstanceImpl newInstance = new KubeCloudInstanceImpl(kubeCloudImage, newPod, myApiConnector);
+            kubeCloudImage.addInstance(newInstance);
+            return newInstance;
         } catch (KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
             throw ex;
@@ -80,7 +87,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public void terminateInstance(@NotNull CloudInstance cloudInstance) {
         KubeCloudInstance kubeCloudInstance = (KubeCloudInstance) cloudInstance;
-        myApiConnector.deletePod(kubeCloudInstance.getPod());
+        kubeCloudInstance.terminate();
         //TODO: update instance counter
     }
 
@@ -133,17 +140,20 @@ public class KubeCloudClient implements CloudClientEx {
         final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
 
         ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
-        Container container = new ContainerBuilder()
+        String serverAddress = cloudInstanceUserData.getServerAddress();
+        ContainerBuilder containerBuilder = new ContainerBuilder()
                 .withName(agentName)
                 .withImage(kubeCloudImage.getDockerImage())
                 .withImagePullPolicy(imagePullPolicy == null ? ImagePullPolicy.IfNotPresent.getName() : imagePullPolicy.getName())
-                .withArgs(kubeCloudImage.getDockerArguments())
-                .withCommand(kubeCloudImage.getDockerCommand())
-                .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))
-                .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, cloudInstanceUserData.getServerAddress(), null))
-                .withEnv(new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null))
-                .withEnv(new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null))
-                .build();
+                .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null),
+                        new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
+                        new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
+                        new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null),
+                        new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
+        String dockerCommand = kubeCloudImage.getDockerCommand();
+        if(!StringUtil.isEmpty(dockerCommand)) containerBuilder = containerBuilder.withCommand(dockerCommand);
+        String dockerArguments = kubeCloudImage.getDockerArguments();
+        if(!StringUtil.isEmpty(dockerArguments)) containerBuilder = containerBuilder.withArgs(dockerArguments);
 
         return new PodBuilder()
                 .withNewMetadata()
@@ -156,7 +166,7 @@ public class KubeCloudClient implements CloudClientEx {
                         KubeLabels.getImageLabel(kubeCloudImage.getId())))
                 .endMetadata()
                 .withNewSpec()
-                .withContainers(Collections.singletonList(container))
+                .withContainers(Collections.singletonList(containerBuilder.build()))
                 .withRestartPolicy(NEVER_RESTART_POLICY)
                 .endSpec()
                 .build();

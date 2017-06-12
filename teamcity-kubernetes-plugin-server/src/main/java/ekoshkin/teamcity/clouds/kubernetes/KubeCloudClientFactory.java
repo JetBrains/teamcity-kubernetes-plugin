@@ -75,12 +75,15 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @NotNull
     @Override
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
-        KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
+        final KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
         final KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams);
         List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), new Converter<KubeCloudImage, KubeCloudImageData>() {
             @Override
             public KubeCloudImage createFrom(@NotNull KubeCloudImageData kubeCloudImageData) {
-                return new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
+                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, kubeClientParams);
+                //TODO: defer this
+                kubeCloudImage.populateInstances();
+                return kubeCloudImage;
             }
         });
         return new KubeCloudClient(apiConnector, myServerSettings, images, kubeClientParams);
