@@ -83,6 +83,6 @@ public class KubeCloudClientFactory implements CloudClientFactory {
                 return new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
             }
         });
-        return new KubeCloudClient(apiConnector, myServerSettings, images);
+        return new KubeCloudClient(apiConnector, myServerSettings, images, kubeClientParams);
     }
 }

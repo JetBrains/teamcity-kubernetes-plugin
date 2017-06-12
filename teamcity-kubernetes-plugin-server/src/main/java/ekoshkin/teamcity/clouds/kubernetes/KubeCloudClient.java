@@ -5,16 +5,19 @@ import com.google.common.collect.Maps;
 import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.NEVER_RESTART_POLICY;
@@ -26,10 +29,13 @@ public class KubeCloudClient implements CloudClientEx {
     private final KubeApiConnector myApiConnector;
     private final ServerSettings myServerSettings;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
+    private final KubeCloudClientParameters myKubeClientParams;
+    private CloudErrorInfo myCurrentError = null;
 
     public KubeCloudClient(@NotNull final KubeApiConnector apiConnector,
                            @NotNull ServerSettings serverSettings,
-                           @NotNull List<KubeCloudImage> images) {
+                           @NotNull List<KubeCloudImage> images,
+                           @NotNull KubeCloudClientParameters kubeClientParams) {
         myApiConnector = apiConnector;
         myServerSettings = serverSettings;
         myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>(Maps.uniqueIndex(images, new Function<KubeCloudImage, String>() {
@@ -39,6 +45,7 @@ public class KubeCloudClient implements CloudClientEx {
                 return kubeCloudImage.getId();
             }
         }));
+        myKubeClientParams = kubeClientParams;
     }
 
     @Override
@@ -55,8 +62,14 @@ public class KubeCloudClient implements CloudClientEx {
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
         final KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
         final Pod podTemplate = getPodTemplate(cloudInstanceUserData, kubeCloudImage);
-        final Pod newPod = myApiConnector.createPod(podTemplate);
-        return new KubeCloudInstanceImpl(kubeCloudImage, newPod);
+
+        try {
+            final Pod newPod = myApiConnector.createPod(podTemplate);
+            return new KubeCloudInstanceImpl(kubeCloudImage, newPod);
+        } catch (KubernetesClientException ex){
+            myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     @Override
@@ -99,7 +112,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public CloudErrorInfo getErrorInfo() {
-        return null;
+        return myCurrentError;
     }
 
     @Override
@@ -116,11 +129,12 @@ public class KubeCloudClient implements CloudClientEx {
     }
 
     private Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, KubeCloudImage kubeCloudImage) {
-        final String agentName = cloudInstanceUserData.getAgentName(); //TODO: review agent name generation
+        String agentNameProvided = cloudInstanceUserData.getAgentName();
+        final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
 
         ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
         Container container = new ContainerBuilder()
-                .withName(agentName) //TODO: review
+                .withName(agentName)
                 .withImage(kubeCloudImage.getDockerImage())
                 .withImagePullPolicy(imagePullPolicy == null ? ImagePullPolicy.IfNotPresent.getName() : imagePullPolicy.getName())
                 .withArgs(kubeCloudImage.getDockerArguments())
@@ -128,12 +142,13 @@ public class KubeCloudClient implements CloudClientEx {
                 .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))
                 .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, cloudInstanceUserData.getServerAddress(), null))
                 .withEnv(new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null))
-                .withEnv(new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null)) //TODO: review
+                .withEnv(new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null))
                 .build();
 
         return new PodBuilder()
                 .withNewMetadata()
-                .withName(agentName) //TODO: review
+                .withName(agentName)
+                .withNamespace(myKubeClientParams.getNamespace())
                 .withLabels(CollectionsUtil.asMap(
                         KubeLabels.TEAMCITY_AGENT_LABEL,
                         KubeLabels.getServerLabel(myServerSettings.getServerUUID()),
