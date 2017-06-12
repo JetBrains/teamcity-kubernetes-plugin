@@ -24,7 +24,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     @NotNull
     @Override
-    public String getContainerImage() {
+    public String getDockerImage() {
         return myImageData.getDockerImage();
     }
 
@@ -36,13 +36,13 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     @Nullable
     @Override
-    public String getContainerArguments() {
+    public String getDockerArguments() {
         return myImageData.getDockerArguments();
     }
 
     @Nullable
     @Override
-    public String getContainerCommand() {
+    public String getDockerCommand() {
         return myImageData.getDockerCommand();
     }
 

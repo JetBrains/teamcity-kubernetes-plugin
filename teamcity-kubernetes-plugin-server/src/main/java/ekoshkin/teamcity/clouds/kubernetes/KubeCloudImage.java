@@ -10,14 +10,14 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface KubeCloudImage extends CloudImage {
     @NotNull
-    String getContainerImage();
+    String getDockerImage();
 
     @NotNull
     ImagePullPolicy getImagePullPolicy();
 
     @Nullable
-    String getContainerArguments();
+    String getDockerArguments();
 
     @Nullable
-    String getContainerCommand();
+    String getDockerCommand();
 }

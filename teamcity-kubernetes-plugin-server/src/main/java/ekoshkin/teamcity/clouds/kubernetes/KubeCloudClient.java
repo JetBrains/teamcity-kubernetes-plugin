@@ -119,10 +119,10 @@ public class KubeCloudClient implements CloudClientEx {
 
         Container container = new ContainerBuilder()
                 .withName(agentName) //TODO: review
-                .withImage(kubeCloudImage.getContainerImage())
+                .withImage(kubeCloudImage.getDockerImage())
                 .withImagePullPolicy(kubeCloudImage.getImagePullPolicy().getName())
-                .withArgs(kubeCloudImage.getContainerArguments())
-                .withCommand(kubeCloudImage.getContainerCommand())
+                .withArgs(kubeCloudImage.getDockerArguments())
+                .withCommand(kubeCloudImage.getDockerCommand())
                 .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null))
                 .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, cloudInstanceUserData.getServerAddress(), null))
                 .withEnv(new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null))
