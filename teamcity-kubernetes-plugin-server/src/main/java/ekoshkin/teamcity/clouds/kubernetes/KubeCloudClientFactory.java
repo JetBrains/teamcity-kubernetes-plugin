@@ -23,7 +23,7 @@ import java.util.Map;
 public class KubeCloudClientFactory implements CloudClientFactory {
 
     public static final String DISPLAY_NAME = "Kubernetes";
-    public static final String ID = "kubernetes";
+    public static final String ID = "kube"; //should be 6 chars maximum
 
     private final PluginDescriptor myPluginDescriptor;
     private final ServerSettings myServerSettings;
