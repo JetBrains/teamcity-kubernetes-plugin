@@ -37,7 +37,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public String getInstanceId() {
-        return myPod.getMetadata().getUid();
+        return myPod.getMetadata().getName();
     }
 
     @NotNull
@@ -86,7 +86,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @Override
     public boolean containsAgent(@NotNull AgentDescription agentDescription) {
         final Map<String, String> configParams = agentDescription.getConfigurationParameters();
-        return getInstanceId().equals(configParams.get(INSTANCE_NAME));
+        return getName().equals(configParams.get(INSTANCE_NAME));
     }
 
     @Override
