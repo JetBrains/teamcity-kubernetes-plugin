@@ -32,6 +32,7 @@ public class KubeCloudClient implements CloudClientEx {
     private final KubeApiConnector myApiConnector;
     private final ServerSettings myServerSettings;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageNameToImageMap;
+    private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParameters myKubeClientParams;
     private CloudErrorInfo myCurrentError = null;
 
@@ -46,6 +47,13 @@ public class KubeCloudClient implements CloudClientEx {
             @Override
             public String apply(@javax.annotation.Nullable KubeCloudImage kubeCloudImage) {
                 return kubeCloudImage.getName();
+            }
+        }));
+        myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>(Maps.uniqueIndex(images, new Function<KubeCloudImage, String>() {
+            @NotNull
+            @Override
+            public String apply(@javax.annotation.Nullable KubeCloudImage kubeCloudImage) {
+                return kubeCloudImage.getId();
             }
         }));
         myKubeClientParams = kubeClientParams;
@@ -94,7 +102,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public CloudImage findImageById(@NotNull String imageId) throws CloudException {
-        return myImageNameToImageMap.get(imageId);
+        return myImageIdToImageMap.get(imageId);
     }
 
     @Nullable
