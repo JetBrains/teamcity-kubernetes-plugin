@@ -160,7 +160,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.addImage();
             }
-            this.validateImages();
             BS.Kube.ImageDialog.close();
         }
         return false;
@@ -281,11 +280,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             delete this._displayedErrors[errorId];
         }
         target.empty();
-    },
-
-    validateImages: function (){
-        //TODO: implement
-        return true;
     },
 
     testConnection: function() {
