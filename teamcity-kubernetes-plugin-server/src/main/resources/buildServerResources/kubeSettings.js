@@ -7,7 +7,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
-<td class="imageName highlight"><div class="sourceIcon sourceIcon_unknown">?</div><span class="imageName"></span></td>\
 <td class="dockerImage highlight"></td>\
 <td class="maxInstances highlight"></td>\
 <td class="edit highlight"><a href="#" class="editVmImageLink">edit</a></td>\
