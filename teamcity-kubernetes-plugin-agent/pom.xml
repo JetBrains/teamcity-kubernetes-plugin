@@ -8,6 +8,9 @@
   </parent>
   <artifactId>teamcity-kubernetes-plugin-agent</artifactId>
   <packaging>jar</packaging>
+  <properties>
+    <java_16>${env.JAVA_16_HOME}</java_16>
+  </properties>
   <dependencies>
     
     <dependency>
@@ -39,4 +42,22 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <fork>true</fork>
+          <executable>${java_16}/bin/javac</executable>
+          <source>1.6</source>
+          <target>1.6</target>
+          <compilerVersion>1.6</compilerVersion>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
