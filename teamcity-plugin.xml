@@ -4,13 +4,12 @@
     <name>teamcity-kubernetes-plugin</name>
     <display-name>teamcity-kubernetes-plugin</display-name>
     <version>@Version@</version>
-    <description>Plugin description</description>
-    <download-url>Plugin download URL</download-url>
-    <email>Plugin author e-mail</email>
+    <description>Allows to run TeamCity agents on Kubernetes cluster</description>
+    <download-url>https://github.com/ekoshkin/teamcity-kubernetes-plugin</download-url>
+    <email>evgeniy.koshkin@jetbrains.com</email>
     <vendor>
-      <name>@VendorName@</name>
-      <url>@VendorURL@</url>
-      <logo>Plugin vendor logo URL</logo>
+      <name>JetBrains, s.r.o.</name>
+      <url>http://www.jetbrains.com</url>
     </vendor>
   </info>
   <deployment use-separate-classloader="true" />
