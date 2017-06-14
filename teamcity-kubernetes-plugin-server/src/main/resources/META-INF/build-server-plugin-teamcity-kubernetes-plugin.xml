@@ -4,5 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
     <bean id="kubeCloudClientFactory" class="ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientFactory" />
+    <bean id="kubeAuthStrategyProvider" class="ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl" />
     <bean id="kubeProfileEditController" class="ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController" />
 </beans>
