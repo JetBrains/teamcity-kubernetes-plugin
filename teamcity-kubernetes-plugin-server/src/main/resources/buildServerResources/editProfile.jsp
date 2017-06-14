@@ -13,6 +13,7 @@
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
+<jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy>"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -29,24 +30,24 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${cons.seviceAccountName}">Service account name: <l:star/></label></th>
-        <td><props:textProperty name="${cons.seviceAccountName}" className="longField"/>
-            <span id="error_${cons.seviceAccountName}" class="error"></span>
-            <span class="smallNote">Name of the service account use to access API</span>
-        </td>
-    </tr>
-    <tr>
-        <th><label for="${cons.seviceAccountToken}">Service account token: <l:star/></label></th>
-        <td><props:textProperty name="${cons.seviceAccountToken}" className="longField"/>
-            <span id="error_${cons.seviceAccountToken}" class="error"></span>
-            <span class="smallNote">The signed JWT to use as a bearer token to authenticate as the given service account.</span>
-        </td>
-    </tr>
-    <tr>
         <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
         <td><props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
             <span class="smallNote">Kubernetes namespace to use. Leave blanc to use default namespace.</span>
+        </td>
+    </tr>
+    <tr>
+        <th><label for="${cons.authStrategy}">Authentication Strategy: <l:star/></label></th>
+        <td>
+            <div>
+                <select name="${cons.authStrategy}" id="${cons.authStrategy}" data-id="${cons.authStrategy}" data-err-id="${cons.authStrategy}">
+                    <c:forEach var="strategy" items="${authStrategies}">
+                        <props:option value="${strategy.id}"><c:out value="${strategy.displayName}"/></props:option>
+                    </c:forEach>
+                </select>
+                <span id="error_${cons.authStrategy}" class="error"></span>
+                <span class="smallNote">Kubernetes server API authentication strategy to use.</span>
+            </div>
         </td>
     </tr>
     <tr>

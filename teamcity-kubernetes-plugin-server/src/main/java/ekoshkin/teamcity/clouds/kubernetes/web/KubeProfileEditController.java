@@ -62,8 +62,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
         PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true);
         final Map<String, String> props = propsBean.getProperties();
         final String apiServerUrl = props.get(KubeParametersConstants.API_SERVER_URL);
-        final String accountName = props.get(KubeParametersConstants.SERVICE_ACCOUNT_NAME);
-        final String accountToken = props.get(KubeParametersConstants.SERVICE_ACCOUNT_TOKEN);
         final String authStrategy = props.get(KubeParametersConstants.AUTH_STRATEGY);
 
         if(Boolean.parseBoolean(request.getParameter("testConnection"))){

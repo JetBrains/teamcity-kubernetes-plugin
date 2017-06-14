@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface KubeAuthStrategy {
     @NotNull String getId();
-    @NotNull String getDisplayNmae();
+    @NotNull String getDisplayName();
     @Nullable String getDescription();
     void apply(@NotNull ConfigBuilder clientConfig);
 }

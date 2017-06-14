@@ -16,7 +16,7 @@ public class UserPasswdAuthStrategy implements KubeAuthStrategy {
 
     @NotNull
     @Override
-    public String getDisplayNmae() {
+    public String getDisplayName() {
         return null;
     }
 
