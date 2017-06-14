@@ -2,6 +2,7 @@ package ekoshkin.teamcity.clouds.kubernetes.web;
 
 import ekoshkin.teamcity.clouds.internal.PluginPropertiesUtil;
 import ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants;
+import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectionCheckResult;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
@@ -31,15 +32,17 @@ public class KubeProfileEditController extends BaseFormXmlController {
 
     private final PluginDescriptor myPluginDescriptor;
     private final AgentPoolManager myAgentPoolManager;
+    private final KubeAuthStrategyProvider myAuthStrategyProvider;
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
                                      @NotNull final WebControllerManager web,
                                      @NotNull final PluginDescriptor pluginDescriptor,
-                                     @NotNull final AgentPoolManager agentPoolManager) {
+                                     @NotNull final AgentPoolManager agentPoolManager, KubeAuthStrategyProvider authStrategyProvider) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myPath = pluginDescriptor.getPluginResourcesPath(EDIT_KUBE_HTML);
         myAgentPoolManager = agentPoolManager;
+        myAuthStrategyProvider = authStrategyProvider;
         web.registerController(myPath, this);
     }
 
@@ -61,6 +64,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         final String apiServerUrl = props.get(KubeParametersConstants.API_SERVER_URL);
         final String accountName = props.get(KubeParametersConstants.SERVICE_ACCOUNT_NAME);
         final String accountToken = props.get(KubeParametersConstants.SERVICE_ACCOUNT_TOKEN);
+        final String authStrategy = props.get(KubeParametersConstants.AUTH_STRATEGY);
 
         if(Boolean.parseBoolean(request.getParameter("testConnection"))){
             KubeApiConnection connectionSettings = new KubeApiConnection() {
@@ -70,25 +74,13 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     return apiServerUrl;
                 }
 
-                @NotNull
-                @Override
-                public String getPassword() {
-                    return accountToken;
-                }
-
-                @NotNull
-                @Override
-                public String getUsername() {
-                    return accountName;
-                }
-
                 @Nullable
                 @Override
                 public String getNamespace() {
                     return null;
                 }
             };
-            KubeApiConnectionCheckResult connectionCheckResult = new KubeApiConnectorImpl(connectionSettings).testConnection();
+            KubeApiConnectionCheckResult connectionCheckResult = new KubeApiConnectorImpl(connectionSettings, myAuthStrategyProvider.get(authStrategy)).testConnection();
             if(!connectionCheckResult.isSuccess()){
                 final ActionErrors errors = new ActionErrors();
                 errors.addError("connection", connectionCheckResult.getMessage());

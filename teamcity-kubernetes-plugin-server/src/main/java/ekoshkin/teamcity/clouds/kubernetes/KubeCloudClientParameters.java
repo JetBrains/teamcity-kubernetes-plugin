@@ -35,18 +35,6 @@ public class KubeCloudClientParameters implements KubeApiConnection {
         return myParameters.getParameter(API_SERVER_URL);
     }
 
-    @NotNull
-    @Override
-    public String getPassword() {
-        return myParameters.getParameter(SERVICE_ACCOUNT_TOKEN);
-    }
-
-    @NotNull
-    @Override
-    public String getUsername() {
-        return myParameters.getParameter(SERVICE_ACCOUNT_NAME);
-    }
-
     public String getNamespace(){
         String explicitNameSpace = myParameters.getParameter(KUBERNETES_NAMESPACE);
         return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;
@@ -59,5 +47,10 @@ public class KubeCloudClientParameters implements KubeApiConnection {
                 return new KubeCloudImageData(cloudImageParameters);
             }
         });
+    }
+
+    @NotNull
+    public String getAuthStrategy() {
+        return myParameters.getParameter(AUTH_STRATEGY);
     }
 }

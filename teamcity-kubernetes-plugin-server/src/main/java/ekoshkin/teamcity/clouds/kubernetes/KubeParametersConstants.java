@@ -7,6 +7,7 @@ import jetbrains.buildServer.clouds.CloudImageParameters;
  */
 public class KubeParametersConstants {
     public static final String API_SERVER_URL = "api-server-url";
+    public static final String AUTH_STRATEGY = "auth-strategy";
     public static final String SERVICE_ACCOUNT_NAME = "service-account-name";
     public static final String SERVICE_ACCOUNT_TOKEN = "service-account-token";
     public static final String KUBERNETES_NAMESPACE = "kubernetes-namespace";

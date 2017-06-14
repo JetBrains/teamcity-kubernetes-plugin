@@ -14,4 +14,7 @@ public interface KubeAuthStrategyProvider {
 
     @Nullable
     KubeAuthStrategy find(@Nullable String id);
+
+    @NotNull
+    KubeAuthStrategy get(@Nullable String id);
 }

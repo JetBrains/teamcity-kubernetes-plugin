@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
+import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController;
@@ -8,7 +9,6 @@ import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.CollectionsUtil;
-import jetbrains.buildServer.util.Converter;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,12 +27,15 @@ public class KubeCloudClientFactory implements CloudClientFactory {
 
     private final PluginDescriptor myPluginDescriptor;
     private final ServerSettings myServerSettings;
+    private KubeAuthStrategyProvider myAuthStrategies;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
                                   @NotNull final PluginDescriptor pluginDescriptor,
-                                  @NotNull final ServerSettings serverSettings) {
+                                  @NotNull final ServerSettings serverSettings,
+                                  @NotNull final KubeAuthStrategyProvider authStrategies) {
         myPluginDescriptor = pluginDescriptor;
         myServerSettings = serverSettings;
+        myAuthStrategies = authStrategies;
         registrar.registerCloudFactory(this);
     }
 
@@ -76,15 +79,12 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @Override
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
         final KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
-        final KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams);
-        List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), new Converter<KubeCloudImage, KubeCloudImageData>() {
-            @Override
-            public KubeCloudImage createFrom(@NotNull KubeCloudImageData kubeCloudImageData) {
-                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
-                //TODO: defer this
-                kubeCloudImage.populateInstances();
-                return kubeCloudImage;
-            }
+        final KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
+        List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
+            KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
+            //TODO: defer this
+            kubeCloudImage.populateInstances();
+            return kubeCloudImage;
         });
         return new KubeCloudClient(apiConnector, myServerSettings, images, kubeClientParams);
     }

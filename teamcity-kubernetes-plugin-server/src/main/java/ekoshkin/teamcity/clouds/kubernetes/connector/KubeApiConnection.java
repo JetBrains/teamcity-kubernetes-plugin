@@ -10,12 +10,6 @@ public interface KubeApiConnection {
     @NotNull
     String getApiServerUrl();
 
-    @NotNull
-    String getPassword();
-
-    @NotNull
-    String getUsername();
-
     @Nullable
     String getNamespace();
 }

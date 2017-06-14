@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes.connector;
 
+import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -18,9 +19,15 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private final KubeApiConnection myConnectionSettings;
     private KubernetesClient myKubernetesClient;
 
-    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings) {
+    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
         myConnectionSettings = connectionSettings;
-        myKubernetesClient = createClient(myConnectionSettings);
+
+        ConfigBuilder configBuilder = new ConfigBuilder()
+                .withMasterUrl(connectionSettings.getApiServerUrl())
+                .withNamespace(connectionSettings.getNamespace());
+        authStrategy.apply(configBuilder);
+
+        myKubernetesClient = new DefaultKubernetesClient(configBuilder.build());
     }
 
     @NotNull
@@ -45,7 +52,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @Override
     public boolean deletePod(@NotNull Pod pod) {
-        return createClient(myConnectionSettings).pods().delete(pod);
+        return myKubernetesClient.pods().delete(pod);
     }
 
     @NotNull
@@ -59,14 +66,5 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     public PodPhase getPodPhase(@NotNull Pod pod) {
         final Pod podNow = myKubernetesClient.pods().withName(pod.getMetadata().getName()).get();
         return podNow == null ? PodPhase.Unknown : PodPhase.valueOf(podNow.getStatus().getPhase());
-    }
-
-    private static KubernetesClient createClient(KubeApiConnection connectionSettings)  {
-        ConfigBuilder builder = new ConfigBuilder()
-                .withMasterUrl(connectionSettings.getApiServerUrl())
-                .withUsername(connectionSettings.getUsername())
-                .withPassword(connectionSettings.getPassword())
-                .withNamespace(connectionSettings.getNamespace());
-        return new DefaultKubernetesClient(builder.build());
     }
 }

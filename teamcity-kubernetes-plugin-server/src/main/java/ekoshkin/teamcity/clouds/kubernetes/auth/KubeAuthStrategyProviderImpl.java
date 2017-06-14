@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes.auth;
 
+import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,14 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
     @Override
     public KubeAuthStrategy find(@Nullable String strategyId) {
         return myIdToStrategyMap.get(strategyId);
+    }
+
+    @NotNull
+    @Override
+    public KubeAuthStrategy get(@Nullable String id) {
+        KubeAuthStrategy authStrategy = find(id);
+        if(authStrategy == null) throw new KubeCloudException("Unknown auth strategy " + id);
+        return authStrategy;
     }
 
     private void registerStrategy(KubeAuthStrategy authStrategy){
