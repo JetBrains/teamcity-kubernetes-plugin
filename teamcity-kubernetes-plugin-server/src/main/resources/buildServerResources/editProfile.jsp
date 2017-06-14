@@ -33,21 +33,41 @@
         <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
         <td><props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
-            <span class="smallNote">Kubernetes namespace to use. Leave blanc to use default namespace.</span>
+            <span class="smallNote">Kubernetes namespace to use. Leave blank to use default namespace.</span>
         </td>
     </tr>
     <tr>
         <th><label for="${cons.authStrategy}">Authentication Strategy: <l:star/></label></th>
         <td>
             <div>
-                <select name="${cons.authStrategy}" id="${cons.authStrategy}" data-id="${cons.authStrategy}" data-err-id="${cons.authStrategy}">
+                <select name="${cons.authStrategy}" id="${cons.authStrategy}" data-id="${cons.authStrategy}" data-err-id="${cons.authStrategy}" onselect="">
+                    <props:option value="">--- Choose authentication strategy ---</props:option>
                     <c:forEach var="strategy" items="${authStrategies}">
                         <props:option value="${strategy.id}"><c:out value="${strategy.displayName}"/></props:option>
                     </c:forEach>
                 </select>
                 <span id="error_${cons.authStrategy}" class="error"></span>
-                <span class="smallNote">Kubernetes server API authentication strategy to use.</span>
             </div>
+            <c:forEach var="strategy" items="${authStrategies}">
+                <c:set var="description" value="${strategy.description}"/>
+                <c:if test="${not empty description}">
+                    <span class="smallNote"><c:out value="${description}"/></span>
+                </c:if>
+            </c:forEach>
+        </td>
+    </tr>
+    <tr class="hidden userpassword">
+        <th><label for="${cons.username}">Username: <l:star/></label></th>
+        <td><props:textProperty name="${cons.username}" className="longField"/>
+            <span id="error_${cons.username}" class="error"></span>
+            <span class="smallNote">Authorized Kubernetes user.</span>
+        </td>
+    </tr>
+    <tr class="hidden userpassword">
+        <th><label for="${cons.password}">Password: <l:star/></label></th>
+        <td><props:textProperty name="${cons.password}" className="longField"/>
+            <span id="error_${cons.password}" class="error"></span>
+            <span class="smallNote">Password of authorized Kubernetes user.</span>
         </td>
     </tr>
     <tr>

@@ -12,4 +12,10 @@ public interface KubeApiConnection {
 
     @Nullable
     String getNamespace();
+
+    @Nullable
+    String getUsername();
+
+    @Nullable
+    String getPassword();
 }

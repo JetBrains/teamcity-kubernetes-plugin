@@ -14,6 +14,8 @@ public class KubeParametersConstants {
     public static final String DOCKER_ARGS = "dockerArgs";
     public static final String DOCKER_CMD = "dockerCmd";
     public static final String IMAGE_PULL_POLICY = "imagePullPolicy";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
 
     public String getApiServerUrl() {
         return API_SERVER_URL;
@@ -49,5 +51,13 @@ public class KubeParametersConstants {
 
     public String getAuthStrategy() {
         return AUTH_STRATEGY;
+    }
+
+    public String getUsername() {
+        return USERNAME;
+    }
+
+    public String getPassword() {
+        return PASSWORD;
     }
 }

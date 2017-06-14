@@ -25,7 +25,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         ConfigBuilder configBuilder = new ConfigBuilder()
                 .withMasterUrl(connectionSettings.getApiServerUrl())
                 .withNamespace(connectionSettings.getNamespace());
-        authStrategy.apply(configBuilder);
+        configBuilder = authStrategy.apply(configBuilder, connectionSettings);
 
         myKubernetesClient = new DefaultKubernetesClient(configBuilder.build());
     }

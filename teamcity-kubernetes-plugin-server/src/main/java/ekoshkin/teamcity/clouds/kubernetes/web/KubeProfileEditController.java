@@ -53,6 +53,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         model.put("testConnectionUrl", myPath + "?testConnection=true");
         final String projectId = httpServletRequest.getParameter("projectId");
         model.put("agentPools", myAgentPoolManager.getProjectOwnedAgentPools(projectId));
+        model.put("authStrategies", myAuthStrategyProvider.getAll());
         return modelAndView;
     }
 
@@ -61,7 +62,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
         BasePropertiesBean propsBean =  new BasePropertiesBean(null);
         PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true);
         final Map<String, String> props = propsBean.getProperties();
-        final String apiServerUrl = props.get(KubeParametersConstants.API_SERVER_URL);
         final String authStrategy = props.get(KubeParametersConstants.AUTH_STRATEGY);
 
         if(Boolean.parseBoolean(request.getParameter("testConnection"))){
@@ -69,13 +69,25 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 @NotNull
                 @Override
                 public String getApiServerUrl() {
-                    return apiServerUrl;
+                    return props.get(KubeParametersConstants.API_SERVER_URL);
                 }
 
                 @Nullable
                 @Override
                 public String getNamespace() {
-                    return null;
+                    return props.get(KubeParametersConstants.KUBERNETES_NAMESPACE);
+                }
+
+                @Nullable
+                @Override
+                public String getUsername() {
+                    return props.get(KubeParametersConstants.USERNAME);
+                }
+
+                @Nullable
+                @Override
+                public String getPassword() {
+                    return props.get(KubeParametersConstants.PASSWORD);
                 }
             };
             KubeApiConnectionCheckResult connectionCheckResult = new KubeApiConnectorImpl(connectionSettings, myAuthStrategyProvider.get(authStrategy)).testConnection();
