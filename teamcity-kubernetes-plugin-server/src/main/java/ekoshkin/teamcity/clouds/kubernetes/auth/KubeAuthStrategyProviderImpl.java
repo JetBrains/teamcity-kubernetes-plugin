@@ -17,6 +17,7 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
     public KubeAuthStrategyProviderImpl() {
         registerStrategy(new UserPasswdAuthStrategy());
         registerStrategy(new DefaultServiceAccountAuthStrategy());
+        registerStrategy(new UnauthorizedAccessStrategy());
     }
 
     @NotNull
