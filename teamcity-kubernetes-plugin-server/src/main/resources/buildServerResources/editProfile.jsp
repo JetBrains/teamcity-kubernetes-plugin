@@ -40,12 +40,13 @@
         <th><label for="${cons.authStrategy}">Authentication Strategy: <l:star/></label></th>
         <td>
             <div>
-                <forms:select name="${cons.authStrategy}" id="${cons.authStrategy}">
-                    <props:option value="">--- Choose authentication strategy ---</props:option>
-                    <c:forEach var="strategy" items="${authStrategies}">
-                        <props:option value="${strategy.id}"><c:out value="${strategy.displayName}"/></props:option>
+                <c:set var="selectedAuthStrategy" value="${propertiesBean.properties[cons.authStrategy]}" />
+                <props:selectProperty name="${cons.authStrategy}">
+                    <props:option value="" selected="${empty selectedAuthStrategy}">--- Choose authentication strategy ---</props:option>
+                    <c:forEach var="authStrategy" items="${authStrategies}">
+                        <props:option value="${authStrategy.id}" selected="${not empty selectedAuthStrategy and authStrategy.id eq selectedAuthStrategy}"><c:out value="${authStrategy.displayName}"/></props:option>
                     </c:forEach>
-                </forms:select>
+                </props:selectProperty>
                 <span id="error_${cons.authStrategy}" class="error"></span>
             </div>
             <c:forEach var="strategy" items="${authStrategies}">
