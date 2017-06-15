@@ -14,6 +14,7 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 <jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy>"/>
+<jsp:useBean id="podSpecProviders" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProvider>"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -116,6 +117,29 @@
 <bs:dialog dialogId="KubeImageDialog" title="Add Kubernetes Cloud Image" closeCommand="BS.Kube.ImageDialog.close()"
            dialogClass="KubeImageDialog" titleId="KubeImageDialogTitle">
     <table class="runnerFormTable paramsTable">
+
+        <tr>
+            <th><label for="${cons.podSpecMode}">Mode: <l:star/></label></th>
+            <td>
+                <div>
+                    <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
+                    <props:selectProperty name="${cons.podSpecMode}">
+                        <props:option value="" selected="${empty selectedPodSpecMode}">--- Choose what you need ---</props:option>
+                        <c:forEach var="podSpecProvider" items="${podSpecProviders}">
+                            <props:option value="${podSpecProvider.id}" selected="${not empty selectedPodSpecMode and podSpecProvider.id eq selectedPodSpecMode}"><c:out value="${podSpecProvider.displayName}"/></props:option>
+                        </c:forEach>
+                    </props:selectProperty>
+                    <span id="error_${cons.podSpecMode}" class="error"></span>
+                </div>
+                <c:forEach var="podSpecProvider" items="${podSpecProviders}">
+                    <c:set var="description" value="${podSpecProvider.description}"/>
+                    <c:if test="${not empty description}">
+                        <span class="smallNote"><c:out value="${description}"/></span>
+                    </c:if>
+                </c:forEach>
+            </td>
+        </tr>
+
         <tr>
             <th>Docker image:&nbsp;<l:star/></th>
             <td>

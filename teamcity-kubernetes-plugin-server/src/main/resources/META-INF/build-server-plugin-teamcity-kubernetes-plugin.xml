@@ -5,5 +5,6 @@
        default-autowire="constructor">
     <bean id="kubeCloudClientFactory" class="ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientFactory" />
     <bean id="kubeAuthStrategyProvider" class="ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl" />
+    <bean id="podSpecProviders" class="ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProvidersImpl" />
     <bean id="kubeProfileEditController" class="ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController" />
 </beans>

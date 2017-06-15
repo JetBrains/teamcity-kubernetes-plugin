@@ -60,4 +60,8 @@ public class KubeParametersConstants {
     public String getPassword() {
         return PASSWORD;
     }
+
+    public String getPodSpecMode() {
+        return null;
+    }
 }
