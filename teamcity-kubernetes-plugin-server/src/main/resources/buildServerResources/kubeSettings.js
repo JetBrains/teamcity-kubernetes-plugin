@@ -37,6 +37,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
         this.$addImageButton = $j('#kubeAddImageButton');
         this.$cancelAddImageButton = $j('#kubeCancelAddImageButton');
+        this.$authStrategySelector = $j('#auth-strategy');
 
         this.$dockerImage = $j('#dockerImage');
         this.$imagePullPolicy = $j('#imagePullPolicy');
@@ -93,6 +94,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             }
             return false;
         });
+
+        this.$authStrategySelector.on('change', this._toggleAuth.bind(this));
 
         ///// Change handlers
         this.$dockerImage.on('change', function (e, value) {
@@ -205,6 +208,16 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagesTableWrapper.removeClass('hidden');
         this.$emptyImagesListMessage.toggleClass('hidden', toggle);
         this.$imagesTable.toggleClass('hidden', !toggle);
+    },
+
+    _toggleAuth: function () {
+        console.info('_toggleAuth called');
+        var selectedStrategyId = this.$authStrategySelector.val();
+        console.info('auth strategy selected ' + selectedStrategyId);
+        $j('.auth-ui').toggleClass('hidden', true);
+        if(selectedStrategyId) {
+            $j('.' + selectedStrategyId).removeClass('hidden');
+        }
     },
 
     validateOptions: function (options){

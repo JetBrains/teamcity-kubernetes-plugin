@@ -40,7 +40,7 @@
         <th><label for="${cons.authStrategy}">Authentication Strategy: <l:star/></label></th>
         <td>
             <div>
-                <select name="${cons.authStrategy}" id="${cons.authStrategy}" data-id="${cons.authStrategy}" data-err-id="${cons.authStrategy}" onselect="">
+                <select name="${cons.authStrategy}" id="${cons.authStrategy}" data-id="${cons.authStrategy}" data-err-id="${cons.authStrategy}">
                     <props:option value="">--- Choose authentication strategy ---</props:option>
                     <c:forEach var="strategy" items="${authStrategies}">
                         <props:option value="${strategy.id}"><c:out value="${strategy.displayName}"/></props:option>
@@ -56,14 +56,14 @@
             </c:forEach>
         </td>
     </tr>
-    <tr class="hidden userpassword">
+    <tr class="hidden user-passwd auth-ui">
         <th><label for="${cons.username}">Username: <l:star/></label></th>
         <td><props:textProperty name="${cons.username}" className="longField"/>
             <span id="error_${cons.username}" class="error"></span>
             <span class="smallNote">Authorized Kubernetes user.</span>
         </td>
     </tr>
-    <tr class="hidden userpassword">
+    <tr class="hidden user-passwd auth-ui">
         <th><label for="${cons.password}">Password: <l:star/></label></th>
         <td><props:textProperty name="${cons.password}" className="longField"/>
             <span id="error_${cons.password}" class="error"></span>
