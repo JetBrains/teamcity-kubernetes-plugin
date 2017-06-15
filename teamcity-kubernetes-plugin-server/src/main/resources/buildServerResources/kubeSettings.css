@@ -9,3 +9,8 @@
 .imagesTableWrapper {
     margin-bottom: 0.5em;
 }
+
+textarea {
+    width: 100%;
+    height: 30em;
+}

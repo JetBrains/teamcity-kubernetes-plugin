@@ -73,8 +73,8 @@
         </td>
     </tr>
     <tr>
-        <th></th>
-        <td>
+        <th class="noBorder"></th>
+        <td class="noBorder">
             <forms:button id="kubeTestConnectionButton" onclick="BS.Kube.ProfileSettingsForm.testConnection();">Test connection</forms:button>
         </td>
     </tr>
@@ -188,7 +188,8 @@
         <tr class="hidden custom-pod-template pod-spec-ui">
             <th>Content:&nbsp;<l:star/></th>
             <td>
-                TODO
+                <textarea id="${cons.customPodTemplate}" wrap="off"></textarea>
+                <span class="error option-error option-error_${cons.customPodTemplate}"></span>
             </td>
         </tr>
         <tr class="hidden deployment-base pod-spec-ui">

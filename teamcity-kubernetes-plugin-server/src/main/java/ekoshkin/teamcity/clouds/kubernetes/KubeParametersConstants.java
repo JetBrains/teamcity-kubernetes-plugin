@@ -18,6 +18,7 @@ public class KubeParametersConstants {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String DEPLOYMENT_NAME = "deployment-name";
+    public static final String CUSTOM_POD_TEMPLATE = "custom-pod-template";
 
     public String getApiServerUrl() {
         return API_SERVER_URL;
@@ -69,5 +70,9 @@ public class KubeParametersConstants {
 
     public String getDeploymentName() {
         return DEPLOYMENT_NAME;
+    }
+
+    public String getCustomPodTemplate() {
+        return CUSTOM_POD_TEMPLATE;
     }
 }
