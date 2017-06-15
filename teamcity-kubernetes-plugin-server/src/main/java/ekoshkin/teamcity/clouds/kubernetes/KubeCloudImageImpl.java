@@ -31,6 +31,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     @NotNull
     @Override
+    public String getPodSpecMode() {
+        return myImageData.getPodSpecMode();
+    }
+
+    @NotNull
+    @Override
     public String getDockerImage() {
         return myImageData.getDockerImage();
     }
@@ -99,7 +105,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myIdToInstanceMap.remove(instance.getInstanceId()) != null;
     }
 
-    public void populateInstances(){
+    void populateInstances(){
         try{
             for (Pod pod : myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()))){
                 KubeCloudInstanceImpl cloudInstance = new KubeCloudInstanceImpl(this, pod, myApiConnector);

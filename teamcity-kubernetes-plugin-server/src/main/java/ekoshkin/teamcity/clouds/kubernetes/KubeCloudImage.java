@@ -24,4 +24,7 @@ public interface KubeCloudImage extends CloudImage {
     void addInstance(@NotNull KubeCloudInstance instance);
 
     boolean deleteInstance(@NotNull KubeCloudInstance instance);
+
+    @NotNull
+    String getPodSpecMode();
 }

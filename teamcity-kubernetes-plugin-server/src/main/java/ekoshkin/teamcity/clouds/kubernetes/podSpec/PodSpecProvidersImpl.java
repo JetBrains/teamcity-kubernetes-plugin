@@ -1,6 +1,7 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,8 +15,8 @@ import java.util.Map;
 public class PodSpecProvidersImpl implements PodSpecProviders {
     private final Map<String, PodSpecProvider> myIdToProviderMap = new HashMap<>();
 
-    public PodSpecProvidersImpl() {
-        registerProvider(new SimpleRunContainerPodSpecProvider());
+    public PodSpecProvidersImpl(@NotNull ServerSettings serverSettings) {
+        registerProvider(new SimpleRunContainerPodSpecProvider(serverSettings));
         registerProvider(new CustomTemplatePodSpecProvider());
         registerProvider(new DeploymentPodSpecProvider());
     }

@@ -10,6 +10,7 @@ public class KubeParametersConstants {
     public static final String AUTH_STRATEGY = "authStrategy";
     public static final String KUBERNETES_NAMESPACE = "kubernetes-namespace";
     public static final String PROFILE_INSTANCE_LIMIT = "profile-instance-limit";
+    public static final String POD_TEMPLATE_MODE = "pod-template-mode";
     public static final String DOCKER_IMAGE = "dockerImage";
     public static final String DOCKER_ARGS = "dockerArgs";
     public static final String DOCKER_CMD = "dockerCmd";

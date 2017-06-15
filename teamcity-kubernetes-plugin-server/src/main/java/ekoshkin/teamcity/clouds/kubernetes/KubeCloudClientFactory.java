@@ -3,11 +3,11 @@ package ekoshkin.teamcity.clouds.kubernetes;
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
+import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProviders;
 import ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
-import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
@@ -26,16 +26,16 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     public static final String ID = "kube"; //should be 6 chars maximum
 
     private final PluginDescriptor myPluginDescriptor;
-    private final ServerSettings myServerSettings;
     private KubeAuthStrategyProvider myAuthStrategies;
+    private PodSpecProviders myPodSpecProviders;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
                                   @NotNull final PluginDescriptor pluginDescriptor,
-                                  @NotNull final ServerSettings serverSettings,
-                                  @NotNull final KubeAuthStrategyProvider authStrategies) {
+                                  @NotNull final KubeAuthStrategyProvider authStrategies,
+                                  @NotNull final PodSpecProviders podSpecProviders) {
         myPluginDescriptor = pluginDescriptor;
-        myServerSettings = serverSettings;
         myAuthStrategies = authStrategies;
+        myPodSpecProviders = podSpecProviders;
         registrar.registerCloudFactory(this);
     }
 
@@ -86,6 +86,6 @@ public class KubeCloudClientFactory implements CloudClientFactory {
             kubeCloudImage.populateInstances();
             return kubeCloudImage;
         });
-        return new KubeCloudClient(apiConnector, myServerSettings, images, kubeClientParams);
+        return new KubeCloudClient(apiConnector, images, kubeClientParams, myPodSpecProviders);
     }
 }

@@ -1,6 +1,9 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
+import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
+import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import io.fabric8.kubernetes.api.model.Pod;
+import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,5 +14,7 @@ public interface PodSpecProvider {
     @NotNull String getId();
     @NotNull String getDisplayName();
     @Nullable String getDescription();
-    @NotNull Pod getPodSpec();
+
+    @NotNull
+    Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeApiConnection kubeApiConnection);
 }

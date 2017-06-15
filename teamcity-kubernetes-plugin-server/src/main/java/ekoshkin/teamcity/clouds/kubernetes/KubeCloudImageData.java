@@ -45,4 +45,8 @@ public class KubeCloudImageData {
     public Integer getAgentPoolId() {
         return myRawImageData.getAgentPoolId();
     }
+
+    public String getPodSpecMode() {
+        return myRawImageData.getParameter(KubeParametersConstants.POD_TEMPLATE_MODE);
+    }
 }
