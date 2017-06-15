@@ -37,7 +37,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
         this.$addImageButton = $j('#kubeAddImageButton');
         this.$cancelAddImageButton = $j('#kubeCancelAddImageButton');
-        this.$authStrategySelector = $j('#auth-strategy');
+        this.$authStrategySelector = $j('#authStrategy');
 
         this.$dockerImage = $j('#dockerImage');
         this.$imagePullPolicy = $j('#imagePullPolicy');

@@ -7,7 +7,7 @@ import jetbrains.buildServer.clouds.CloudImageParameters;
  */
 public class KubeParametersConstants {
     public static final String API_SERVER_URL = "api-server-url";
-    public static final String AUTH_STRATEGY = "auth-strategy";
+    public static final String AUTH_STRATEGY = "authStrategy";
     public static final String KUBERNETES_NAMESPACE = "kubernetes-namespace";
     public static final String PROFILE_INSTANCE_LIMIT = "profile-instance-limit";
     public static final String DOCKER_IMAGE = "dockerImage";
