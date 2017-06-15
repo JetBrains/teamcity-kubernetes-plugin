@@ -117,7 +117,6 @@
 <bs:dialog dialogId="KubeImageDialog" title="Add Kubernetes Cloud Image" closeCommand="BS.Kube.ImageDialog.close()"
            dialogClass="KubeImageDialog" titleId="KubeImageDialogTitle">
     <table class="runnerFormTable paramsTable">
-
         <tr>
             <th><label for="${cons.podSpecMode}">Mode: <l:star/></label></th>
             <td>
@@ -139,8 +138,7 @@
                 </c:forEach>
             </td>
         </tr>
-
-        <tr>
+        <tr class="hidden simple pod-spec-ui">
             <th>Docker image:&nbsp;<l:star/></th>
             <td>
                 <div>
@@ -150,7 +148,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="hidden simple pod-spec-ui">
             <th>Image pull policy:</th>
             <td>
                 <div>
@@ -165,7 +163,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="hidden simple pod-spec-ui">
             <th>Docker command:</th>
             <td>
                 <div>
@@ -176,7 +174,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="hidden simple pod-spec-ui">
             <th>Docker Arguments:</th>
             <td>
                 <div>
@@ -184,6 +182,22 @@
                     <div class="smallNoteAttention">Arguments for docker entrypoint. The docker image's CMD is used if this is not provided.
                         &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a></div>
                     <span class="error option-error option-error_${cons.dockerArguments}"></span>
+                </div>
+            </td>
+        </tr>
+        <tr class="hidden custom-pod-template pod-spec-ui">
+            <th>Content:&nbsp;<l:star/></th>
+            <td>
+                TODO
+            </td>
+        </tr>
+        <tr class="hidden deployment-base pod-spec-ui">
+            <th>Deployment name:&nbsp;<l:star/></th>
+            <td>
+                <div>
+                    <input type="text" id="${cons.deploymentName}" value="" class="longField" data-id="${cons.deploymentName}" data-err-id="${cons.deploymentName}"/>
+                    <div class="smallNoteAttention">Deployment to use as a pod template.</div>
+                    <span class="error option-error option-error_${cons.deploymentName}"></span>
                 </div>
             </td>
         </tr>

@@ -38,6 +38,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$addImageButton = $j('#kubeAddImageButton');
         this.$cancelAddImageButton = $j('#kubeCancelAddImageButton');
         this.$authStrategySelector = $j('#authStrategy');
+        this.$podSpecModeSelector = $j('#podTemplateMode');
 
         this.$dockerImage = $j('#dockerImage');
         this.$imagePullPolicy = $j('#imagePullPolicy');
@@ -96,6 +97,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         });
 
         this.$authStrategySelector.on('change', this._toggleAuth.bind(this));
+        this.$podSpecModeSelector.on('change', this._togglePodSpecMode.bind(this));
 
         ///// Change handlers
         this.$dockerImage.on('change', function (e, value) {
@@ -211,12 +213,18 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _toggleAuth: function () {
-        console.info('_toggleAuth called');
         var selectedStrategyId = this.$authStrategySelector.val();
-        console.info('auth strategy selected ' + selectedStrategyId);
         $j('.auth-ui').toggleClass('hidden', true);
         if(selectedStrategyId) {
             $j('.' + selectedStrategyId).removeClass('hidden');
+        }
+    },
+
+    _togglePodSpecMode: function () {
+        var selectedMode = this.$podSpecModeSelector.val();
+        $j('.pod-spec-ui').toggleClass('hidden', true);
+        if(selectedMode) {
+            $j('.' + selectedMode).removeClass('hidden');
         }
     },
 
