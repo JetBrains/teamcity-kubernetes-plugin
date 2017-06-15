@@ -1,6 +1,5 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
@@ -42,20 +41,8 @@ public class KubeCloudClient implements CloudClientEx {
                            @NotNull KubeCloudClientParameters kubeClientParams) {
         myApiConnector = apiConnector;
         myServerSettings = serverSettings;
-        myImageNameToImageMap = new ConcurrentHashMap<String, KubeCloudImage>(Maps.uniqueIndex(images, new Function<KubeCloudImage, String>() {
-            @NotNull
-            @Override
-            public String apply(@javax.annotation.Nullable KubeCloudImage kubeCloudImage) {
-                return kubeCloudImage.getName();
-            }
-        }));
-        myImageIdToImageMap = new ConcurrentHashMap<String, KubeCloudImage>(Maps.uniqueIndex(images, new Function<KubeCloudImage, String>() {
-            @NotNull
-            @Override
-            public String apply(@javax.annotation.Nullable KubeCloudImage kubeCloudImage) {
-                return kubeCloudImage.getId();
-            }
-        }));
+        myImageNameToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, kubeCloudImage -> kubeCloudImage.getName()));
+        myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, kubeCloudImage -> kubeCloudImage.getId()));
         myKubeClientParams = kubeClientParams;
     }
 
