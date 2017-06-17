@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public class CustomTemplatePodSpecProvider implements PodSpecProvider {
+public class CustomTemplatePodTemplateProvider implements PodTemplateProvider {
     @NotNull
     @Override
     public String getId() {

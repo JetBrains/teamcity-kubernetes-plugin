@@ -14,7 +14,7 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 <jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy>"/>
-<jsp:useBean id="podSpecProviders" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProvider>"/>
+<jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.podSpec.PodTemplateProvider>"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -124,14 +124,14 @@
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
                     <props:selectProperty name="${cons.podSpecMode}">
                         <props:option value="" selected="${empty selectedPodSpecMode}">--- Choose what you need ---</props:option>
-                        <c:forEach var="podSpecProvider" items="${podSpecProviders}">
-                            <props:option value="${podSpecProvider.id}" selected="${not empty selectedPodSpecMode and podSpecProvider.id eq selectedPodSpecMode}"><c:out value="${podSpecProvider.displayName}"/></props:option>
+                        <c:forEach var="podTemplateProvider" items="${podTemplateProviders}">
+                            <props:option value="${podTemplateProvider.id}" selected="${not empty selectedPodSpecMode and podTemplateProvider.id eq selectedPodSpecMode}"><c:out value="${podTemplateProvider.displayName}"/></props:option>
                         </c:forEach>
                     </props:selectProperty>
                     <span id="error_${cons.podSpecMode}" class="error"></span>
                 </div>
-                <c:forEach var="podSpecProvider" items="${podSpecProviders}">
-                    <c:set var="description" value="${podSpecProvider.description}"/>
+                <c:forEach var="podTemplateProvider" items="${podTemplateProviders}">
+                    <c:set var="description" value="${podTemplateProvider.description}"/>
                     <c:if test="${not empty description}">
                         <span class="smallNote"><c:out value="${description}"/></span>
                     </c:if>

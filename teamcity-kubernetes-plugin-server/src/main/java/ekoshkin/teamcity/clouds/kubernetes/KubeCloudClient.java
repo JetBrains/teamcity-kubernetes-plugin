@@ -2,8 +2,8 @@ package ekoshkin.teamcity.clouds.kubernetes;
 
 import com.google.common.collect.Maps;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
-import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProvider;
-import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProviders;
+import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodTemplateProvider;
+import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodTemplateProviders;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.*;
@@ -24,18 +24,18 @@ public class KubeCloudClient implements CloudClientEx {
     private final ConcurrentHashMap<String, KubeCloudImage> myImageNameToImageMap;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParameters myKubeClientParams;
-    private final PodSpecProviders myPodSpecProviders;
+    private final PodTemplateProviders myPodTemplateProviders;
     private CloudErrorInfo myCurrentError = null;
 
     public KubeCloudClient(@NotNull final KubeApiConnector apiConnector,
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParameters kubeClientParams,
-                           @NotNull PodSpecProviders podSpecProviders) {
+                           @NotNull PodTemplateProviders podTemplateProviders) {
         myApiConnector = apiConnector;
         myImageNameToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, kubeCloudImage -> kubeCloudImage.getName()));
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, kubeCloudImage -> kubeCloudImage.getId()));
         myKubeClientParams = kubeClientParams;
-        myPodSpecProviders = podSpecProviders;
+        myPodTemplateProviders = podTemplateProviders;
     }
 
     @Override
@@ -52,8 +52,8 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
         final KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
-        PodSpecProvider podSpecProvider = myPodSpecProviders.get(kubeCloudImage.getPodSpecMode());
-        final Pod podTemplate = podSpecProvider.getPodTemplate(cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
+        PodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
+        final Pod podTemplate = podTemplateProvider.getPodTemplate(cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
 
         try {
             final Pod newPod = myApiConnector.createPod(podTemplate);

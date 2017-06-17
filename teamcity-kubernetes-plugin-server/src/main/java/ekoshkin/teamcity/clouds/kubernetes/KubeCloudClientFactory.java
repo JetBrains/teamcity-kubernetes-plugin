@@ -3,7 +3,7 @@ package ekoshkin.teamcity.clouds.kubernetes;
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
-import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProviders;
+import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodTemplateProviders;
 import ekoshkin.teamcity.clouds.kubernetes.web.KubeProfileEditController;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.serverSide.AgentDescription;
@@ -27,15 +27,15 @@ public class KubeCloudClientFactory implements CloudClientFactory {
 
     private final PluginDescriptor myPluginDescriptor;
     private KubeAuthStrategyProvider myAuthStrategies;
-    private PodSpecProviders myPodSpecProviders;
+    private PodTemplateProviders myPodTemplateProviders;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
                                   @NotNull final PluginDescriptor pluginDescriptor,
                                   @NotNull final KubeAuthStrategyProvider authStrategies,
-                                  @NotNull final PodSpecProviders podSpecProviders) {
+                                  @NotNull final PodTemplateProviders podTemplateProviders) {
         myPluginDescriptor = pluginDescriptor;
         myAuthStrategies = authStrategies;
-        myPodSpecProviders = podSpecProviders;
+        myPodTemplateProviders = podTemplateProviders;
         registrar.registerCloudFactory(this);
     }
 
@@ -86,6 +86,6 @@ public class KubeCloudClientFactory implements CloudClientFactory {
             kubeCloudImage.populateInstances();
             return kubeCloudImage;
         });
-        return new KubeCloudClient(apiConnector, images, kubeClientParams, myPodSpecProviders);
+        return new KubeCloudClient(apiConnector, images, kubeClientParams, myPodTemplateProviders);
     }
 }

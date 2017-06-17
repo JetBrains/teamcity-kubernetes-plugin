@@ -6,7 +6,7 @@ import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectionCheckResult;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
-import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodSpecProviders;
+import ekoshkin.teamcity.clouds.kubernetes.podSpec.PodTemplateProviders;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
@@ -34,20 +34,20 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final PluginDescriptor myPluginDescriptor;
     private final AgentPoolManager myAgentPoolManager;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
-    private final PodSpecProviders myPodSpecProviders;
+    private final PodTemplateProviders myPodTemplateProviders;
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
                                      @NotNull final WebControllerManager web,
                                      @NotNull final PluginDescriptor pluginDescriptor,
                                      @NotNull final AgentPoolManager agentPoolManager,
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
-                                     @NotNull final PodSpecProviders podSpecProviders) {
+                                     @NotNull final PodTemplateProviders podTemplateProviders) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myPath = pluginDescriptor.getPluginResourcesPath(EDIT_KUBE_HTML);
         myAgentPoolManager = agentPoolManager;
         myAuthStrategyProvider = authStrategyProvider;
-        myPodSpecProviders = podSpecProviders;
+        myPodTemplateProviders = podTemplateProviders;
         web.registerController(myPath, this);
     }
 
@@ -59,7 +59,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         final String projectId = httpServletRequest.getParameter("projectId");
         model.put("agentPools", myAgentPoolManager.getProjectOwnedAgentPools(projectId));
         model.put("authStrategies", myAuthStrategyProvider.getAll());
-        model.put("podSpecProviders", myPodSpecProviders.getAll());
+        model.put("podSpecProviders", myPodTemplateProviders.getAll());
         return modelAndView;
     }
 

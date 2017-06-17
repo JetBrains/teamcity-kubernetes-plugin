@@ -24,10 +24,10 @@ import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.NEV
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public class SimpleRunContainerPodSpecProvider implements PodSpecProvider {
+public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvider {
     private final ServerSettings myServerSettings;
 
-    public SimpleRunContainerPodSpecProvider(@NotNull ServerSettings serverSettings) {
+    public SimpleRunContainerPodTemplateProvider(@NotNull ServerSettings serverSettings) {
         myServerSettings = serverSettings;
     }
 
