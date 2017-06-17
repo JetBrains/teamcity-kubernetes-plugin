@@ -35,6 +35,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myImageData.getPodSpecMode();
     }
 
+    @Nullable
+    @Override
+    public String getCustomPodTemplateContent() {
+        return myImageData.getCustomPodTemplateContent();
+    }
+
     @NotNull
     @Override
     public String getDockerImage() {

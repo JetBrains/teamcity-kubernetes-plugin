@@ -27,4 +27,7 @@ public interface KubeCloudImage extends CloudImage {
 
     @NotNull
     String getPodSpecMode();
+
+    @Nullable
+    String getCustomPodTemplateContent();
 }

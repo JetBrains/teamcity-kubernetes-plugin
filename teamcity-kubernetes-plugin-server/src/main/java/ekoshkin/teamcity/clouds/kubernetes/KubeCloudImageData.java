@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class KubeCloudImageData {
     private final CloudImageParameters myRawImageData;
+    private String myCustomPodTemplateContent;
 
     public KubeCloudImageData(@NotNull final CloudImageParameters rawImageData) {
         myRawImageData = rawImageData;
@@ -48,5 +49,9 @@ public class KubeCloudImageData {
 
     public String getPodSpecMode() {
         return myRawImageData.getParameter(KubeParametersConstants.POD_TEMPLATE_MODE);
+    }
+
+    public String getCustomPodTemplateContent() {
+        return myRawImageData.getParameter(KubeParametersConstants.CUSTOM_POD_TEMPLATE);
     }
 }
