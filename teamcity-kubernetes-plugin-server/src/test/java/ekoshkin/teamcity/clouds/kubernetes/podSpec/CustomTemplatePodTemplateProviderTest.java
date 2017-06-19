@@ -17,7 +17,7 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
         myPodTemplateProvider = new CustomTemplatePodTemplateProvider();
     }
 
-    @Test
+    @Test(enabled = false)
     public void testGetPodTemplate() throws Exception {
         assertNotNull(myPodTemplateProvider.getPodTemplate(null, null, null));
     }
