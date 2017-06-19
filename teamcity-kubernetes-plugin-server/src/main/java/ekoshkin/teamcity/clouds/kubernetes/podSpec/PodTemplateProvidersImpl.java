@@ -1,6 +1,7 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
+import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,10 +16,10 @@ import java.util.Map;
 public class PodTemplateProvidersImpl implements PodTemplateProviders {
     private final Map<String, PodTemplateProvider> myIdToProviderMap = new HashMap<>();
 
-    public PodTemplateProvidersImpl(@NotNull ServerSettings serverSettings) {
+    public PodTemplateProvidersImpl(@NotNull ServerSettings serverSettings, @NotNull KubeAuthStrategyProvider authStrategies) {
         registerProvider(new SimpleRunContainerPodTemplateProvider(serverSettings));
         registerProvider(new CustomTemplatePodTemplateProvider());
-        registerProvider(new DeploymentPodTemplateProvider(kubeApiConnector));
+        registerProvider(new DeploymentPodTemplateProvider(authStrategies));
     }
 
     @NotNull

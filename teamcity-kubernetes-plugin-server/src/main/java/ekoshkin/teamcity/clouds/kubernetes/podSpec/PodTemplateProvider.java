@@ -1,7 +1,7 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
+import ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientParameters;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import io.fabric8.kubernetes.api.model.Pod;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import org.jetbrains.annotations.NotNull;
@@ -16,5 +16,5 @@ public interface PodTemplateProvider {
     @Nullable String getDescription();
 
     @NotNull
-    Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeApiConnection kubeApiConnection);
+    Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters clientParameters);
 }

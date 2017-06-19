@@ -1,9 +1,10 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
+import ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientParameters;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
+import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
+import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.api.model.PodTemplateSpec;
@@ -17,10 +18,10 @@ import org.jetbrains.annotations.Nullable;
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
 public class DeploymentPodTemplateProvider implements PodTemplateProvider {
-    private KubeApiConnector myKubeApiConnector;
+    private KubeAuthStrategyProvider myAuthStrategies;
 
-    public DeploymentPodTemplateProvider(KubeApiConnector kubeApiConnector) {
-        myKubeApiConnector = kubeApiConnector;
+    public DeploymentPodTemplateProvider(KubeAuthStrategyProvider authStrategies) {
+        myAuthStrategies = authStrategies;
     }
 
     @NotNull
@@ -43,12 +44,14 @@ public class DeploymentPodTemplateProvider implements PodTemplateProvider {
 
     @NotNull
     @Override
-    public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeApiConnection kubeApiConnection) {
+    public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters kubeClientParams) {
         String sourceDeploymentName = kubeCloudImage.getSourceDeploymentName();
         if(StringUtil.isEmpty(sourceDeploymentName))
             throw new KubeCloudException("Deployment name is not set in kubernetes cloud image " + kubeCloudImage.getId());
 
-        Deployment sourceDeployment = myKubeApiConnector.getDeployment(sourceDeploymentName);
+        KubeApiConnectorImpl kubeApiConnector = new KubeApiConnectorImpl(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
+
+        Deployment sourceDeployment = kubeApiConnector.getDeployment(sourceDeploymentName);
         if(sourceDeployment == null)
             throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);
 

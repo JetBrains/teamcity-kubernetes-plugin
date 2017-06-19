@@ -1,10 +1,10 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
+import ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientParameters;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
 import ekoshkin.teamcity.clouds.kubernetes.KubeContainerEnvironment;
 import ekoshkin.teamcity.clouds.kubernetes.KubeTeamCityLabels;
 import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
-import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -51,7 +51,7 @@ public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvide
 
     @NotNull
     @Override
-    public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeApiConnection apiConnection) {
+    public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters clientParameters) {
         String agentNameProvided = cloudInstanceUserData.getAgentName();
         final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
 
@@ -74,7 +74,7 @@ public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvide
         return new PodBuilder()
                 .withNewMetadata()
                 .withName(agentName)
-                .withNamespace(apiConnection.getNamespace())
+                .withNamespace(clientParameters.getNamespace())
                 .withLabels(CollectionsUtil.asMap(
                         KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
                         KubeTeamCityLabels.TEAMCITY_SERVER_UUID, myServerSettings.getServerUUID(),
