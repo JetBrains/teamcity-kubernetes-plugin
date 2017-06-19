@@ -2,11 +2,13 @@ package ekoshkin.teamcity.clouds.kubernetes.connector;
 
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -66,5 +68,11 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     public PodPhase getPodPhase(@NotNull Pod pod) {
         final Pod podNow = myKubernetesClient.pods().withName(pod.getMetadata().getName()).get();
         return podNow == null ? PodPhase.Unknown : PodPhase.valueOf(podNow.getStatus().getPhase());
+    }
+
+    @Nullable
+    @Override
+    public Deployment getDeployment(@NotNull String deploymentName) {
+        return myKubernetesClient.extensions().deployments().withName(deploymentName).get();
     }
 }

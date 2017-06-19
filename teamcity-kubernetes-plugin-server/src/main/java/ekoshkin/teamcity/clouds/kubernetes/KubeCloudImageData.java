@@ -54,4 +54,8 @@ public class KubeCloudImageData {
     public String getCustomPodTemplateContent() {
         return myRawImageData.getParameter(KubeParametersConstants.CUSTOM_POD_TEMPLATE);
     }
+
+    public String getDeploymentName() {
+        return myRawImageData.getParameter(KubeParametersConstants.SOURCCE_DEPLOYMENT);
+    }
 }

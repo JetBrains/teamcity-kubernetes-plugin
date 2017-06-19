@@ -18,7 +18,7 @@ public class PodTemplateProvidersImpl implements PodTemplateProviders {
     public PodTemplateProvidersImpl(@NotNull ServerSettings serverSettings) {
         registerProvider(new SimpleRunContainerPodTemplateProvider(serverSettings));
         registerProvider(new CustomTemplatePodTemplateProvider());
-        registerProvider(new DeploymentPodTemplateProvider());
+        registerProvider(new DeploymentPodTemplateProvider(kubeApiConnector));
     }
 
     @NotNull

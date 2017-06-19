@@ -196,9 +196,9 @@
             <th>Deployment name:&nbsp;<l:star/></th>
             <td>
                 <div>
-                    <input type="text" id="${cons.deploymentName}" value="" class="longField" data-id="${cons.deploymentName}" data-err-id="${cons.deploymentName}"/>
+                    <input type="text" id="${cons.sourceDeployment}" value="" class="longField" data-id="${cons.sourceDeployment}" data-err-id="${cons.sourceDeployment}"/>
                     <div class="smallNoteAttention">Deployment to use as a pod template.</div>
-                    <span class="error option-error option-error_${cons.deploymentName}"></span>
+                    <span class="error option-error option-error_${cons.sourceDeployment}"></span>
                 </div>
             </td>
         </tr>

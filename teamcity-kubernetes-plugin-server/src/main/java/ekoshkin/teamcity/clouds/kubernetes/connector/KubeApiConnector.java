@@ -1,7 +1,9 @@
 package ekoshkin.teamcity.clouds.kubernetes.connector;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -25,4 +27,7 @@ public interface KubeApiConnector {
 
     @NotNull
     PodPhase getPodPhase(@NotNull Pod pod);
+
+    @Nullable
+    Deployment getDeployment(@NotNull String deploymentName);
 }
