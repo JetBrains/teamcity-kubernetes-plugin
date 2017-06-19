@@ -51,6 +51,7 @@ public class DeploymentPodTemplateProvider implements PodTemplateProvider {
 
         KubeApiConnectorImpl kubeApiConnector = new KubeApiConnectorImpl(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
 
+        //TODO:cache api call result
         Deployment sourceDeployment = kubeApiConnector.getDeployment(sourceDeploymentName);
         if(sourceDeployment == null)
             throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);

@@ -114,6 +114,7 @@ public class KubeCloudClient implements CloudClientEx {
     public boolean canStartNewInstance(@NotNull CloudImage cloudImage) {
         //TODO: count instances, look into kubeapi
         //TODO: introdice limit
+        //TODO: check cluster resource quota -> https://kubernetes.io/docs/tasks/administer-cluster/apply-resource-quota-limit/
         return true;
     }
 
