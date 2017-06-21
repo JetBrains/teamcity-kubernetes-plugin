@@ -2,6 +2,7 @@ package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientParameters;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
@@ -53,7 +54,6 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
             allowing(image).getCustomPodTemplateSpec(); will(returnValue("{\n" +
-                    "\t\"template\": {\n" +
                     "\t\t\"metadata\": {\n" +
                     "\t\t\t\"labels\": {\n" +
                     "\t\t\t\t\"app\": \"nginx\"\n" +
@@ -72,10 +72,12 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
                     "\t\t\t\t}\n" +
                     "\t\t\t]\n" +
                     "\t\t}\n" +
-                    "\t}\n" +
                     "}"));
         }});
-        assertNotNull(myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams));
+        Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
+        assertNotNull(podTemplate);
+        assertNotNull(podTemplate.getMetadata());
+        assertNotNull(podTemplate.getSpec());
     }
 
     private CloudInstanceUserData createInstanceTag() {
