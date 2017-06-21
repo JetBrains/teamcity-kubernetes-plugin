@@ -23,13 +23,13 @@ public class KubeCloudClient implements CloudClientEx {
     private final KubeApiConnector myApiConnector;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageNameToImageMap;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
-    private final KubeCloudClientParameters myKubeClientParams;
+    private final KubeCloudClientParametersImpl myKubeClientParams;
     private final PodTemplateProviders myPodTemplateProviders;
     private CloudErrorInfo myCurrentError = null;
 
     public KubeCloudClient(@NotNull final KubeApiConnector apiConnector,
                            @NotNull List<KubeCloudImage> images,
-                           @NotNull KubeCloudClientParameters kubeClientParams,
+                           @NotNull KubeCloudClientParametersImpl kubeClientParams,
                            @NotNull PodTemplateProviders podTemplateProviders) {
         myApiConnector = apiConnector;
         myImageNameToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, kubeCloudImage -> kubeCloudImage.getName()));

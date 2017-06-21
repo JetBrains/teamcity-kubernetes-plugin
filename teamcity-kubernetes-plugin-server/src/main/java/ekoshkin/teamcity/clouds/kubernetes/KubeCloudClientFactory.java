@@ -78,7 +78,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @NotNull
     @Override
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
-        final KubeCloudClientParameters kubeClientParams = KubeCloudClientParameters.create(cloudClientParameters);
+        final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
         final KubeApiConnector apiConnector = new KubeApiConnectorImpl(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
         List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
             KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
