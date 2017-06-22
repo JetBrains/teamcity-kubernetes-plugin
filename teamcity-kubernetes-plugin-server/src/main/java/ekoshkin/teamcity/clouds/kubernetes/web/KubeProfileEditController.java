@@ -59,7 +59,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         final String projectId = httpServletRequest.getParameter("projectId");
         model.put("agentPools", myAgentPoolManager.getProjectOwnedAgentPools(projectId));
         model.put("authStrategies", myAuthStrategyProvider.getAll());
-        model.put("podSpecProviders", myPodTemplateProviders.getAll());
+        model.put("podTemplateProviders", myPodTemplateProviders.getAll());
         return modelAndView;
     }
 
