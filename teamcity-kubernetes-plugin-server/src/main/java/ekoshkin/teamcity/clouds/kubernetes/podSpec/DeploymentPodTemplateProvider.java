@@ -3,16 +3,18 @@ package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientParameters;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
+import ekoshkin.teamcity.clouds.kubernetes.KubeContainerEnvironment;
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnectorImpl;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodBuilder;
-import io.fabric8.kubernetes.api.model.PodTemplateSpec;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
@@ -56,11 +58,28 @@ public class DeploymentPodTemplateProvider implements PodTemplateProvider {
         if(sourceDeployment == null)
             throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);
 
+        final String agentNameProvided = cloudInstanceUserData.getAgentName();
+        final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
+        final String serverAddress = cloudInstanceUserData.getServerAddress();
+
         PodTemplateSpec podTemplateSpec = sourceDeployment.getSpec().getTemplate();
-        //TODO: fill all required properties
+
+        ObjectMeta metadata = podTemplateSpec.getMetadata();
+        metadata.setName(agentName);
+        metadata.setNamespace(kubeClientParams.getNamespace());
+        PodSpec spec = podTemplateSpec.getSpec();
+        for (Container container : spec.getContainers()){
+            container.setName(agentName);
+            container.setEnv(Arrays.asList(
+                    new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null),
+                    new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
+                    new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
+                    new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null),
+                    new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null)));
+        }
         return new PodBuilder()
-                .withSpec(podTemplateSpec.getSpec())
-                .withMetadata(podTemplateSpec.getMetadata())
+                .withMetadata(metadata)
+                .withSpec(spec)
                 .build();
     }
 }
