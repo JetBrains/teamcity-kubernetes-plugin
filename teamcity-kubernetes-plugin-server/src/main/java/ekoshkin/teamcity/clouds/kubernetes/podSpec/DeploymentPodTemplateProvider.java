@@ -1,5 +1,6 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
+import com.intellij.openapi.util.Pair;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientParameters;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
@@ -13,8 +14,7 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
@@ -70,12 +70,26 @@ public class DeploymentPodTemplateProvider implements PodTemplateProvider {
         PodSpec spec = podTemplateSpec.getSpec();
         for (Container container : spec.getContainers()){
             container.setName(agentName);
-            container.setEnv(Arrays.asList(
-                    new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null),
-                    new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
-                    new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
-                    new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null),
-                    new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null)));
+
+            Map<String, String> patchedEnvData = new HashMap<>();
+            for (EnvVar env : container.getEnv()){
+                patchedEnvData.put(env.getName(), env.getValue());
+            }
+
+            for (Pair<String, String> env : Arrays.asList(
+                    new Pair<>(KubeContainerEnvironment.AGENT_NAME, agentName),
+                    new Pair<>(KubeContainerEnvironment.SERVER_URL, serverAddress),
+                    new Pair<>(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress),
+                    new Pair<>(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName()),
+                    new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, agentName))){
+                patchedEnvData.put(env.first, env.second);
+            }
+
+            List<EnvVar> patchedEnv = new ArrayList<>();
+            for (String envName : patchedEnvData.keySet()){
+                patchedEnv.add(new EnvVar(envName, patchedEnvData.get(envName), null));
+            }
+            container.setEnv(patchedEnv);
         }
         return new PodBuilder()
                 .withMetadata(metadata)
