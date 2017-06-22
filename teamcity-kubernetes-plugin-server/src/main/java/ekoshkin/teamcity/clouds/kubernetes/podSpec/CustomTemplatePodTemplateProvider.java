@@ -1,13 +1,12 @@
 package ekoshkin.teamcity.clouds.kubernetes.podSpec;
 
 import com.intellij.openapi.util.Pair;
-import ekoshkin.teamcity.clouds.kubernetes.KubeCloudClientParameters;
-import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
-import ekoshkin.teamcity.clouds.kubernetes.KubeCloudImage;
-import ekoshkin.teamcity.clouds.kubernetes.KubeContainerEnvironment;
+import ekoshkin.teamcity.clouds.kubernetes.*;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
+import jetbrains.buildServer.serverSide.ServerSettings;
+import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +18,12 @@ import java.util.*;
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
 public class CustomTemplatePodTemplateProvider implements PodTemplateProvider {
+    private final ServerSettings myServerSettings;
+
+    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings) {
+        myServerSettings = serverSettings;
+    }
+
     @NotNull
     @Override
     public String getId() {
@@ -53,6 +58,16 @@ public class CustomTemplatePodTemplateProvider implements PodTemplateProvider {
         ObjectMeta metadata = podTemplateSpec.getMetadata();
         metadata.setName(agentName);
         metadata.setNamespace(kubeClientParams.getNamespace());
+
+        Map<String, String> patchedLabels = new HashMap<>();
+        patchedLabels.putAll(metadata.getLabels());
+        patchedLabels.putAll(CollectionsUtil.asMap(
+                KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
+                KubeTeamCityLabels.TEAMCITY_SERVER_UUID, myServerSettings.getServerUUID(),
+                KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudInstanceUserData.getProfileId(),
+                KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, kubeCloudImage.getId()));
+        metadata.setLabels(patchedLabels);
+
         PodSpec spec = podTemplateSpec.getSpec();
         for (Container container : spec.getContainers()){
             container.setName(agentName);

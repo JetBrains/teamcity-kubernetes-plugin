@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.testng.annotations.AfterMethod;
@@ -26,7 +27,11 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         m = new Mockery();
-        myPodTemplateProvider = new CustomTemplatePodTemplateProvider();
+        ServerSettings serverSettings = m.mock(ServerSettings.class);
+        m.checking(new Expectations(){{
+            allowing(serverSettings).getServerUUID(); will(returnValue("server uuid"));
+        }});
+        myPodTemplateProvider = new CustomTemplatePodTemplateProvider(serverSettings);
     }
 
     @AfterMethod
@@ -54,7 +59,8 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
             allowing(clientParams).getNamespace(); will(returnValue("custom namespace"));
-            allowing(image).getName(); will(returnValue("my image"));
+            allowing(image).getId(); will(returnValue("my image id"));
+            allowing(image).getName(); will(returnValue("my image name"));
             allowing(image).getCustomPodTemplateSpec(); will(returnValue("{\n" +
                     "\t\t\"metadata\": {\n" +
                     "\t\t\t\"labels\": {\n" +

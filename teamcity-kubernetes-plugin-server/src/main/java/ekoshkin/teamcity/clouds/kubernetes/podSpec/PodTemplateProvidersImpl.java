@@ -18,8 +18,8 @@ public class PodTemplateProvidersImpl implements PodTemplateProviders {
 
     public PodTemplateProvidersImpl(@NotNull ServerSettings serverSettings, @NotNull KubeAuthStrategyProvider authStrategies) {
         registerProvider(new SimpleRunContainerPodTemplateProvider(serverSettings));
-        registerProvider(new CustomTemplatePodTemplateProvider());
-        registerProvider(new DeploymentPodTemplateProvider(authStrategies));
+        registerProvider(new CustomTemplatePodTemplateProvider(serverSettings));
+        registerProvider(new DeploymentPodTemplateProvider(serverSettings, authStrategies));
     }
 
     @NotNull
