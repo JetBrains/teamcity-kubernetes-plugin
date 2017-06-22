@@ -53,6 +53,8 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
         KubeCloudClientParameters clientParams = m.mock(KubeCloudClientParameters.class);
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
+            allowing(clientParams).getNamespace(); will(returnValue("custom namespace"));
+            allowing(image).getName(); will(returnValue("my image"));
             allowing(image).getCustomPodTemplateSpec(); will(returnValue("{\n" +
                     "\t\t\"metadata\": {\n" +
                     "\t\t\t\"labels\": {\n" +
@@ -81,6 +83,6 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
     }
 
     private CloudInstanceUserData createInstanceTag() {
-        return new CloudInstanceUserData("foo", "foo", "foo", null, "foo", "foo", Collections.emptyMap());
+        return new CloudInstanceUserData("agent name", "auth token", "server address", null, "profile id", "profile description", Collections.emptyMap());
     }
 }
