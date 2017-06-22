@@ -35,9 +35,5 @@ public class KubeAgentConfigurationProvider {
 
         myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.IMAGE_NAME, env.get(KubeContainerEnvironment.IMAGE_NAME));
         myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.INSTANCE_NAME, env.get(KubeContainerEnvironment.INSTANCE_NAME));
-
-        //TODO: review this
-//        myAgentConfigurationEx.addAlternativeAgentAddress();
-//        myAgentConfigurationEx.setAuthorizationToken();
     }
 }
