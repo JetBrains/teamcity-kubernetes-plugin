@@ -53,7 +53,7 @@
             <c:forEach var="strategy" items="${authStrategies}">
                 <c:set var="description" value="${strategy.description}"/>
                 <c:if test="${not empty description}">
-                    <span class="smallNote"><c:out value="${description}"/></span>
+                    <span class="smallNote hidden auth-ui ${strategy.id}"><c:out value="${description}"/></span>
                 </c:if>
             </c:forEach>
         </td>
