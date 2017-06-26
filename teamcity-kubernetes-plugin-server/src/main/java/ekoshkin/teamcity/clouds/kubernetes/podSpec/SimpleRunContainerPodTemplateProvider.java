@@ -40,7 +40,7 @@ public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvide
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Simply run container";
+        return "Simply run single container";
     }
 
     @Nullable
