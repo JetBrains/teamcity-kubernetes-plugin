@@ -18,7 +18,8 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
         registerStrategy(new UserPasswdAuthStrategy());
         registerStrategy(new DefaultServiceAccountAuthStrategy());
         registerStrategy(new UnauthorizedAccessStrategy());
-        //TODO: token auth strategy (regular and openshift)
+        registerStrategy(new ClientCertificateAuthStrategy());
+        registerStrategy(new TokenAuthStrategy());
     }
 
     @NotNull
