@@ -118,7 +118,7 @@
            dialogClass="KubeImageDialog" titleId="KubeImageDialogTitle">
     <table class="runnerFormTable paramsTable">
         <tr>
-            <th><label for="${cons.podSpecMode}">Mode: <l:star/></label></th>
+            <th><label for="${cons.podSpecMode}">Pod Specification: <l:star/></label></th>
             <td>
                 <div>
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
