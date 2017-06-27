@@ -242,7 +242,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             }.bind(this),
 
             maxInstances: function () {
-                if (!$j.isNumeric(maxInstances) || maxInstances < 0 ) {
+                if (maxInstances && (!$j.isNumeric(maxInstances) || maxInstances < 0 )) {
                     this.addOptionError('nonNegative', 'maxInstances');
                     isValid = false;
                 }
@@ -413,7 +413,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerArgs.trigger('change', '');
         this.$deploymentName.trigger('change', '');
         this.$customPodTemplate.trigger('change', '');
-        this.$maxInstances.trigger('change', '1');
+        this.$maxInstances.trigger('change', '');
     }
 });
 
