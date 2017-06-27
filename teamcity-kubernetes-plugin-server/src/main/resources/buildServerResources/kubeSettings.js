@@ -332,9 +332,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         BS.Hider.addHideFunction('KubeImageDialog', this._resetDataAndDialog.bind(this));
         this.$addImageButton.val('Add').data('image-id', 'undefined');
 
-        this._image = {
-            maxInstances: 1
-        };
+        this._image = {};
 
         BS.Kube.ImageDialog.showCentered();
     },
