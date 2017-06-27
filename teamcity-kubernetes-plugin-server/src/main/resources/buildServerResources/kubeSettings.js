@@ -68,6 +68,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this._bindHandlers();
         this._renderImagesTable();
         this.$addImageButton.removeAttr('disabled');
+        this._toggleAuth();
 
         this._resetDataAndDialog();
 
