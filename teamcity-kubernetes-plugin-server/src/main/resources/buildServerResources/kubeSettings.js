@@ -151,10 +151,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         }.bind(this));
     },
 
-    _resetImageData: function () {
-        this.image = [];
-    },
-
     _showDialogClickHandler: function () {
         if (! this.$showAddImageDialogButton.attr('disabled')) {
             this.showAddImageDialog();
