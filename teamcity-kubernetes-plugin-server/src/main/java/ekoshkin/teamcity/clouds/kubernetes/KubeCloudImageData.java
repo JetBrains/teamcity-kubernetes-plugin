@@ -56,6 +56,6 @@ public class KubeCloudImageData {
     }
 
     public String getDeploymentName() {
-        return myRawImageData.getParameter(KubeParametersConstants.SOURCCE_DEPLOYMENT);
+        return myRawImageData.getParameter(KubeParametersConstants.SOURCE_DEPLOYMENT);
     }
 }

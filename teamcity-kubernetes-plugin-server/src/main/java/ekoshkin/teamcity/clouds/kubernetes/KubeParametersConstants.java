@@ -17,8 +17,8 @@ public class KubeParametersConstants {
     public static final String IMAGE_PULL_POLICY = "imagePullPolicy";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
-    public static final String CUSTOM_POD_TEMPLATE = "custom-pod-template";
-    public static final String SOURCCE_DEPLOYMENT = "source-deployment";
+    public static final String CUSTOM_POD_TEMPLATE = "customPodTemplate";
+    public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
 
     public String getApiServerUrl() {
         return API_SERVER_URL;
@@ -69,7 +69,7 @@ public class KubeParametersConstants {
     }
 
     public String getSourceDeployment() {
-        return SOURCCE_DEPLOYMENT;
+        return SOURCE_DEPLOYMENT;
     }
 
     public String getCustomPodTemplate() {

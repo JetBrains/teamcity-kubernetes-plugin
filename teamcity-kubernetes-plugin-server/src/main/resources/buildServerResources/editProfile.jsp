@@ -123,12 +123,12 @@
                 <div>
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
                     <props:selectProperty name="${cons.podSpecMode}">
-                        <props:option value="" selected="${empty selectedPodSpecMode}">--- Choose what you need ---</props:option>
+                        <props:option value="notSelected" selected="${empty selectedPodSpecMode}">--- Choose what you need ---</props:option>
                         <c:forEach var="podTemplateProvider" items="${podTemplateProviders}">
                             <props:option value="${podTemplateProvider.id}" selected="${not empty selectedPodSpecMode and podTemplateProvider.id eq selectedPodSpecMode}"><c:out value="${podTemplateProvider.displayName}"/></props:option>
                         </c:forEach>
                     </props:selectProperty>
-                    <span id="error_${cons.podSpecMode}" class="error"></span>
+                    <span class="error option-error option-error_${cons.podSpecMode}"></span>
                 </div>
                 <c:forEach var="podTemplateProvider" items="${podTemplateProviders}">
                     <c:set var="description" value="${podTemplateProvider.description}"/>
@@ -186,7 +186,7 @@
             </td>
         </tr>
         <tr class="hidden custom-pod-template pod-spec-ui">
-            <th>Content:&nbsp;<l:star/></th>
+            <th>Pod Template Content:&nbsp;<l:star/></th>
             <td>
                 <textarea id="${cons.customPodTemplate}" wrap="off"></textarea>
                 <span class="error option-error option-error_${cons.customPodTemplate}"></span>

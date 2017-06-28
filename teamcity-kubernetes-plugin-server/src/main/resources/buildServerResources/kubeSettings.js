@@ -13,7 +13,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 <td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
         </tr>')},
 
-    _dataKeys: [ 'dockerImage', 'pool', 'maxInstances' ],
+    _dataKeys: [ 'dockerImage', 'pool', 'maxInstances', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment' ],
 
     selectors: {
         rmImageLink: '.removeVmImageLink',
@@ -24,6 +24,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     _errors: {
         badParam: 'Bad parameter',
         required: 'This field cannot be blank',
+        notSeleted: 'Something should be seleted',
         nonNegative: 'Must be non-negative number'
     },
 
@@ -44,8 +45,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagePullPolicy = $j('#imagePullPolicy');
         this.$dockerCommand = $j('#dockerCmd');
         this.$dockerArgs = $j('#dockerArgs');
-        this.$deploymentName = $j('#source-deployment');
-        this.$customPodTemplate = $j('#custom-pod-template');
+        this.$deploymentName = $j('#sourceDeployment');
+        this.$customPodTemplate = $j('#customPodTemplate');
         this.$maxInstances = $j('#maxInstances');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
@@ -102,7 +103,16 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         });
 
         this.$authStrategySelector.on('change', this._toggleAuth.bind(this));
-        this.$podSpecModeSelector.on('change', this._togglePodSpecMode.bind(this));
+
+        this.$podSpecModeSelector.on('change', function(e, value) {
+            if (arguments.length === 1) {
+                this._image['podTemplateMode'] = this.$podSpecModeSelector.val();
+            } else {
+                this.$podSpecModeSelector.val(value);
+            }
+            this._togglePodSpecMode();
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
 
         ///// Change handlers
         this.$dockerImage.on('change', function (e, value) {
@@ -125,7 +135,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
         this.$dockerCommand.on('change', function (e, value) {
             if (arguments.length === 1) {
-                this._image['dockerCommand'] = this.$dockerCommand.val();
+                this._image['dockerCmd'] = this.$dockerCommand.val();
             } else {
                 this.$dockerCommand.val(value);
             }
@@ -137,6 +147,24 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 this._image['dockerArgs'] = this.$dockerArgs.val();
             } else {
                 this.$dockerArgs.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$deploymentName.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['sourceDeployment'] = this.$deploymentName.val();
+            } else {
+                this.$deploymentName.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$customPodTemplate.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['customPodTemplate'] = this.$customPodTemplate.val();
+            } else {
+                this.$customPodTemplate.val(value);
             }
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
@@ -231,17 +259,41 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     validateOptions: function (options){
         var isValid = true;
-        var maxInstances = this._image['maxInstances'];
 
         var validators = {
+
+            podTemplateMode : function () {
+                var podTemplateMode = this._image['podTemplateMode'];
+                if (!podTemplateMode || podTemplateMode === 'notSelected' || podTemplateMode === 'undefined') {
+                    this.addOptionError('notSeleted', 'podTemplateMode');
+                    isValid = false;
+                }
+            }.bind(this),
+
             dockerImage : function () {
-                if (!this._image['dockerImage']) {
+                if (this._image['podTemplateMode'] === 'simple' && !this._image['dockerImage']) {
                     this.addOptionError('required', 'dockerImage');
                     isValid = false;
                 }
             }.bind(this),
 
+            sourceDeployment : function () {
+                if (this._image['podTemplateMode'] === 'deployment-base' && !this._image['sourceDeployment']) {
+                    this.addOptionError('required', 'sourceDeployment');
+                    isValid = false;
+                }
+            }.bind(this),
+
+            customPodTemplateContent : function () {
+                var valueToValidate = this._image['customPodTemplate'];
+                if (this._image['podTemplateMode'] === 'custom-pod-template' && (!valueToValidate || valueToValidate === '')) {
+                    this.addOptionError('required', 'customPodTemplate');
+                    isValid = false;
+                }
+            }.bind(this),
+
             maxInstances: function () {
+                var maxInstances = this._image['maxInstances'];
                 if (maxInstances && (!$j.isNumeric(maxInstances) || maxInstances < 0 )) {
                     this.addOptionError('nonNegative', 'maxInstances');
                     isValid = false;
@@ -349,20 +401,19 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
         var image = this._image;
 
-        this.$podSpecModeSelector.trigger('change', image['podTemplateMode'] || '');
+        this.$podSpecModeSelector.trigger('change', image['podTemplateMode'] || 'notSelected');
         this.$dockerImage.trigger('change', image['dockerImage'] || '');
-        this.$imagePullPolicy.trigger('change', image['imagePullPolicy'] || '');
+        this.$imagePullPolicy.trigger('change', image['imagePullPolicy'] || 'IfNotPresent');
         this.$dockerCommand.trigger('change', image['dockerCmd'] || '');
         this.$dockerArgs.trigger('change', image['dockerArgs'] || '');
-        this.$deploymentName.trigger('change', image['source-deployment'] || '');
-        this.$customPodTemplate.trigger('change', image['custom-pod-template'] || '');
+        this.$deploymentName.trigger('change', image['sourceDeployment'] || '');
+        this.$customPodTemplate.trigger('change', image['customPodTemplate'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
 
         BS.Kube.ImageDialog.showCentered();
     },
 
     addImage: function () {
-        console.info('addimage called');
         var newImageId = this._lastImageId++,
             newImage = this._image;
         newImage['source-id'] = newImageId;
@@ -402,13 +453,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _resetDataAndDialog: function () {
-        console.info('_resetDataAndDialog called');
-
         this._image = {};
 
-        this.$podSpecModeSelector.trigger('change', '0');
+        this.$podSpecModeSelector.trigger('change', 'notSelected');
         this.$dockerImage.trigger('change', '');
-        this.$imagePullPolicy.trigger('change', '');
+        this.$imagePullPolicy.trigger('change', 'IfNotPresent');
         this.$dockerCommand.trigger('change', '');
         this.$dockerArgs.trigger('change', '');
         this.$deploymentName.trigger('change', '');
