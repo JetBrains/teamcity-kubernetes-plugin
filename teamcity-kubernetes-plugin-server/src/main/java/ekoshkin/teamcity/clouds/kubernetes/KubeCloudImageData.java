@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public class KubeCloudImageData {
     private final CloudImageParameters myRawImageData;
-    private String myCustomPodTemplateContent;
 
     public KubeCloudImageData(@NotNull final CloudImageParameters rawImageData) {
         myRawImageData = rawImageData;
@@ -57,5 +56,11 @@ public class KubeCloudImageData {
 
     public String getDeploymentName() {
         return myRawImageData.getParameter(KubeParametersConstants.SOURCE_DEPLOYMENT);
+    }
+
+    public int getInstanceLimit() {
+        String parameter = myRawImageData.getParameter(KubeParametersConstants.IMAGE_INSTANCE_LIMIT);
+        if(StringUtil.isEmpty(parameter)) return -1;
+        return Integer.parseInt(parameter);
     }
 }

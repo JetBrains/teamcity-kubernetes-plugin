@@ -9,7 +9,8 @@ public class KubeParametersConstants {
     public static final String API_SERVER_URL = "api-server-url";
     public static final String AUTH_STRATEGY = "authStrategy";
     public static final String KUBERNETES_NAMESPACE = "kubernetes-namespace";
-    public static final String PROFILE_INSTANCE_LIMIT = "profile-instance-limit";
+    public static final String PROFILE_INSTANCE_LIMIT = "profileInstanceLimit";
+    public static final String IMAGE_INSTANCE_LIMIT = "imageInstanceLimit";
     public static final String POD_TEMPLATE_MODE = "podTemplateMode";
     public static final String DOCKER_IMAGE = "dockerImage";
     public static final String DOCKER_ARGS = "dockerArgs";
@@ -84,5 +85,9 @@ public class KubeParametersConstants {
 
     public String getCustomPodTemplate() {
         return CUSTOM_POD_TEMPLATE;
+    }
+
+    public String getMaxInstances() {
+        return IMAGE_INSTANCE_LIMIT;
     }
 }

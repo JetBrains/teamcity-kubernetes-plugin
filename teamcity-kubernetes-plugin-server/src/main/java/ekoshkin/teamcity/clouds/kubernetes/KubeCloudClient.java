@@ -26,6 +26,7 @@ public class KubeCloudClient implements CloudClientEx {
     private final KubeCloudClientParametersImpl myKubeClientParams;
     private final PodTemplateProviders myPodTemplateProviders;
     private CloudErrorInfo myCurrentError = null;
+    private int myCurrentlyRunningInstancesCount = 0;
 
     public KubeCloudClient(@NotNull final KubeApiConnector apiConnector,
                            @NotNull List<KubeCloudImage> images,
@@ -36,6 +37,10 @@ public class KubeCloudClient implements CloudClientEx {
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getId));
         myKubeClientParams = kubeClientParams;
         myPodTemplateProviders = podTemplateProviders;
+        for(KubeCloudImage image : images) {
+            image.populateInstances();
+            myCurrentlyRunningInstancesCount += image.getInstanceCount();
+        }
     }
 
     @Override
@@ -60,6 +65,7 @@ public class KubeCloudClient implements CloudClientEx {
             myCurrentError = null;
             final KubeCloudInstanceImpl newInstance = new KubeCloudInstanceImpl(kubeCloudImage, newPod, myApiConnector);
             kubeCloudImage.addInstance(newInstance);
+            myCurrentlyRunningInstancesCount++;
             return newInstance;
         } catch (KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
@@ -76,7 +82,7 @@ public class KubeCloudClient implements CloudClientEx {
     public void terminateInstance(@NotNull CloudInstance cloudInstance) {
         KubeCloudInstance kubeCloudInstance = (KubeCloudInstance) cloudInstance;
         kubeCloudInstance.terminate();
-        //TODO: update instance counter
+        myCurrentlyRunningInstancesCount--;
     }
 
     @Nullable
@@ -112,10 +118,12 @@ public class KubeCloudClient implements CloudClientEx {
 
     @Override
     public boolean canStartNewInstance(@NotNull CloudImage cloudImage) {
-        //TODO: count instances, look into kubeapi
-        //TODO: introdice limit
         //TODO: check cluster resource quota -> https://kubernetes.io/docs/tasks/administer-cluster/apply-resource-quota-limit/
-        return true;
+        int profileInstanceLimit = myKubeClientParams.getInstanceLimit();
+        if(profileInstanceLimit > 0 && myCurrentlyRunningInstancesCount >= profileInstanceLimit) return false;
+        KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
+        int imageLimit = kubeCloudImage.getInstanceLimit();
+        return imageLimit < 0 || kubeCloudImage.getInstanceCount() < imageLimit;
     }
 
     @Nullable

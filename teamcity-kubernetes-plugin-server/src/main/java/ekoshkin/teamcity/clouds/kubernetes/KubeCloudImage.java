@@ -25,6 +25,8 @@ public interface KubeCloudImage extends CloudImage {
 
     boolean deleteInstance(@NotNull KubeCloudInstance instance);
 
+    void populateInstances();
+
     @NotNull
     String getPodSpecMode();
 
@@ -33,4 +35,8 @@ public interface KubeCloudImage extends CloudImage {
 
     @Nullable
     String getSourceDeploymentName();
+
+    int getInstanceCount();
+
+    int getInstanceLimit();
 }

@@ -47,6 +47,16 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myImageData.getDeploymentName();
     }
 
+    @Override
+    public int getInstanceCount() {
+        return myIdToInstanceMap.size();
+    }
+
+    @Override
+    public int getInstanceLimit() {
+        return myImageData.getInstanceLimit();
+    }
+
     @NotNull
     @Override
     public String getDockerImage() {
@@ -117,7 +127,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myIdToInstanceMap.remove(instance.getInstanceId()) != null;
     }
 
-    void populateInstances(){
+    public void populateInstances(){
         try{
             for (Pod pod : myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()))){
                 KubeCloudInstanceImpl cloudInstance = new KubeCloudInstanceImpl(this, pod, myApiConnector);
@@ -126,6 +136,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
             myCurrentError = null;
         } catch (KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed populate instances", ex.getMessage(), ex);
+            throw ex;
         }
     }
 }

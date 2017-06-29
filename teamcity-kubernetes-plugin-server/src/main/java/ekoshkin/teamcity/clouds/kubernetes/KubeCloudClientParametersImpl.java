@@ -47,12 +47,17 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
     @NotNull
     @Override
     public Collection<KubeCloudImageData> getImages(){
-        return CollectionsUtil.convertCollection(myParameters.getCloudImages(), cloudImageParameters -> new KubeCloudImageData(cloudImageParameters));
+        return CollectionsUtil.convertCollection(myParameters.getCloudImages(), KubeCloudImageData::new);
     }
 
     @Override
     @NotNull
     public String getAuthStrategy() {
         return myParameters.getParameter(AUTH_STRATEGY);
+    }
+
+    public int getInstanceLimit() {
+        String parameter = myParameters.getParameter(PROFILE_INSTANCE_LIMIT);
+        return StringUtil.isEmpty(parameter) ? -1 : Integer.valueOf(parameter);
     }
 }

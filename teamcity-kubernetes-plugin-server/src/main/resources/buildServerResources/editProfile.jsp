@@ -220,9 +220,9 @@
             <th>Max number of instances:</th>
             <td>
                 <div>
-                    <input type="text" id="maxInstances" value="" class="longField" data-id="maxInstances" data-err-id="maxInstances"/>
+                    <input type="text" id="${cons.maxInstances}" value="" class="longField" data-id="${cons.maxInstances}" data-err-id="${cons.maxInstances}"/>
                 </div>
-                <span class="error option-error option-error_maxInstances"></span>
+                <span class="error option-error option-error_${cons.maxInstances}"></span>
             </td>
         </tr>
         <tr class="advancedSetting">
