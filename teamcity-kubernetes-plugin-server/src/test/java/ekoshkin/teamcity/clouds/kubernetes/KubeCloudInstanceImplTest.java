@@ -6,12 +6,11 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.PodStatusBuilder;
 import jetbrains.buildServer.BaseTestCase;
+import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.Date;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 29.06.17.
@@ -29,14 +28,18 @@ public class KubeCloudInstanceImplTest extends BaseTestCase {
 
     @AfterMethod
     public void tearDown() throws Exception {
+        m.assertIsSatisfied();
         super.tearDown();
     }
 
     @Test
     public void testGetStartedTime() throws Exception {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
-        Pod pod = new Pod("1.0", "kind", new ObjectMeta(), new PodSpec(), new PodStatusBuilder().withStartTime("2017-06-12T22:59").build());
+        Pod pod = new Pod("1.0", "kind", new ObjectMeta(), new PodSpec(), new PodStatusBuilder().withStartTime("2017-06-12T22:59Z").build());
+        m.checking(new Expectations(){{
+            allowing(myApi).getPodStatus(with(pod)); will(returnValue(pod.getStatus()));
+        }});
         KubeCloudInstanceImpl instance = new KubeCloudInstanceImpl(image, pod, myApi);
-        assertEquals(new Date(), instance.getStartedTime());
+        assertEquals("Mon Jun 12 22:59:00 MSK 2017", instance.getStartedTime().toString());
     }
 }

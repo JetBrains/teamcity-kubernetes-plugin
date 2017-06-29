@@ -2,7 +2,6 @@ package ekoshkin.teamcity.clouds.kubernetes.web;
 
 import com.intellij.openapi.diagnostic.Logger;
 import ekoshkin.teamcity.clouds.internal.PluginPropertiesUtil;
-import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants;
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
@@ -101,7 +100,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     errors.addError("connection", connectionCheckResult.getMessage());
                     writeErrors(xmlResponse, errors);
                 }
-            } catch (KubeCloudException ex){
+            } catch (Exception ex){
                 LOG.debug(ex);
                 final ActionErrors errors = new ActionErrors();
                 errors.addError("connection", ex.getMessage());

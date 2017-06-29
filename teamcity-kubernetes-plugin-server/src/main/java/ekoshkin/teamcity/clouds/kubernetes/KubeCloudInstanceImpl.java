@@ -4,15 +4,20 @@ import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
 import ekoshkin.teamcity.clouds.kubernetes.connector.PodConditionType;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodCondition;
+import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.InstanceStatus;
 import jetbrains.buildServer.serverSide.AgentDescription;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static ekoshkin.teamcity.clouds.kubernetes.KubeAgentProperties.INSTANCE_NAME;
@@ -21,10 +26,13 @@ import static ekoshkin.teamcity.clouds.kubernetes.KubeAgentProperties.INSTANCE_N
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeCloudInstanceImpl implements KubeCloudInstance {
+    SimpleDateFormat POD_TRANSITION_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    SimpleDateFormat POD_START_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+
     private final KubeCloudImage myKubeCloudImage;
-    @NotNull
     private final KubeApiConnector myApiConnector;
     private final Pod myPod;
+
     private CloudErrorInfo myCurrentError;
 
     public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage,
@@ -62,11 +70,23 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public Date getStartedTime() {
-        for(PodCondition podCondition : myPod.getStatus().getConditions()){
-            if(PodConditionType.valueOf(podCondition.getType()) == PodConditionType.Ready)
-                return new Date(podCondition.getLastTransitionTime());
+        final PodStatus podStatus = myApiConnector.getPodStatus(myPod);
+        try {
+            final List<PodCondition> podConditions = podStatus.getConditions();
+            if (!podConditions.isEmpty()) {
+                for (PodCondition podCondition : podConditions) {
+                    if (PodConditionType.valueOf(podCondition.getType()) == PodConditionType.Ready)
+                        return POD_TRANSITION_TIME_FORMAT.parse(podCondition.getLastTransitionTime());
+                }
+            }
+            String startTime = podStatus.getStartTime();
+            if(!StringUtil.isEmpty(startTime)){
+                return POD_START_TIME_FORMAT.parse(startTime);
+            } else
+                throw new KubeCloudException("Failed to get instance start date");
+        } catch (ParseException e) {
+            throw new KubeCloudException("Failed to get instance start date", e);
         }
-        throw new KubeCloudException("Failed to get started time for instance " + getInstanceId());
     }
 
     @Nullable

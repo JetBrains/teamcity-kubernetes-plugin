@@ -3,6 +3,7 @@ package ekoshkin.teamcity.clouds.kubernetes.connector;
 import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.client.*;
 import org.jetbrains.annotations.NotNull;
@@ -76,5 +77,16 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Override
     public Deployment getDeployment(@NotNull String deploymentName) {
         return myKubernetesClient.extensions().deployments().withName(deploymentName).get();
+    }
+
+    @NotNull
+    @Override
+    public PodStatus getPodStatus(@NotNull Pod pod) {
+        String podName = pod.getMetadata().getName();
+        final Pod podNow = myKubernetesClient.pods().withName(podName).get();
+        if(podNow == null) {
+            throw new KubeCloudException("Failed to get pod status for pod " + podName);
+        }
+        return podNow.getStatus();
     }
 }
