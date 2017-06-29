@@ -1,12 +1,10 @@
 package ekoshkin.teamcity.clouds.kubernetes.connector;
 
+import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
-import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,15 +19,19 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private final KubeApiConnection myConnectionSettings;
     private KubernetesClient myKubernetesClient;
 
-    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
+    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull Config config) {
         myConnectionSettings = connectionSettings;
+        myKubernetesClient = new DefaultKubernetesClient(config);
+    }
 
+    @NotNull
+    public static KubeApiConnectorImpl create(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) throws KubeCloudException{
         ConfigBuilder configBuilder = new ConfigBuilder()
                 .withMasterUrl(connectionSettings.getApiServerUrl())
                 .withNamespace(connectionSettings.getNamespace());
         configBuilder = authStrategy.apply(configBuilder, connectionSettings);
-
-        myKubernetesClient = new DefaultKubernetesClient(configBuilder.build());
+        Config config = configBuilder.build();
+        return new KubeApiConnectorImpl(connectionSettings, config);
     }
 
     @NotNull

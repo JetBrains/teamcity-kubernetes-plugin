@@ -52,7 +52,7 @@ public class DeploymentPodTemplateProvider implements PodTemplateProvider {
         if(StringUtil.isEmpty(sourceDeploymentName))
             throw new KubeCloudException("Deployment name is not set in kubernetes cloud image " + kubeCloudImage.getId());
 
-        KubeApiConnectorImpl kubeApiConnector = new KubeApiConnectorImpl(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
+        KubeApiConnectorImpl kubeApiConnector = KubeApiConnectorImpl.create(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
 
         //TODO:cache api call result
         Deployment sourceDeployment = kubeApiConnector.getDeployment(sourceDeploymentName);
