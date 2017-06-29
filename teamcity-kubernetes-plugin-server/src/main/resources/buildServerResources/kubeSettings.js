@@ -284,7 +284,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 }
             }.bind(this),
 
-            customPodTemplateContent : function () {
+            customPodTemplate : function () {
                 var valueToValidate = this._image['customPodTemplate'];
                 if (this._image['podTemplateMode'] === 'custom-pod-template' && (!valueToValidate || valueToValidate === '')) {
                     this.addOptionError('required', 'customPodTemplate');
