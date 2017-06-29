@@ -1,7 +1,9 @@
 package ekoshkin.teamcity.clouds.kubernetes;
 
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
+import ekoshkin.teamcity.clouds.kubernetes.connector.PodConditionType;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodCondition;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
@@ -24,7 +26,6 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     private final KubeApiConnector myApiConnector;
     private final Pod myPod;
     private CloudErrorInfo myCurrentError;
-    private Date myStartedTime = new Date();
 
     public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage,
                                  @NotNull Pod pod,
@@ -61,8 +62,11 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public Date getStartedTime() {
-        //TODO: make this work => return new Date(myPod.getStatus().getStartTime());
-        return myStartedTime;
+        for(PodCondition podCondition : myPod.getStatus().getConditions()){
+            if(PodConditionType.valueOf(podCondition.getType()) == PodConditionType.Ready)
+                return new Date(podCondition.getLastTransitionTime());
+        }
+        throw new KubeCloudException("Failed to get started time for instance " + getInstanceId());
     }
 
     @Nullable
