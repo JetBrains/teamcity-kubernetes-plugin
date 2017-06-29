@@ -12,6 +12,10 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 29.06.17.
  */
@@ -40,6 +44,9 @@ public class KubeCloudInstanceImplTest extends BaseTestCase {
             allowing(myApi).getPodStatus(with(pod)); will(returnValue(pod.getStatus()));
         }});
         KubeCloudInstanceImpl instance = new KubeCloudInstanceImpl(image, pod, myApi);
-        assertEquals("Mon Jun 12 22:59:00 MSK 2017", instance.getStartedTime().toString());
+        Date startedTime = instance.getStartedTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        assertEquals("2017-06-12T22:59Z", dateFormat.format(startedTime));
     }
 }

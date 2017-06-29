@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static ekoshkin.teamcity.clouds.kubernetes.KubeAgentProperties.INSTANCE_NAME;
 
@@ -26,8 +27,8 @@ import static ekoshkin.teamcity.clouds.kubernetes.KubeAgentProperties.INSTANCE_N
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeCloudInstanceImpl implements KubeCloudInstance {
-    SimpleDateFormat POD_TRANSITION_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    SimpleDateFormat POD_START_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+    private SimpleDateFormat myPodTransitionTimeFormat;
+    private SimpleDateFormat myPodStartTimeFormat;
 
     private final KubeCloudImage myKubeCloudImage;
     private final KubeApiConnector myApiConnector;
@@ -41,6 +42,11 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         myKubeCloudImage = kubeCloudImage;
         myApiConnector = apiConnector;
         myPod = pod;
+        final TimeZone utc = TimeZone.getTimeZone("UTC");
+        myPodStartTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+        myPodStartTimeFormat.setTimeZone(utc);
+        myPodTransitionTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        myPodTransitionTimeFormat.setTimeZone(utc);
     }
 
     @NotNull
@@ -76,12 +82,12 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
             if (!podConditions.isEmpty()) {
                 for (PodCondition podCondition : podConditions) {
                     if (PodConditionType.valueOf(podCondition.getType()) == PodConditionType.Ready)
-                        return POD_TRANSITION_TIME_FORMAT.parse(podCondition.getLastTransitionTime());
+                        return myPodTransitionTimeFormat.parse(podCondition.getLastTransitionTime());
                 }
             }
             String startTime = podStatus.getStartTime();
             if(!StringUtil.isEmpty(startTime)){
-                return POD_START_TIME_FORMAT.parse(startTime);
+                return myPodStartTimeFormat.parse(startTime);
             } else
                 throw new KubeCloudException("Failed to get instance start date");
         } catch (ParseException e) {
