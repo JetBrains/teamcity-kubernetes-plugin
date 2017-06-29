@@ -195,10 +195,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                     imageDescription = 'Custom pod template';
                     break;
                 case 'deployment-base':
-                    imageDescription = 'Use deployment:' + image['sourceDeployment'];
+                    imageDescription = 'Use deployment: ' + image['sourceDeployment'];
                     break;
                 case 'simple':
-                    imageDescription = 'Run container:' + image['dockerImage'];
+                    imageDescription = 'Run container: ' + image['dockerImage'];
                     break;
                 default : imageDescription = 'UNKNOWN';
             }
