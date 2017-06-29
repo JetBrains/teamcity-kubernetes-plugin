@@ -72,6 +72,20 @@
             <span class="smallNote">Password of authorized Kubernetes user.</span>
         </td>
     </tr>
+    <tr class="hidden client-cert auth-ui">
+        <th><label for="${cons.clientCertData}">Client Certificate: <l:star/></label></th>
+        <td><props:textProperty name="${cons.clientCertData}" className="longField"/>
+            <span id="error_${cons.clientCertData}" class="error"></span>
+            <span class="smallNote">X509 Client Certificate.</span>
+        </td>
+    </tr>
+    <tr class="hidden token auth-ui">
+        <th><label for="${cons.authToken}">Token: <l:star/></label></th>
+        <td><props:textProperty name="${cons.authToken}" className="longField"/>
+            <span id="error_${cons.authToken}" class="error"></span>
+            <span class="smallNote">Bearer Token.</span>
+        </td>
+    </tr>
     <tr>
         <th class="noBorder"></th>
         <td class="noBorder">

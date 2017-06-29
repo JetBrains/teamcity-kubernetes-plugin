@@ -5,6 +5,9 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants.PASSWORD;
+import static ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants.USERNAME;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 14.06.17.
  */
@@ -32,6 +35,8 @@ public class UserPasswdAuthStrategy implements KubeAuthStrategy {
     @NotNull
     @Override
     public ConfigBuilder apply(@NotNull ConfigBuilder clientConfig, @NotNull KubeApiConnection connection) {
-        return clientConfig.withUsername(connection.getUsername()).withPassword(connection.getPassword());
+        String username = connection.getCustomParameter(USERNAME);
+        String password = connection.getCustomParameter(PASSWORD);
+        return clientConfig.withUsername(username).withPassword(password);
     }
 }

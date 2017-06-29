@@ -14,8 +14,5 @@ public interface KubeApiConnection {
     String getNamespace();
 
     @Nullable
-    String getUsername();
-
-    @Nullable
-    String getPassword();
+    String getCustomParameter(@NotNull String parameterName);
 }

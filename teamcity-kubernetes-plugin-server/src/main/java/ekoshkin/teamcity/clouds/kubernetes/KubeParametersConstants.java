@@ -17,6 +17,8 @@ public class KubeParametersConstants {
     public static final String IMAGE_PULL_POLICY = "imagePullPolicy";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String CLIENT_CERTIFICATE_DATA = "clientCertData";
+    public static final String AUTH_TOKEN = "authToken";
     public static final String CUSTOM_POD_TEMPLATE = "customPodTemplate";
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
 
@@ -62,6 +64,14 @@ public class KubeParametersConstants {
 
     public String getPassword() {
         return PASSWORD;
+    }
+
+    public String getAuthToken() {
+        return AUTH_TOKEN;
+    }
+
+    public String getClientCertData() {
+        return CLIENT_CERTIFICATE_DATA;
     }
 
     public String getPodSpecMode() {

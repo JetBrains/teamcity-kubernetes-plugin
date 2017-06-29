@@ -86,14 +86,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
 
                 @Nullable
                 @Override
-                public String getUsername() {
-                    return props.get(KubeParametersConstants.USERNAME);
-                }
-
-                @Nullable
-                @Override
-                public String getPassword() {
-                    return props.get(KubeParametersConstants.PASSWORD);
+                public String getCustomParameter(@NotNull String parameterName) {
+                    return props.get(parameterName);
                 }
             };
             KubeApiConnectionCheckResult connectionCheckResult = new KubeApiConnectorImpl(connectionSettings, myAuthStrategyProvider.get(authStrategy)).testConnection();

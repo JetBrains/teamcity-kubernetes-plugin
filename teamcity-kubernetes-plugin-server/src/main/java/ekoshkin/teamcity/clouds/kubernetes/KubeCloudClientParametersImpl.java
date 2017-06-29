@@ -4,6 +4,7 @@ import jetbrains.buildServer.clouds.CloudClientParameters;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -37,6 +38,12 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
         return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;
     }
 
+    @Nullable
+    @Override
+    public String getCustomParameter(@NotNull String parameterName) {
+        return myParameters.getParameter(parameterName);
+    }
+
     @NotNull
     @Override
     public Collection<KubeCloudImageData> getImages(){
@@ -47,13 +54,5 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
     @NotNull
     public String getAuthStrategy() {
         return myParameters.getParameter(AUTH_STRATEGY);
-    }
-
-    public String getUsername() {
-        return myParameters.getParameter(USERNAME);
-    }
-
-    public String getPassword() {
-        return myParameters.getParameter(PASSWORD);
     }
 }
