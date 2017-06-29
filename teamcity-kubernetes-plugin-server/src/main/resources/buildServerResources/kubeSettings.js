@@ -7,13 +7,13 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
-<td class="dockerImage highlight"></td>\
+<td class="imageDescription highlight"></td>\
 <td class="maxInstances highlight"></td>\
 <td class="edit highlight"><a href="#" class="editVmImageLink">edit</a></td>\
 <td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
         </tr>')},
 
-    _dataKeys: [ 'dockerImage', 'pool', 'maxInstances', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment' ],
+    _dataKeys: [ 'imageDescription', 'dockerImage', 'pool', 'maxInstances', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment' ],
 
     selectors: {
         rmImageLink: '.removeVmImageLink',
@@ -107,6 +107,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$podSpecModeSelector.on('change', function(e, value) {
             if (arguments.length === 1) {
                 this._image['podTemplateMode'] = this.$podSpecModeSelector.val();
+                this._updateImageDescription(this._image);
             } else {
                 this.$podSpecModeSelector.val(value);
             }
@@ -118,6 +119,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerImage.on('change', function (e, value) {
             if (arguments.length === 1) {
                 this._image['dockerImage'] = this.$dockerImage.val();
+                this._updateImageDescription(this._image);
             } else {
                 this.$dockerImage.val(value);
             }
@@ -127,6 +129,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagePullPolicy.on('change', function(e, value) {
             if (arguments.length === 1) {
                 this._image['imagePullPolicy'] = this.$imagePullPolicy.val();
+                this._updateImageDescription(this._image);
             } else {
                 this.$imagePullPolicy.val(value);
             }
@@ -136,6 +139,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerCommand.on('change', function (e, value) {
             if (arguments.length === 1) {
                 this._image['dockerCmd'] = this.$dockerCommand.val();
+                this._updateImageDescription(this._image);
             } else {
                 this.$dockerCommand.val(value);
             }
@@ -145,6 +149,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerArgs.on('change', function (e, value) {
             if (arguments.length === 1) {
                 this._image['dockerArgs'] = this.$dockerArgs.val();
+                this._updateImageDescription(this._image);
             } else {
                 this.$dockerArgs.val(value);
             }
@@ -154,6 +159,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$deploymentName.on('change', function (e, value) {
             if (arguments.length === 1) {
                 this._image['sourceDeployment'] = this.$deploymentName.val();
+                this._updateImageDescription(this._image);
             } else {
                 this.$deploymentName.val(value);
             }
@@ -163,6 +169,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$customPodTemplate.on('change', function (e, value) {
             if (arguments.length === 1) {
                 this._image['customPodTemplate'] = this.$customPodTemplate.val();
+                this._updateImageDescription(this._image);
             } else {
                 this.$customPodTemplate.val(value);
             }
@@ -177,6 +184,26 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             }
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
+    },
+
+    _updateImageDescription: function (image) {
+        var imageDescription = '';
+        var podSpecMode = image['podTemplateMode'];
+        if(podSpecMode){
+            switch (podSpecMode){
+                case 'custom-pod-template':
+                    imageDescription = 'Custom pod template';
+                    break;
+                case 'deployment-base':
+                    imageDescription = 'Use deployment:' + image['sourceDeployment'];
+                    break;
+                case 'simple':
+                    imageDescription = 'Run container:' + image['dockerImage'];
+                    break;
+                default : imageDescription = 'UNKNOWN';
+            }
+        }
+        image['imageDescription'] = imageDescription;
     },
 
     _showDialogClickHandler: function () {
@@ -208,9 +235,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
         if (this._imagesDataLength) {
             Object.keys(this.imagesData).forEach(function (imageId) {
-                var src = this.imagesData[imageId]['source-id'];
+                var image = this.imagesData[imageId];
+                var src = image['source-id'];
                 $j('#initial_images_list').val($j('#initial_images_list').val() + src + ",");
-                this._renderImageRow(this.imagesData[imageId], imageId);
+                this._updateImageDescription(image);
+                this._renderImageRow(image, imageId);
             }.bind(this));
         }
 
