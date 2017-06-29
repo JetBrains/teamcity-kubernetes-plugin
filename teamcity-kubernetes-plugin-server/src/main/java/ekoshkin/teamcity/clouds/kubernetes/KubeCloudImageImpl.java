@@ -2,6 +2,8 @@ package ekoshkin.teamcity.clouds.kubernetes;
 
 import ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector;
+import ekoshkin.teamcity.clouds.kubernetes.podSpec.DeploymentPodTemplateProvider;
+import ekoshkin.teamcity.clouds.kubernetes.podSpec.SimpleRunContainerPodTemplateProvider;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
@@ -57,7 +59,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myImageData.getInstanceLimit();
     }
 
-    @NotNull
+    @Nullable
     @Override
     public String getDockerImage() {
         return myImageData.getDockerImage();
@@ -90,7 +92,14 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @NotNull
     @Override
     public String getName() {
-        return myImageData.getName();
+        switch (getPodSpecMode()){
+            case SimpleRunContainerPodTemplateProvider.ID:
+                return "Docker Image: " + getDockerImage();
+            case DeploymentPodTemplateProvider.ID:
+                return "Deployment: " + getSourceDeploymentName();
+            default:
+                return "UNKNOWN";
+        }
     }
 
     @NotNull

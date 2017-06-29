@@ -25,6 +25,7 @@ import static ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnector.NEV
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
 public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvider {
+    public static final String ID = "simple";
     private final ServerSettings myServerSettings;
 
     public SimpleRunContainerPodTemplateProvider(@NotNull ServerSettings serverSettings) {
@@ -34,7 +35,7 @@ public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvide
     @NotNull
     @Override
     public String getId() {
-        return "simple";
+        return ID;
     }
 
     @NotNull

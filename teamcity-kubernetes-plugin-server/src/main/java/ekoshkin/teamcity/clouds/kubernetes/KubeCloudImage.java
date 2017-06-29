@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public interface KubeCloudImage extends CloudImage {
-    @NotNull
+    @Nullable
     String getDockerImage();
 
     @Nullable

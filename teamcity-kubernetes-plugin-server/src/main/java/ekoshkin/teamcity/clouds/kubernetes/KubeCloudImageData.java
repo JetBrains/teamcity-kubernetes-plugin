@@ -38,10 +38,6 @@ public class KubeCloudImageData {
         return myRawImageData.getId();
     }
 
-    public String getName() {
-        return String.format("%s (id: %s)", getDockerImage(), getId());
-    }
-
     public Integer getAgentPoolId() {
         return myRawImageData.getAgentPoolId();
     }

@@ -19,6 +19,8 @@ import java.util.*;
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
 public class DeploymentPodTemplateProvider implements PodTemplateProvider {
+    public static final String ID = "deployment-base";
+
     private final ServerSettings myServerSettings;
     private KubeAuthStrategyProvider myAuthStrategies;
 
@@ -30,7 +32,7 @@ public class DeploymentPodTemplateProvider implements PodTemplateProvider {
     @NotNull
     @Override
     public String getId() {
-        return "deployment-base";
+        return ID;
     }
 
     @NotNull
