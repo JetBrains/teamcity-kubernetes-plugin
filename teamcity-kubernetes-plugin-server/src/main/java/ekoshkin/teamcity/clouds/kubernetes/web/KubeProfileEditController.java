@@ -1,6 +1,8 @@
 package ekoshkin.teamcity.clouds.kubernetes.web;
 
+import com.intellij.openapi.diagnostic.Logger;
 import ekoshkin.teamcity.clouds.internal.PluginPropertiesUtil;
+import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants;
 import ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
@@ -27,6 +29,7 @@ import java.util.Map;
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeProfileEditController extends BaseFormXmlController {
+    private final static Logger LOG = Logger.getInstance(KubeProfileEditController.class.getName());
 
     public static final String EDIT_KUBE_HTML = "editKube.html";
     private final String myPath;
@@ -90,10 +93,18 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     return props.get(parameterName);
                 }
             };
-            KubeApiConnectionCheckResult connectionCheckResult = new KubeApiConnectorImpl(connectionSettings, myAuthStrategyProvider.get(authStrategy)).testConnection();
-            if(!connectionCheckResult.isSuccess()){
+            try {
+                KubeApiConnectorImpl apiConnector = KubeApiConnectorImpl.create(connectionSettings, myAuthStrategyProvider.get(authStrategy));
+                KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
+                if(!connectionCheckResult.isSuccess()){
+                    final ActionErrors errors = new ActionErrors();
+                    errors.addError("connection", connectionCheckResult.getMessage());
+                    writeErrors(xmlResponse, errors);
+                }
+            } catch (KubeCloudException ex){
+                LOG.debug(ex);
                 final ActionErrors errors = new ActionErrors();
-                errors.addError("connection", connectionCheckResult.getMessage());
+                errors.addError("connection", ex.getMessage());
                 writeErrors(xmlResponse, errors);
             }
         }
