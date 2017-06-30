@@ -16,6 +16,10 @@ import java.util.Map;
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeApiConnectorImpl implements KubeApiConnector {
+
+    private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
+    private static final int DEFAULT_REQUEST_TIMEOUT_MS = 15 * 1000;
+
     @NotNull
     private final KubeApiConnection myConnectionSettings;
     private KubernetesClient myKubernetesClient;
@@ -29,10 +33,11 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     public static KubeApiConnectorImpl create(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) throws KubeCloudException{
         ConfigBuilder configBuilder = new ConfigBuilder()
                 .withMasterUrl(connectionSettings.getApiServerUrl())
-                .withNamespace(connectionSettings.getNamespace());
+                .withNamespace(connectionSettings.getNamespace())
+                .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
+                .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
         configBuilder = authStrategy.apply(configBuilder, connectionSettings);
-        Config config = configBuilder.build();
-        return new KubeApiConnectorImpl(connectionSettings, config);
+        return new KubeApiConnectorImpl(connectionSettings, configBuilder.build());
     }
 
     @NotNull
