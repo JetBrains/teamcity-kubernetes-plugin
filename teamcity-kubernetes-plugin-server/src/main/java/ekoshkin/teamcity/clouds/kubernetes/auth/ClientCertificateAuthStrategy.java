@@ -34,6 +34,7 @@ public class ClientCertificateAuthStrategy implements KubeAuthStrategy {
     @NotNull
     @Override
     public ConfigBuilder apply(@NotNull ConfigBuilder clientConfig, @NotNull KubeApiConnection connection) {
+        //TODO: debug
         String clientCertData = connection.getCustomParameter(CLIENT_CERTIFICATE_DATA);
         if(StringUtil.isEmpty(clientCertData)) {
             throw new KubeCloudException("Client certificate data is empty for connection " + connection);
