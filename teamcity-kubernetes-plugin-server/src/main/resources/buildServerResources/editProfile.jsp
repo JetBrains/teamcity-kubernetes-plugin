@@ -1,4 +1,4 @@
-<%@ page import="ekoshkin.teamcity.clouds.kubernetes.connector.ImagePullPolicy" %>
+<%@ page import="jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy" %>
 <%@ include file="/include.jsp" %>
 
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
@@ -9,12 +9,12 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
-<jsp:useBean id="cons" class="ekoshkin.teamcity.clouds.kubernetes.KubeParametersConstants"/>
+<jsp:useBean id="cons" class="jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants"/>
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
-<jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.auth.KubeAuthStrategy>"/>
-<jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<ekoshkin.teamcity.clouds.kubernetes.podSpec.PodTemplateProvider>"/>
+<jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy>"/>
+<jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.podSpec.PodTemplateProvider>"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
