@@ -15,8 +15,8 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>ekoshkin:teamcity-kubernetes-plugin-agent</include>
-                <include>ekoshkin:teamcity-kubernetes-plugin-common</include>
+                <include>org.jetbrains.teamcity:teamcity-kubernetes-plugin-agent</include>
+                <include>org.jetbrains.teamcity:teamcity-kubernetes-plugin-common</include>
             </includes>
             <binaries>
                 <outputDirectory>lib</outputDirectory>

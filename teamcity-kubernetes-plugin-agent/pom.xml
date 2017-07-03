@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>teamcity-kubernetes-plugin</artifactId>
-    <groupId>ekoshkin</groupId>
+    <groupId>org.jetbrains.teamcity</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>teamcity-kubernetes-plugin-agent</artifactId>
@@ -14,7 +14,7 @@
   <dependencies>
     
     <dependency>
-      <groupId>ekoshkin</groupId>
+      <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>teamcity-kubernetes-plugin-common</artifactId>
       <version>1.0-SNAPSHOT</version>
       <scope>compile</scope>
