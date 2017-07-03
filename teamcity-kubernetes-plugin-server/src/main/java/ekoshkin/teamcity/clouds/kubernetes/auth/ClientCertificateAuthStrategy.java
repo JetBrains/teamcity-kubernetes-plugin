@@ -4,6 +4,7 @@ import ekoshkin.teamcity.clouds.kubernetes.KubeCloudException;
 import ekoshkin.teamcity.clouds.kubernetes.connector.KubeApiConnection;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import jetbrains.buildServer.util.StringUtil;
+import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,11 +35,10 @@ public class ClientCertificateAuthStrategy implements KubeAuthStrategy {
     @NotNull
     @Override
     public ConfigBuilder apply(@NotNull ConfigBuilder clientConfig, @NotNull KubeApiConnection connection) {
-        //TODO: debug
         String clientCertData = connection.getCustomParameter(CLIENT_CERTIFICATE_DATA);
         if(StringUtil.isEmpty(clientCertData)) {
             throw new KubeCloudException("Client certificate data is empty for connection " + connection);
         }
-        return clientConfig.withClientCertData(clientCertData);
+        return clientConfig.withClientCertData(Base64.encodeBase64String(clientCertData.getBytes()));
     }
 }

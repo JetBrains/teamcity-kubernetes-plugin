@@ -74,9 +74,12 @@
     </tr>
     <tr class="hidden client-cert auth-ui">
         <th><label for="${cons.clientCertData}">Client Certificate: <l:star/></label></th>
-        <td><props:textProperty name="${cons.clientCertData}" className="longField"/>
+        <td><props:multilineProperty name="${cons.clientCertData}"
+                                     className="longField"
+                                     linkTitle="Enter X509 Client Sertificate Content"
+                                     cols="35" rows="3"
+                                     expanded="true"/>
             <span id="error_${cons.clientCertData}" class="error"></span>
-            <span class="smallNote">X509 Client Certificate.</span>
         </td>
     </tr>
     <tr class="hidden token auth-ui">
@@ -202,7 +205,7 @@
         <tr class="hidden custom-pod-template pod-spec-ui">
             <th>Pod Template Content:&nbsp;<l:star/></th>
             <td>
-                <textarea id="${cons.customPodTemplate}" wrap="off"></textarea>
+                <textarea id="${cons.customPodTemplate}" wrap="off" class="podTemplateContent"></textarea>
                 <span class="error option-error option-error_${cons.customPodTemplate}"></span>
             </td>
         </tr>
