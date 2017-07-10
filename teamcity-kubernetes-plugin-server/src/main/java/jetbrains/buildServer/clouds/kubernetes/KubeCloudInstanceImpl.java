@@ -79,7 +79,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         final PodStatus podStatus = myApiConnector.getPodStatus(myPod);
         try {
             final List<PodCondition> podConditions = podStatus.getConditions();
-            if (!podConditions.isEmpty()) {
+            if (podConditions != null && !podConditions.isEmpty()) {
                 for (PodCondition podCondition : podConditions) {
                     if (PodConditionType.valueOf(podCondition.getType()) == PodConditionType.Ready)
                         return myPodTransitionTimeFormat.parse(podCondition.getLastTransitionTime());
