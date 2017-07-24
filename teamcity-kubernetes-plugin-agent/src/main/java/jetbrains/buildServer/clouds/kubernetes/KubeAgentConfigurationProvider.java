@@ -5,6 +5,7 @@ import jetbrains.buildServer.agent.AgentLifeCycleListener;
 import jetbrains.buildServer.agent.BuildAgent;
 import jetbrains.buildServer.agent.BuildAgentConfigurationEx;
 import jetbrains.buildServer.util.EventDispatcher;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -30,8 +31,11 @@ public class KubeAgentConfigurationProvider {
 
     private void appendKubeSpecificConfiguration() {
         Map<String, String> env = System.getenv();
-        myAgentConfigurationEx.setName(env.get(KubeContainerEnvironment.AGENT_NAME));
-        myAgentConfigurationEx.setServerUrl(env.get(KubeContainerEnvironment.SERVER_URL));
+
+        String providedAgentName = env.get(KubeContainerEnvironment.AGENT_NAME);
+        if(!StringUtil.isEmpty(providedAgentName)) myAgentConfigurationEx.setName(providedAgentName);
+        String providedServerUrl = env.get(KubeContainerEnvironment.SERVER_URL);
+        if(!StringUtil.isEmpty(providedServerUrl)) myAgentConfigurationEx.setServerUrl(providedServerUrl);
 
         myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.IMAGE_NAME, env.get(KubeContainerEnvironment.IMAGE_NAME));
         myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.INSTANCE_NAME, env.get(KubeContainerEnvironment.INSTANCE_NAME));
