@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
+import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
@@ -89,7 +91,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 @Nullable
                 @Override
                 public String getCustomParameter(@NotNull String parameterName) {
-                    return props.get(parameterName);
+                    return props.containsKey(parameterName) ? props.get(parameterName) : props.get(SECURE_PROPERTY_PREFIX + parameterName);
                 }
             };
             try {

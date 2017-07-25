@@ -66,9 +66,9 @@
         </td>
     </tr>
     <tr class="hidden user-passwd auth-ui">
-        <th><label for="${cons.password}">Password: <l:star/></label></th>
-        <td><props:textProperty name="${cons.password}" className="longField"/>
-            <span id="error_${cons.password}" class="error"></span>
+        <th><label for="secure:${cons.password}">Password: <l:star/></label></th>
+        <td><props:passwordProperty name="secure:${cons.password}" className="longField"/>
+            <span id="error_secure:${cons.password}" class="error"></span>
             <span class="smallNote">Password of authorized Kubernetes user.</span>
         </td>
     </tr>
@@ -83,9 +83,9 @@
         </td>
     </tr>
     <tr class="hidden token auth-ui">
-        <th><label for="${cons.authToken}">Token: <l:star/></label></th>
-        <td><props:textProperty name="${cons.authToken}" className="longField"/>
-            <span id="error_${cons.authToken}" class="error"></span>
+        <th><label for="secure:${cons.authToken}">Token: <l:star/></label></th>
+        <td><props:passwordProperty name="secure:${cons.authToken}" className="longField"/>
+            <span id="error_secure:${cons.authToken}" class="error"></span>
             <span class="smallNote">Bearer Token.</span>
         </td>
     </tr>
