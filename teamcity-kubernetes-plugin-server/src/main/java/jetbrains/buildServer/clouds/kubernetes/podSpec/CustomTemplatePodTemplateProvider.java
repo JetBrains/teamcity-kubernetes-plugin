@@ -79,11 +79,16 @@ public class CustomTemplatePodTemplateProvider implements PodTemplateProvider {
 
             for (Pair<String, String> env : Arrays.asList(
                     new Pair<>(KubeContainerEnvironment.AGENT_NAME, agentName),
-                    new Pair<>(KubeContainerEnvironment.SERVER_URL, serverAddress),
-                    new Pair<>(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress),
                     new Pair<>(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName()),
                     new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, agentName))){
                 patchedEnvData.put(env.first, env.second);
+            }
+
+            if(!patchedEnvData.containsKey(KubeContainerEnvironment.SERVER_URL)){
+                patchedEnvData.put(KubeContainerEnvironment.SERVER_URL, serverAddress);
+            }
+            if(!patchedEnvData.containsKey(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL)){
+                patchedEnvData.put(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress);
             }
 
             List<EnvVar> patchedEnv = new ArrayList<>();
