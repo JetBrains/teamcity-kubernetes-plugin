@@ -60,16 +60,15 @@ public class KubeCloudClient implements CloudClientEx {
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
         final KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
         PodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
-        final Pod podTemplate = podTemplateProvider.getPodTemplate(cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
-
         try {
+            final Pod podTemplate = podTemplateProvider.getPodTemplate(cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
             final Pod newPod = myApiConnector.createPod(podTemplate);
             myCurrentError = null;
             final KubeCloudInstanceImpl newInstance = new KubeCloudInstanceImpl(kubeCloudImage, newPod, myApiConnector);
             kubeCloudImage.addInstance(newInstance);
             myCurrentlyRunningInstancesCount++;
             return newInstance;
-        } catch (KubernetesClientException ex){
+        } catch (KubeCloudException | KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
             throw ex;
         }
