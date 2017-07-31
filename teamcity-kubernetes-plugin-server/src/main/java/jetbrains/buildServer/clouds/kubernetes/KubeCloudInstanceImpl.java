@@ -35,6 +35,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     private final Pod myPod;
 
     private CloudErrorInfo myCurrentError;
+    private Date myCreationTime;
 
     public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage,
                                  @NotNull Pod pod,
@@ -47,6 +48,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         myPodStartTimeFormat.setTimeZone(utc);
         myPodTransitionTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         myPodTransitionTimeFormat.setTimeZone(utc);
+        myCreationTime = new Date();
     }
 
     @NotNull
@@ -86,10 +88,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
                 }
             }
             String startTime = podStatus.getStartTime();
-            if(!StringUtil.isEmpty(startTime)){
-                return myPodStartTimeFormat.parse(startTime);
-            } else
-                throw new KubeCloudException("Failed to get instance start date");
+            return !StringUtil.isEmpty(startTime) ? myPodStartTimeFormat.parse(startTime) : myCreationTime;
         } catch (ParseException e) {
             throw new KubeCloudException("Failed to get instance start date", e);
         }
