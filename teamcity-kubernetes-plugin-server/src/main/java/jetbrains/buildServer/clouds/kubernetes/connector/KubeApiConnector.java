@@ -27,11 +27,11 @@ public interface KubeApiConnector {
     Collection<Pod> listPods(@NotNull Map<String, String> labels);
 
     @NotNull
-    PodPhase getPodPhase(@NotNull Pod pod);
+    PodPhase getPodPhase(@NotNull String podName);
 
     @Nullable
     Deployment getDeployment(@NotNull String deploymentName);
 
-    @NotNull
-    PodStatus getPodStatus(@NotNull Pod pod);
+    @Nullable
+    PodStatus getPodStatus(@NotNull String podName);
 }

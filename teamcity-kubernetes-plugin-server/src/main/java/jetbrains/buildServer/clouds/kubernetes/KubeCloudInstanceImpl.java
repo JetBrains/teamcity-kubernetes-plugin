@@ -78,7 +78,8 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public Date getStartedTime() {
-        final PodStatus podStatus = myApiConnector.getPodStatus(myPod);
+        final PodStatus podStatus = myApiConnector.getPodStatus(myPod.getMetadata().getName());
+        if(podStatus == null) return myCreationTime;
         try {
             final List<PodCondition> podConditions = podStatus.getConditions();
             if (podConditions != null && !podConditions.isEmpty()) {
@@ -103,7 +104,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public InstanceStatus getStatus() {
-        return InstanceStatusUtils.mapPodPhase(myApiConnector.getPodPhase(myPod));
+        return InstanceStatusUtils.mapPodPhase(myApiConnector.getPodPhase(myPod.getMetadata().getName()));
     }
 
     @Nullable

@@ -73,8 +73,8 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @NotNull
     @Override
-    public PodPhase getPodPhase(@NotNull Pod pod) {
-        final Pod podNow = myKubernetesClient.pods().withName(pod.getMetadata().getName()).get();
+    public PodPhase getPodPhase(@NotNull String podName) {
+        final Pod podNow = myKubernetesClient.pods().withName(podName).get();
         return podNow == null ? PodPhase.Unknown : PodPhase.valueOf(podNow.getStatus().getPhase());
     }
 
@@ -84,14 +84,10 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         return myKubernetesClient.extensions().deployments().withName(deploymentName).get();
     }
 
-    @NotNull
+    @Nullable
     @Override
-    public PodStatus getPodStatus(@NotNull Pod pod) {
-        String podName = pod.getMetadata().getName();
+    public PodStatus getPodStatus(@NotNull String podName) {
         final Pod podNow = myKubernetesClient.pods().withName(podName).get();
-        if(podNow == null) {
-            throw new KubeCloudException("Failed to get pod status for pod " + podName);
-        }
-        return podNow.getStatus();
+        return podNow == null ? null : podNow.getStatus();
     }
 }

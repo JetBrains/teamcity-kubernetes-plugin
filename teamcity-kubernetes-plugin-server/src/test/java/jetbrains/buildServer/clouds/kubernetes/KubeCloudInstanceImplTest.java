@@ -39,9 +39,11 @@ public class KubeCloudInstanceImplTest extends BaseTestCase {
     @Test
     public void testGetStartedTime() throws Exception {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
-        Pod pod = new Pod("1.0", "kind", new ObjectMeta(), new PodSpec(), new PodStatusBuilder().withStartTime("2017-06-12T22:59Z").build());
+        ObjectMeta metadata = new ObjectMeta();
+        metadata.setName("foo");
+        Pod pod = new Pod("1.0", "kind", metadata, new PodSpec(), new PodStatusBuilder().withStartTime("2017-06-12T22:59Z").build());
         m.checking(new Expectations(){{
-            allowing(myApi).getPodStatus(with(pod)); will(returnValue(pod.getStatus()));
+            allowing(myApi).getPodStatus(with("foo")); will(returnValue(pod.getStatus()));
         }});
         KubeCloudInstanceImpl instance = new KubeCloudInstanceImpl(image, pod, myApi);
         Date startedTime = instance.getStartedTime();
