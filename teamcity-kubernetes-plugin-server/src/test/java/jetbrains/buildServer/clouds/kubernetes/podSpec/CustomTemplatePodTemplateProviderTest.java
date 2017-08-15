@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
+import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.BaseTestCase;
@@ -86,6 +87,42 @@ public class CustomTemplatePodTemplateProviderTest extends BaseTestCase {
         assertNotNull(podTemplate);
         assertNotNull(podTemplate.getMetadata());
         assertNotNull(podTemplate.getSpec());
+    }
+
+    @Test
+    public void testShouldNotsetContainerName(){
+        CloudInstanceUserData instanceTag = createInstanceTag();
+        KubeCloudClientParameters clientParams = m.mock(KubeCloudClientParameters.class);
+        KubeCloudImage image = m.mock(KubeCloudImage.class);
+        m.checking(new Expectations(){{
+            allowing(clientParams).getNamespace(); will(returnValue("custom namespace"));
+            allowing(image).getId(); will(returnValue("my image id"));
+            allowing(image).getName(); will(returnValue("my image name"));
+            allowing(image).getCustomPodTemplateSpec(); will(returnValue("{\n" +
+                    "\t\t\"metadata\": {\n" +
+                    "\t\t\t\"labels\": {\n" +
+                    "\t\t\t\t\"app\": \"nginx\"\n" +
+                    "\t\t\t}\n" +
+                    "\t\t},\n" +
+                    "\t\t\"spec\": {\n" +
+                    "\t\t\t\"containers\": [\n" +
+                    "\t\t\t\t{\n" +
+                    "\t\t\t\t\t\"name\": \"nginx\",\n" +
+                    "\t\t\t\t\t\"image\": \"nginx:1.7.9\",\n" +
+                    "\t\t\t\t\t\"ports\": [\n" +
+                    "\t\t\t\t\t\t{\n" +
+                    "\t\t\t\t\t\t\t\"containerPort\": 80\n" +
+                    "\t\t\t\t\t\t}\n" +
+                    "\t\t\t\t\t]\n" +
+                    "\t\t\t\t}\n" +
+                    "\t\t\t]\n" +
+                    "\t\t}\n" +
+                    "}"));
+        }});
+        Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
+        for(Container container : podTemplate.getSpec().getContainers()){
+            assertNotSame(container.getName(), "agent name");
+        }
     }
 
     private CloudInstanceUserData createInstanceTag() {
