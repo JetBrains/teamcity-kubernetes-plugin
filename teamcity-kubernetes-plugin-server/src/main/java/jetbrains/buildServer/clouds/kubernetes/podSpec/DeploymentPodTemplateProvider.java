@@ -82,8 +82,6 @@ public class DeploymentPodTemplateProvider implements PodTemplateProvider {
 
         PodSpec spec = podTemplateSpec.getSpec();
         for (Container container : spec.getContainers()){
-            container.setName(agentName);
-
             Map<String, String> patchedEnvData = new HashMap<>();
             for (EnvVar env : container.getEnv()){
                 patchedEnvData.put(env.getName(), env.getValue());
