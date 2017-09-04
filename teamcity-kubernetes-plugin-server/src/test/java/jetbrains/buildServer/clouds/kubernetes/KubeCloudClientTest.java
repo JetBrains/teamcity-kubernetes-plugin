@@ -4,7 +4,7 @@ import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.clouds.CloudClientParameters;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.PodTemplateProviders;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import org.jetbrains.annotations.NotNull;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -23,19 +23,24 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.PR
 public class KubeCloudClientTest extends BaseTestCase {
     private Mockery m;
     private KubeApiConnector myApi;
-    private PodTemplateProviders myPodTemplateProviders;
+    private BuildAgentPodTemplateProviders myPodTemplateProviders;
 
     @BeforeMethod
     public void setUp() throws Exception {
         super.setUp();
         m = new Mockery();
         myApi = m.mock(KubeApiConnector.class);
-        myPodTemplateProviders = m.mock(PodTemplateProviders.class);
+        myPodTemplateProviders = m.mock(BuildAgentPodTemplateProviders.class);
     }
 
     @NotNull
-    private KubeCloudClient createClient(KubeApiConnector api, List<KubeCloudImage> images, KubeCloudClientParametersImpl kubeParams, PodTemplateProviders podTemplateProviders) {
-        return new KubeCloudClient(api, images, kubeParams, podTemplateProviders);
+    private KubeCloudClient createClient(KubeApiConnector api, List<KubeCloudImage> images, KubeCloudClientParametersImpl kubeParams, BuildAgentPodTemplateProviders podTemplateProviders) {
+        return createClient("defaultServerUuid", "defaultProfileId", api, images, kubeParams, podTemplateProviders);
+    }
+
+    @NotNull
+    private KubeCloudClient createClient(String serverUuid, String profileId, KubeApiConnector api, List<KubeCloudImage> images, KubeCloudClientParametersImpl kubeParams, BuildAgentPodTemplateProviders podTemplateProviders) {
+        return new KubeCloudClient(serverUuid, profileId, api, images, kubeParams, podTemplateProviders);
     }
 
     @AfterMethod

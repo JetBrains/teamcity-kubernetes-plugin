@@ -8,13 +8,13 @@ import java.util.Collection;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public interface PodTemplateProviders {
+public interface BuildAgentPodTemplateProviders {
     @NotNull
-    Collection<PodTemplateProvider> getAll();
+    Collection<BuildAgentPodTemplateProvider> getAll();
 
     @Nullable
-    PodTemplateProvider find(@Nullable String id);
+    BuildAgentPodTemplateProvider find(@Nullable String id);
 
     @NotNull
-    PodTemplateProvider get(@Nullable String id);
+    BuildAgentPodTemplateProvider get(@Nullable String id);
 }

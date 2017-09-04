@@ -14,7 +14,7 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 <jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy>"/>
-<jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.podSpec.PodTemplateProvider>"/>
+<jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider>"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");

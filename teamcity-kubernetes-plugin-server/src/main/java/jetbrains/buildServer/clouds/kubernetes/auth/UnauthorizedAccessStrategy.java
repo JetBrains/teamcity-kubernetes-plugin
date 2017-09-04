@@ -9,10 +9,13 @@ import org.jetbrains.annotations.Nullable;
  * Created by ekoshkin (koshkinev@gmail.com) on 14.06.17.
  */
 public class UnauthorizedAccessStrategy implements KubeAuthStrategy {
+
+    public static final String ID = "unauthorized";
+
     @NotNull
     @Override
     public String getId() {
-        return "unauthorized";
+        return ID;
     }
 
     @NotNull

@@ -6,7 +6,7 @@ import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectionCheckResult;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.PodTemplateProviders;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
@@ -38,14 +38,14 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final PluginDescriptor myPluginDescriptor;
     private final AgentPoolManager myAgentPoolManager;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
-    private final PodTemplateProviders myPodTemplateProviders;
+    private final BuildAgentPodTemplateProviders myPodTemplateProviders;
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
                                      @NotNull final WebControllerManager web,
                                      @NotNull final PluginDescriptor pluginDescriptor,
                                      @NotNull final AgentPoolManager agentPoolManager,
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
-                                     @NotNull final PodTemplateProviders podTemplateProviders) {
+                                     @NotNull final BuildAgentPodTemplateProviders podTemplateProviders) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myPath = pluginDescriptor.getPluginResourcesPath(EDIT_KUBE_HTML);

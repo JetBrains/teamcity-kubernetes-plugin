@@ -4,10 +4,11 @@ import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.PodTemplateProviders;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.clouds.kubernetes.web.KubeProfileEditController;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
+import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
@@ -26,14 +27,17 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     public static final String ID = "kube"; //should be 6 chars maximum
 
     private final PluginDescriptor myPluginDescriptor;
+    private final ServerSettings myServerSettings;
     private KubeAuthStrategyProvider myAuthStrategies;
-    private PodTemplateProviders myPodTemplateProviders;
+    private BuildAgentPodTemplateProviders myPodTemplateProviders;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
                                   @NotNull final PluginDescriptor pluginDescriptor,
+                                  @NotNull final ServerSettings serverSettings,
                                   @NotNull final KubeAuthStrategyProvider authStrategies,
-                                  @NotNull final PodTemplateProviders podTemplateProviders) {
+                                  @NotNull final BuildAgentPodTemplateProviders podTemplateProviders) {
         myPluginDescriptor = pluginDescriptor;
+        myServerSettings = serverSettings;
         myAuthStrategies = authStrategies;
         myPodTemplateProviders = podTemplateProviders;
         registrar.registerCloudFactory(this);
@@ -72,7 +76,10 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @Override
     public boolean canBeAgentOfType(@NotNull AgentDescription agentDescription) {
         final Map<String, String> map = agentDescription.getAvailableParameters();
-        return map.containsKey(KubeAgentProperties.IMAGE_NAME) && map.containsKey(KubeAgentProperties.INSTANCE_NAME);
+        return  map.containsKey(KubeAgentProperties.SERVER_UUID) &&
+                map.containsKey(KubeAgentProperties.PROFILE_ID) &&
+                map.containsKey(KubeAgentProperties.IMAGE_NAME) &&
+                map.containsKey(KubeAgentProperties.INSTANCE_NAME);
     }
 
     @NotNull
@@ -86,6 +93,6 @@ public class KubeCloudClientFactory implements CloudClientFactory {
             kubeCloudImage.populateInstances();
             return kubeCloudImage;
         });
-        return new KubeCloudClient(apiConnector, images, kubeClientParams, myPodTemplateProviders);
+        return new KubeCloudClient(myServerSettings.getServerUUID(), cloudState.getProfileId(), apiConnector, images, kubeClientParams, myPodTemplateProviders);
     }
 }

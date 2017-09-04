@@ -2,7 +2,7 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
 import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
-import io.fabric8.kubernetes.client.utils.Serialization;
+import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.serverSide.ServerSettings;
@@ -11,29 +11,33 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
 import java.util.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public class CustomTemplatePodTemplateProvider implements PodTemplateProvider {
-    private final ServerSettings myServerSettings;
+public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTemplateProvider {
+    public static final String ID = "deployment-base";
 
-    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings) {
+    private final ServerSettings myServerSettings;
+    private final DeploymentContentProvider myDeploymentContentProvider;
+
+    public DeploymentBuildAgentPodTemplateProvider(ServerSettings serverSettings,
+                                                   DeploymentContentProvider deploymentContentProvider) {
         myServerSettings = serverSettings;
+        myDeploymentContentProvider = deploymentContentProvider;
     }
 
     @NotNull
     @Override
     public String getId() {
-        return "custom-pod-template";
+        return ID;
     }
 
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Use custom pod template";
+        return "Use pod template from deployment";
     }
 
     @Nullable
@@ -45,26 +49,33 @@ public class CustomTemplatePodTemplateProvider implements PodTemplateProvider {
     @NotNull
     @Override
     public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters kubeClientParams) {
-        String customPodTemplateSpecContent = kubeCloudImage.getCustomPodTemplateSpec();
-        if(StringUtil.isEmpty(customPodTemplateSpecContent))
-            throw new KubeCloudException("Custom pod template spec is not specified for image " + kubeCloudImage.getId());
+        String sourceDeploymentName = kubeCloudImage.getSourceDeploymentName();
+        if(StringUtil.isEmpty(sourceDeploymentName))
+            throw new KubeCloudException("Deployment name is not set in kubernetes cloud image " + kubeCloudImage.getId());
 
-        PodTemplateSpec podTemplateSpec = Serialization.unmarshal(new ByteArrayInputStream(customPodTemplateSpecContent.getBytes()), PodTemplateSpec.class);
+        Deployment sourceDeployment = myDeploymentContentProvider.findDeployment(sourceDeploymentName, kubeClientParams);
+        if(sourceDeployment == null)
+            throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);
 
         final String agentNameProvided = cloudInstanceUserData.getAgentName();
         final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
         final String serverAddress = cloudInstanceUserData.getServerAddress();
 
+        PodTemplateSpec podTemplateSpec = sourceDeployment.getSpec().getTemplate();
+
         ObjectMeta metadata = podTemplateSpec.getMetadata();
         metadata.setName(agentName);
         metadata.setNamespace(kubeClientParams.getNamespace());
+
+        String serverUUID = myServerSettings.getServerUUID();
+        String cloudProfileId = cloudInstanceUserData.getProfileId();
 
         Map<String, String> patchedLabels = new HashMap<>();
         patchedLabels.putAll(metadata.getLabels());
         patchedLabels.putAll(CollectionsUtil.asMap(
                 KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
-                KubeTeamCityLabels.TEAMCITY_SERVER_UUID, myServerSettings.getServerUUID(),
-                KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudInstanceUserData.getProfileId(),
+                KubeTeamCityLabels.TEAMCITY_SERVER_UUID, serverUUID,
+                KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudProfileId,
                 KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, kubeCloudImage.getId()));
         metadata.setLabels(patchedLabels);
 
@@ -76,6 +87,8 @@ public class CustomTemplatePodTemplateProvider implements PodTemplateProvider {
             }
 
             for (Pair<String, String> env : Arrays.asList(
+                    new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
+                    new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudProfileId),
                     new Pair<>(KubeContainerEnvironment.AGENT_NAME, agentName),
                     new Pair<>(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName()),
                     new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, agentName))){

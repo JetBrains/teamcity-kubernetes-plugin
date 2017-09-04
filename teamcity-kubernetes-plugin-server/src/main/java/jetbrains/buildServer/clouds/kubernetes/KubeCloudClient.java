@@ -6,8 +6,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.PodTemplateProvider;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.PodTemplateProviders;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -27,14 +28,21 @@ public class KubeCloudClient implements CloudClientEx {
     private final ConcurrentHashMap<String, KubeCloudImage> myImageNameToImageMap;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParametersImpl myKubeClientParams;
-    private final PodTemplateProviders myPodTemplateProviders;
+    private final BuildAgentPodTemplateProviders myPodTemplateProviders;
+    @Nullable private final String myServerUuid;
+    private final String myCloudProfileId;
+
     private CloudErrorInfo myCurrentError = null;
     private int myCurrentlyRunningInstancesCount = 0;
 
-    public KubeCloudClient(@NotNull final KubeApiConnector apiConnector,
+    public KubeCloudClient(@Nullable String serverUuid,
+                           @NotNull String cloudProfileId,
+                           @NotNull KubeApiConnector apiConnector,
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParametersImpl kubeClientParams,
-                           @NotNull PodTemplateProviders podTemplateProviders) {
+                           @NotNull BuildAgentPodTemplateProviders podTemplateProviders) {
+        myServerUuid = serverUuid;
+        myCloudProfileId = cloudProfileId;
         myApiConnector = apiConnector;
         myImageNameToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getName));
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getId));
@@ -59,7 +67,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
         final KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
-        PodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
+        BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
         try {
             final Pod podTemplate = podTemplateProvider.getPodTemplate(cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
             final Pod newPod = myApiConnector.createPod(podTemplate);
@@ -95,11 +103,17 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public CloudInstance findInstanceByAgent(@NotNull AgentDescription agentDescription) {
-        final String imageName = agentDescription.getAvailableParameters().get(KubeAgentProperties.IMAGE_NAME);
+        Map<String, String> agentParameters = agentDescription.getAvailableParameters();
+
+        if((myServerUuid != null && !myServerUuid.equals(agentParameters.get(KubeAgentProperties.SERVER_UUID))) ||
+                !myCloudProfileId.equals(agentParameters.get(KubeAgentProperties.PROFILE_ID))) return null;
+
+        final String imageName = agentParameters.get(KubeAgentProperties.IMAGE_NAME);
+        final String instanceName = agentParameters.get(KubeAgentProperties.INSTANCE_NAME);
         if (imageName != null) {
             final KubeCloudImage cloudImage = myImageNameToImageMap.get(imageName);
             if (cloudImage != null) {
-                return cloudImage.findInstanceById(agentDescription.getAvailableParameters().get(KubeAgentProperties.INSTANCE_NAME));
+                return cloudImage.findInstanceById(instanceName);
             }
         }
         return null;

@@ -6,8 +6,8 @@ import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentPodTemplateProvider;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerPodTemplateProvider;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,9 +93,9 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @Override
     public String getName() {
         switch (getPodSpecMode()){
-            case SimpleRunContainerPodTemplateProvider.ID:
+            case SimpleRunContainerBuildAgentPodTemplateProvider.ID:
                 return "Docker Image: " + getDockerImage();
-            case DeploymentPodTemplateProvider.ID:
+            case DeploymentBuildAgentPodTemplateProvider.ID:
                 return "Deployment: " + getSourceDeploymentName();
             default:
                 return "UNKNOWN";

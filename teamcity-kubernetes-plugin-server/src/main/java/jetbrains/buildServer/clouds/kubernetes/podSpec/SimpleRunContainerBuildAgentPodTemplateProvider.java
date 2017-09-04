@@ -23,11 +23,11 @@ import java.util.UUID;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvider {
+public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAgentPodTemplateProvider {
     public static final String ID = "simple";
     private final ServerSettings myServerSettings;
 
-    public SimpleRunContainerPodTemplateProvider(@NotNull ServerSettings serverSettings) {
+    public SimpleRunContainerBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings) {
         myServerSettings = serverSettings;
     }
 
@@ -57,15 +57,20 @@ public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvide
 
         ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
         String serverAddress = cloudInstanceUserData.getServerAddress();
+        String serverUUID = myServerSettings.getServerUUID();
+        String cloudProfileId = cloudInstanceUserData.getProfileId();
+
         ContainerBuilder containerBuilder = new ContainerBuilder()
                 .withName(agentName)
                 .withImage(kubeCloudImage.getDockerImage())
                 .withImagePullPolicy(imagePullPolicy == null ? ImagePullPolicy.IfNotPresent.getName() : imagePullPolicy.getName())
                 .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null),
-                        new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
-                        new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
-                        new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null),
-                        new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
+                         new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
+                         new EnvVar(KubeContainerEnvironment.SERVER_UUID, serverUUID, null),
+                         new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
+                         new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName(), null),
+                         new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
+                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
         String dockerCommand = kubeCloudImage.getDockerCommand();
         if(!StringUtil.isEmpty(dockerCommand)) containerBuilder = containerBuilder.withCommand(dockerCommand);
         String dockerArguments = kubeCloudImage.getDockerArguments();
@@ -77,8 +82,8 @@ public class SimpleRunContainerPodTemplateProvider implements PodTemplateProvide
                 .withNamespace(clientParameters.getNamespace())
                 .withLabels(CollectionsUtil.asMap(
                         KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
-                        KubeTeamCityLabels.TEAMCITY_SERVER_UUID, myServerSettings.getServerUUID(),
-                        KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudInstanceUserData.getProfileId(),
+                        KubeTeamCityLabels.TEAMCITY_SERVER_UUID, serverUUID,
+                        KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudProfileId,
                         KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, kubeCloudImage.getId()))
                 .endMetadata()
                 .withNewSpec()
