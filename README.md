@@ -1,6 +1,6 @@
 # TeamCity Kubernetes Support Plugin
 [![plugin status]( 
-https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:TestDrive_TeamcityKubernetesPlugin_Build)/statusIcon.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TestDrive_TeamcityKubernetesPlugin_Build&guest=1)
+https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:TeamCityPluginsByJetBrains_TeamCityKubernetesPlugin_Build)/statusIcon.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TestDrive_TeamcityKubernetesPlugin_Build&guest=1)
 
 Run TeamCity cloud agents on Kubernetes cluster.
 
