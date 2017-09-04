@@ -9,7 +9,7 @@
   <artifactId>teamcity-kubernetes-plugin-agent</artifactId>
   <packaging>jar</packaging>
   <properties>
-    <java_16>${env.JAVA_16_HOME}</java_16>
+    <java_16>${env.JDK_16}</java_16>
   </properties>
   <dependencies>
     
