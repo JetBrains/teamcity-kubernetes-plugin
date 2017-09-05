@@ -108,9 +108,9 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
             }
             container.setEnv(patchedEnv);
         }
-        return new PodBuilder()
-                .withMetadata(metadata)
-                .withSpec(spec)
-                .build();
+        final Pod pod = new Pod();
+        pod.setMetadata(metadata);
+        pod.setSpec(spec);
+        return pod;
     }
 }

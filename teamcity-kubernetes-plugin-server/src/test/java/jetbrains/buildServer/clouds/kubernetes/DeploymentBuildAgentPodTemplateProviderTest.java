@@ -139,6 +139,48 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         }
     }
 
+
+    @Test
+    public void testDoNotLoseSpecAdditionalProperties() throws Exception {
+        CloudInstanceUserData instanceTag = createInstanceTag();
+        KubeCloudClientParameters clientParams = m.mock(KubeCloudClientParameters.class);
+        KubeCloudImage image = m.mock(KubeCloudImage.class);
+
+        Deployment deployment = new DeploymentBuilder()
+                .withMetadata(new ObjectMetaBuilder()
+                        .withLabels(CollectionsUtil.asMap("app", "nginx"))
+                        .build())
+                .withSpec(new DeploymentSpecBuilder()
+                        .withTemplate(new PodTemplateSpecBuilder()
+                                .withMetadata(new ObjectMeta())
+                                .withSpec(new PodSpecBuilder()
+                                        .withContainers(new ContainerBuilder()
+                                                .withName("nginx")
+                                                .withImage("nginx:1.7.9")
+                                                .withPorts(new ContainerPortBuilder()
+                                                        .withHostPort(80)
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+
+        deployment.getSpec().getTemplate().getSpec().setAdditionalProperty("affinity", "some value");
+
+        m.checking(new Expectations(){{
+            allowing(clientParams).getNamespace(); will(returnValue("custom namespace"));
+            allowing(image).getId(); will(returnValue("my image id"));
+            allowing(image).getName(); will(returnValue("my image name"));
+            allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
+            allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
+        }});
+
+        Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
+
+        assertNotEmpty(podTemplate.getSpec().getAdditionalProperties().keySet());
+    }
+
     private CloudInstanceUserData createInstanceTag() {
         return new CloudInstanceUserData("agent name", "auth token", "server address", null, "profile id", "profile description", Collections.emptyMap());
     }
