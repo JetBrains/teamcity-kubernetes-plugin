@@ -4,7 +4,7 @@
     <name>teamcity-kubernetes-plugin</name>
     <display-name>teamcity-kubernetes-plugin</display-name>
     <version>@Version@</version>
-    <description>Allows to run TeamCity agents on Kubernetes cluster</description>
+    <description>Allows running TeamCity agents on Kubernetes cluster</description>
     <download-url>https://github.com/ekoshkin/teamcity-kubernetes-plugin</download-url>
     <email>evgeniy.koshkin@jetbrains.com</email>
     <vendor>
