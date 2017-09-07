@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.kubernetes.web;
 
 import com.intellij.openapi.diagnostic.Logger;
+import jetbrains.buildServer.BuildProject;
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
@@ -12,7 +13,9 @@ import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.internal.PluginPropertiesUtil;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
+import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -22,6 +25,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
@@ -61,7 +66,14 @@ public class KubeProfileEditController extends BaseFormXmlController {
         Map<String, Object> model = modelAndView.getModel();
         model.put("testConnectionUrl", myPath + "?testConnection=true");
         final String projectId = httpServletRequest.getParameter("projectId");
-        model.put("agentPools", myAgentPoolManager.getProjectOwnedAgentPools(projectId));
+
+        final List<AgentPool> pools = new ArrayList<>();
+        if (!BuildProject.ROOT_PROJECT_ID.equals(projectId)){
+            pools.add(AgentPoolUtil.DUMMY_PROJECT_POOL);
+        }
+        pools.addAll(myAgentPoolManager.getProjectOwnedAgentPools(projectId));
+
+        model.put("agentPools", pools);
         model.put("authStrategies", myAuthStrategyProvider.getAll());
         model.put("podTemplateProviders", myPodTemplateProviders.getAll());
         return modelAndView;
