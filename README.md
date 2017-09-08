@@ -6,7 +6,7 @@ Run TeamCity cloud agents in a Kubernetes cluster.
 
 ## Compatibility
 
-The plugin is compatible with TeamCity 10.0.x and later.
+The plugin is compatible with TeamCity 2017.1.x and later.
 
 ## Installation
 
