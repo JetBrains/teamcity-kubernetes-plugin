@@ -67,7 +67,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @NotNull
     @Override
-    public Collection<Pod> listPods(Map<String, String> labels) {
+    public Collection<Pod> listPods(@NotNull Map<String, String> labels) {
         return myKubernetesClient.pods().withLabels(labels).list().getItems();
     }
 
