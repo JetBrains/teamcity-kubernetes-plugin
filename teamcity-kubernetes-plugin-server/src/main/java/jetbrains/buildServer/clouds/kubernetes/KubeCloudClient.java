@@ -61,6 +61,7 @@ public class KubeCloudClient implements CloudClientEx {
 
     @Override
     public void dispose() {
+        LOG.debug("KubeCloudClient disposed.");
     }
 
     @NotNull
@@ -106,7 +107,8 @@ public class KubeCloudClient implements CloudClientEx {
         Map<String, String> agentParameters = agentDescription.getAvailableParameters();
 
         if((myServerUuid != null && !myServerUuid.equals(agentParameters.get(KubeAgentProperties.SERVER_UUID))) ||
-                !myCloudProfileId.equals(agentParameters.get(KubeAgentProperties.PROFILE_ID))) return null;
+                !myCloudProfileId.equals(agentParameters.get(KubeAgentProperties.PROFILE_ID)))
+            return null;
 
         final String imageName = agentParameters.get(KubeAgentProperties.IMAGE_NAME);
         final String instanceName = agentParameters.get(KubeAgentProperties.INSTANCE_NAME);
