@@ -20,7 +20,6 @@ public class KubeParametersConstants {
     public static final String PASSWORD = "password";
     public static final String CLIENT_CERTIFICATE_DATA = "clientCertData";
     public static final String AUTH_TOKEN = "authToken";
-    public static final String CUSTOM_POD_TEMPLATE = "customPodTemplate";
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
 
     public String getApiServerUrl() {
@@ -81,10 +80,6 @@ public class KubeParametersConstants {
 
     public String getSourceDeployment() {
         return SOURCE_DEPLOYMENT;
-    }
-
-    public String getCustomPodTemplate() {
-        return CUSTOM_POD_TEMPLATE;
     }
 
     public String getMaxInstances() {
