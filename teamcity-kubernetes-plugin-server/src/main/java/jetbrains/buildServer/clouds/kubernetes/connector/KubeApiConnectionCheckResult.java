@@ -8,7 +8,6 @@ public class KubeApiConnectionCheckResult {
     private final boolean mySuccess;
 
     private KubeApiConnectionCheckResult(String message, boolean success) {
-
         myMessage = message;
         mySuccess = success;
     }

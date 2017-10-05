@@ -84,8 +84,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
         BasePropertiesBean propsBean =  new BasePropertiesBean(null);
         PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true);
         final Map<String, String> props = propsBean.getProperties();
-        final String authStrategy = props.get(KubeParametersConstants.AUTH_STRATEGY);
-
         if(Boolean.parseBoolean(request.getParameter("testConnection"))){
             KubeApiConnection connectionSettings = new KubeApiConnection() {
                 @NotNull
@@ -106,6 +104,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     return props.containsKey(parameterName) ? props.get(parameterName) : props.get(SECURE_PROPERTY_PREFIX + parameterName);
                 }
             };
+            final String authStrategy = props.get(KubeParametersConstants.AUTH_STRATEGY);
             try {
                 KubeApiConnectorImpl apiConnector = KubeApiConnectorImpl.create(connectionSettings, myAuthStrategyProvider.get(authStrategy));
                 KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
