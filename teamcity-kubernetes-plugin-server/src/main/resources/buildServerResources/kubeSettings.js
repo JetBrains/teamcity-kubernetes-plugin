@@ -516,7 +516,7 @@ if(!BS.Kube.NamespaceChooser){
     };
 
     BS.Kube.NamespaceChooser.selectNamespace = function (namespace) {
-        BS.Kube.ProfileSettingsForm.selectNamespace(namespace);
+        $j("#kubernetes-namespace").val(namespace || '');
         this.hidePopup();
     };
 }
