@@ -8,5 +8,5 @@
     <bean id="podTemplateProviders" class="jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvidersImpl" />
     <bean id="deploymentContentProvider" class="jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentContentProviderImpl" />
     <bean id="kubeProfileEditController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeProfileEditController" />
-    <bean id="kubeProfileEditController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeNamespaceChooserController" />
+    <bean id="kubeNamespaceChooserController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeNamespaceChooserController" />
 </beans>
