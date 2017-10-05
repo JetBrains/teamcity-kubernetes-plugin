@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.client.*;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
+import jetbrains.buildServer.util.CollectionsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,5 +90,11 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     public PodStatus getPodStatus(@NotNull String podName) {
         final Pod podNow = myKubernetesClient.pods().withName(podName).get();
         return podNow == null ? null : podNow.getStatus();
+    }
+
+    @NotNull
+    @Override
+    public Collection<String> listNamespaces() {
+        return CollectionsUtil.convertCollection(myKubernetesClient.namespaces().list().getItems(), namespace -> namespace.getMetadata().getName());
     }
 }

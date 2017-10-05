@@ -10,11 +10,13 @@
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
 <jsp:useBean id="cons" class="jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants"/>
-<jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 <jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy>"/>
 <jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider>"/>
+
+<jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
+<jsp:useBean id="namespaceChooserUrl" class="java.lang.String" scope="request"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -32,7 +34,9 @@
     </tr>
     <tr>
         <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
-        <td><props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
+        <td>
+            <props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
+            <i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
             <span class="smallNote">Kubernetes namespace to use. Leave blank to use default namespace.</span>
         </td>

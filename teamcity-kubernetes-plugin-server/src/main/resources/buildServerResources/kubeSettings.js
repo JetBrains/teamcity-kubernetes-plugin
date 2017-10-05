@@ -499,3 +499,24 @@ if(!BS.Kube.ImageDialog) BS.Kube.ImageDialog = OO.extend(BS.AbstractModalDialog,
         return $('KubeImageDialog');
     }
 });
+
+if(!BS.Kube.NamespaceChooser){
+    BS.Kube.NamespaceChooser = new BS.Popup('namespaceChooser', {
+        hideDelay: 0,
+        hideOnMouseOut: false,
+        hideOnMouseClickOutside: true,
+        loadingText: "Loading namespaces..."
+    });
+
+    BS.Kube.NamespaceChooser.showPopup = function(nearestElement, dataLoadUrl){
+        this.showPopupNearElement(nearestElement, {
+            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            url: dataLoadUrl
+        });
+    };
+
+    BS.Kube.NamespaceChooser.selectNamespace = function (namespace) {
+        BS.Kube.ProfileSettingsForm.selectNamespace(namespace);
+        this.hidePopup();
+    };
+}

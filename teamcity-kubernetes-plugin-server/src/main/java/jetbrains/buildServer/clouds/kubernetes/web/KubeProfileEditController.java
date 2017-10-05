@@ -65,6 +65,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("editProfile.jsp"));
         Map<String, Object> model = modelAndView.getModel();
         model.put("testConnectionUrl", myPath + "?testConnection=true");
+        model.put("namespaceChooserUrl", myPath + "?testConnection=true");
         final String projectId = httpServletRequest.getParameter("projectId");
 
         final List<AgentPool> pools = new ArrayList<>();

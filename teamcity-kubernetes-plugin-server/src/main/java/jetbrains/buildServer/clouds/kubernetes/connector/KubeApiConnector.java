@@ -34,4 +34,7 @@ public interface KubeApiConnector {
 
     @Nullable
     PodStatus getPodStatus(@NotNull String podName);
+
+    @NotNull
+    Collection<String> listNamespaces();
 }

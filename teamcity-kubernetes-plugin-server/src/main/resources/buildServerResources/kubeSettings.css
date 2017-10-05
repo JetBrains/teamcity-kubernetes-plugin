@@ -14,3 +14,9 @@ textarea .podTemplateContent {
     width: 100%;
     height: 30em;
 }
+
+ul.chooser {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
