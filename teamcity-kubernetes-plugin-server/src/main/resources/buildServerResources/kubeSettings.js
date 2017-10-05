@@ -33,7 +33,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     initialize: function(){
         this.$imagesTable = $j('#kubeImagesTable');
         this.$imagesTableWrapper = $j('.imagesTableWrapper');
-        this.$emptyImagesListMessage = $j('.emptyImagesListMessage');
+        this.$emptyImagesListMessage = $j('.emptyImagesListMessage'); //TODO: implement
 
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
         this.$addImageButton = $j('#kubeAddImageButton');
@@ -367,8 +367,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     addError: function (errorHTML, target) {
-        (target || this.$fetchOptionsError)
-            .append($j('<div>').html(errorHTML));
+        target.append($j('<div>').html(errorHTML));
     },
 
     clearOptionsErrors: function (options) {

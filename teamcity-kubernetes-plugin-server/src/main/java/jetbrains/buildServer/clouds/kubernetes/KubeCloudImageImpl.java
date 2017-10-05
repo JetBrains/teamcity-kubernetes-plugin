@@ -132,6 +132,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     public void populateInstances(){
         try{
+            //TODO: filter pods more carefully using all setted labels
             for (Pod pod : myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()))){
                 KubeCloudInstanceImpl cloudInstance = new KubeCloudInstanceImpl(this, pod, myApiConnector);
                 myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance);
