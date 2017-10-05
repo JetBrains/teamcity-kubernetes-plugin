@@ -44,19 +44,23 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final AgentPoolManager myAgentPoolManager;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
+    @NotNull
+    private final KubeNamespaceChooserController myKubeNamespaceChooserController;
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
                                      @NotNull final WebControllerManager web,
                                      @NotNull final PluginDescriptor pluginDescriptor,
                                      @NotNull final AgentPoolManager agentPoolManager,
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
-                                     @NotNull final BuildAgentPodTemplateProviders podTemplateProviders) {
+                                     @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
+                                     @NotNull final KubeNamespaceChooserController kubeNamespaceChooserController) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myPath = pluginDescriptor.getPluginResourcesPath(EDIT_KUBE_HTML);
         myAgentPoolManager = agentPoolManager;
         myAuthStrategyProvider = authStrategyProvider;
         myPodTemplateProviders = podTemplateProviders;
+        myKubeNamespaceChooserController = kubeNamespaceChooserController;
         web.registerController(myPath, this);
     }
 
@@ -65,7 +69,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("editProfile.jsp"));
         Map<String, Object> model = modelAndView.getModel();
         model.put("testConnectionUrl", myPath + "?testConnection=true");
-        model.put("namespaceChooserUrl", myPath + "?testConnection=true");
+        model.put("namespaceChooserUrl", myKubeNamespaceChooserController.getUrl());
         final String projectId = httpServletRequest.getParameter("projectId");
 
         final List<AgentPool> pools = new ArrayList<>();

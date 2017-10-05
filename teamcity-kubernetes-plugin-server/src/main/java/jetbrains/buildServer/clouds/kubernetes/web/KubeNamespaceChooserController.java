@@ -33,7 +33,12 @@ public class KubeNamespaceChooserController extends BaseController {
                                           KubeAuthStrategyProvider authStrategyProvider) {
         myPluginDescriptor = pluginDescriptor;
         myAuthStrategyProvider = authStrategyProvider;
-        web.registerController(myPluginDescriptor.getPluginResourcesPath(URL), this);
+        web.registerController(getUrl(), this);
+    }
+
+    @NotNull
+    public String getUrl() {
+        return myPluginDescriptor.getPluginResourcesPath(URL);
     }
 
     @Nullable
