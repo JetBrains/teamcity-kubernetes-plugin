@@ -37,4 +37,7 @@ public interface KubeApiConnector {
 
     @NotNull
     Collection<String> listNamespaces();
+
+    @NotNull
+    Collection<String> listDeployments();
 }

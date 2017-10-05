@@ -157,12 +157,9 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         }.bind(this));
 
         this.$deploymentName.on('change', function (e, value) {
-            if (arguments.length === 1) {
-                this._image['sourceDeployment'] = this.$deploymentName.val();
-                this._updateImageDescription(this._image);
-            } else {
-                this.$deploymentName.val(value);
-            }
+            if(value !== undefined) this.$deploymentName.val(value);
+            this._image['sourceDeployment'] = this.$deploymentName.val();
+            this._updateImageDescription(this._image);
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
@@ -434,11 +431,15 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagePullPolicy.trigger('change', image['imagePullPolicy'] || 'IfNotPresent');
         this.$dockerCommand.trigger('change', image['dockerCmd'] || '');
         this.$dockerArgs.trigger('change', image['dockerArgs'] || '');
-        this.$deploymentName.trigger('change', image['sourceDeployment'] || '');
+        this.selectDeployment(image['sourceDeployment']);
         this.$customPodTemplate.trigger('change', image['customPodTemplate'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
 
         BS.Kube.ImageDialog.showCentered();
+    },
+
+    selectDeployment: function (deployment) {
+        this.$deploymentName.trigger('change', deployment || '');
     },
 
     addImage: function () {
@@ -488,7 +489,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagePullPolicy.trigger('change', 'IfNotPresent');
         this.$dockerCommand.trigger('change', '');
         this.$dockerArgs.trigger('change', '');
-        this.$deploymentName.trigger('change', '');
+        this.selectDeployment('');
         this.$customPodTemplate.trigger('change', '');
         this.$maxInstances.trigger('change', '');
     }
@@ -517,6 +518,27 @@ if(!BS.Kube.NamespaceChooser){
 
     BS.Kube.NamespaceChooser.selectNamespace = function (namespace) {
         $j("#kubernetes-namespace").val(namespace || '');
+        this.hidePopup();
+    };
+}
+
+if(!BS.Kube.DeploymentChooser){
+    BS.Kube.DeploymentChooser = new BS.Popup('deploymentChooser', {
+        hideDelay: 0,
+        hideOnMouseOut: false,
+        hideOnMouseClickOutside: true,
+        loadingText: "Loading deployments..."
+    });
+
+    BS.Kube.DeploymentChooser.showPopup = function(nearestElement, dataLoadUrl){
+        this.showPopupNearElement(nearestElement, {
+            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            url: dataLoadUrl
+        });
+    };
+
+    BS.Kube.DeploymentChooser.selectDeployment = function (deployment) {
+        BS.Kube.ProfileSettingsForm.selectDeployment(deployment);
         this.hidePopup();
     };
 }

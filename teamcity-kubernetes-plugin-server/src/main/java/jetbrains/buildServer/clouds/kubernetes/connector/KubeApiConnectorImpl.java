@@ -97,4 +97,10 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     public Collection<String> listNamespaces() {
         return CollectionsUtil.convertCollection(myKubernetesClient.namespaces().list().getItems(), namespace -> namespace.getMetadata().getName());
     }
+
+    @NotNull
+    @Override
+    public Collection<String> listDeployments() {
+        return CollectionsUtil.convertCollection(myKubernetesClient.extensions().deployments().list().getItems(), namespace -> namespace.getMetadata().getName());
+    }
 }

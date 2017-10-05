@@ -17,6 +17,7 @@
 
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="namespaceChooserUrl" class="java.lang.String" scope="request"/>
+<jsp:useBean id="deploymentChooserUrl" class="java.lang.String" scope="request"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -211,6 +212,7 @@
             <td>
                 <div>
                     <input type="text" id="${cons.sourceDeployment}" value="" class="longField" data-id="${cons.sourceDeployment}" data-err-id="${cons.sourceDeployment}"/>
+                    <i class="icon-magic" style="cursor:pointer;" title="Choose deployment" onclick="BS.Kube.DeploymentChooser.showPopup(this, '<c:url value="${deploymentChooserUrl}"/>')"></i>
                     <div class="smallNoteAttention">Deployment to use as a pod template.</div>
                     <span class="error option-error option-error_${cons.sourceDeployment}"></span>
                 </div>
