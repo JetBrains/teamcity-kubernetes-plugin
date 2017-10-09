@@ -13,10 +13,17 @@
         <span class="testConnectionFailed"><c:out value="${error}"/></span>
     </c:when>
     <c:otherwise>
-        <ul class="chooser">
-            <c:forEach var="deployment" items="${deployments}">
-                <li><a style="cursor:pointer;" onclick="BS.Kube.DeploymentChooser.selectDeployment('${deployment}')"><c:out value="${deployment}"/></a></li>
-            </c:forEach>
-        </ul>
+        <c:choose>
+            <c:when test="${empty deployments}">
+                No deployments found
+            </c:when>
+            <c:otherwise>
+                <ul class="chooser">
+                    <c:forEach var="deployment" items="${deployments}">
+                        <li><a style="cursor:pointer;" onclick="BS.Kube.DeploymentChooser.selectDeployment('${deployment}')"><c:out value="${deployment}"/></a></li>
+                    </c:forEach>
+                </ul>
+            </c:otherwise>
+        </c:choose>
     </c:otherwise>
 </c:choose>
