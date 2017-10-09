@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes.connector;
 
+import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
@@ -7,6 +8,7 @@ import io.fabric8.kubernetes.client.*;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,8 +47,11 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Override
     public KubeApiConnectionCheckResult testConnection() {
         try {
-            myKubernetesClient.pods().list();
-            return KubeApiConnectionCheckResult.ok("Connection successful");
+            String currentNamespaceName = myKubernetesClient.getNamespace();
+            Namespace currentNamespace = myKubernetesClient.namespaces().withName(currentNamespaceName).get();
+            return currentNamespace != null
+                    ? KubeApiConnectionCheckResult.ok("Connection successful")
+                    : KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: invalid namespace %s", myConnectionSettings.getApiServerUrl(), StringUtil.isEmptyOrSpaces(currentNamespaceName) ? "Default" : currentNamespaceName));
         } catch (KubernetesClientException e) {
             return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(),
                     e.getCause() == null ? e.getMessage() : e.getCause().getMessage()));
