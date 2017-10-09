@@ -94,6 +94,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).getId(); will(returnValue("my image id"));
             allowing(image).getName(); will(returnValue("my image name"));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
+            allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
         Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
@@ -131,6 +132,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).getId(); will(returnValue("my image id"));
             allowing(image).getName(); will(returnValue("my image name"));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
+            allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
         Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
@@ -173,6 +175,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).getId(); will(returnValue("my image id"));
             allowing(image).getName(); will(returnValue("my image name"));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
+            allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
 
