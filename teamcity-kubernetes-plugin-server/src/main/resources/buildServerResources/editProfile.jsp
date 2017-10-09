@@ -139,6 +139,13 @@
 <bs:dialog dialogId="KubeImageDialog" title="Add Kubernetes Cloud Image" closeCommand="BS.Kube.ImageDialog.close()"
            dialogClass="KubeImageDialog" titleId="KubeImageDialogTitle">
     <table class="runnerFormTable paramsTable">
+        <tr class="advancedSetting">
+            <th><label for="${cons.agentNamePrefix}">Agent name prefix:</label></th>
+            <td><input type="text" id="${cons.agentNamePrefix}" class="longField configParam"/>
+                <span id="error_${cons.agentNamePrefix}" class="error option-error option-error_${cons.agentNamePrefix}"></span>
+                <span class="smallNote">If no or incorrect prefix provided, default value <strong>KUBE</strong> will be used</span>
+            </td>
+        </tr>
         <tr>
             <th><label for="${cons.podSpecMode}">Pod Specification: <l:star/></label></th>
             <td>
@@ -218,7 +225,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="advancedSetting">
             <th>Max number of instances:</th>
             <td>
                 <div>
@@ -240,6 +247,10 @@
             </td>
         </tr>
     </table>
+
+    <admin:showHideAdvancedOpts containerId="KubeImageDialog" optsKey="kubeCloudSettings"/>
+    <admin:highlightChangedFields containerId="KubeImageDialog"/>
+
     <div class="popupSaveButtonsBlock">
         <forms:submit label="Add" type="button" id="kubeAddImageButton"/>
         <forms:button title="Cancel" id="kubeCancelAddImageButton">Cancel</forms:button>

@@ -21,6 +21,7 @@ public class KubeParametersConstants {
     public static final String CLIENT_CERTIFICATE_DATA = "clientCertData";
     public static final String AUTH_TOKEN = "authToken";
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
+    public static final String AGENT_NAME_PREFIX = "agentNamePrefix";
 
     public String getApiServerUrl() {
         return API_SERVER_URL;
@@ -84,5 +85,9 @@ public class KubeParametersConstants {
 
     public String getMaxInstances() {
         return IMAGE_INSTANCE_LIMIT;
+    }
+
+    public String getAgentNamePrefix() {
+        return AGENT_NAME_PREFIX;
     }
 }
