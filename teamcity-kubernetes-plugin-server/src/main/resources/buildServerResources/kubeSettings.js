@@ -227,7 +227,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     _submitDialogClickHandler: function() {
         if (this.validateOptions()) {
-            if (this.$addImageButton.val().toLowerCase() === 'edit') {
+            if (this.$addImageButton.val().toLowerCase() === 'save') {
                 this.editImage(this.$addImageButton.data('image-id'));
             } else {
                 this.addImage();
@@ -429,7 +429,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         BS.Hider.addHideFunction('KubeImageDialog', this._resetDataAndDialog.bind(this));
 
         typeof imageId !== 'undefined' && (this._image = $j.extend({}, this.imagesData[imageId]));
-        this.$addImageButton.val('Edit').data('image-id', imageId);
+        this.$addImageButton.val('Save').data('image-id', imageId);
         if (imageId === 'undefined'){
             this.$addImageButton.removeData('image-id');
         }
