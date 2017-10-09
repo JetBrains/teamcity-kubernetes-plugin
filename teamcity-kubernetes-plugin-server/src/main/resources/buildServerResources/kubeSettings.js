@@ -8,12 +8,12 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
 <td class="imageDescription highlight"></td>\
-<td class="maxInstances highlight"></td>\
+<td class="imageInstanceLimit highlight"></td>\
 <td class="edit highlight"><a href="#" class="editVmImageLink">edit</a></td>\
 <td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
         </tr>')},
 
-    _dataKeys: [ 'imageDescription', 'dockerImage', 'pool', 'maxInstances', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
+    _dataKeys: [ 'imageDescription', 'dockerImage', 'pool', 'imageInstanceLimit', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
 
     selectors: {
         rmImageLink: '.removeVmImageLink',
@@ -47,7 +47,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerArgs = $j('#dockerArgs');
         this.$deploymentName = $j('#sourceDeployment');
         this.$agentNamePrefix = $j('#agentNamePrefix');
-        this.$maxInstances = $j('#maxInstances');
+        this.$imageInstanceLimit = $j('#imageInstanceLimit');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
 
@@ -173,11 +173,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
-        this.$maxInstances.on('change', function (e, value) {
+        this.$imageInstanceLimit.on('change', function (e, value) {
             if (arguments.length === 1) {
-                this._image['maxInstances'] = this.$maxInstances.val();
+                this._image['imageInstanceLimit'] = this.$imageInstanceLimit.val();
             } else {
-                this.$maxInstances.val(value);
+                this.$imageInstanceLimit.val(value);
             }
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
@@ -310,10 +310,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 }
             }.bind(this),
 
-            maxInstances: function () {
-                var maxInstances = this._image['maxInstances'];
-                if (maxInstances && (!$j.isNumeric(maxInstances) || maxInstances < 0 )) {
-                    this.addOptionError('nonNegative', 'maxInstances');
+            imageInstanceLimit: function () {
+                var imageInstanceLimit = this._image['imageInstanceLimit'];
+                if (imageInstanceLimit && (!$j.isNumeric(imageInstanceLimit) || imageInstanceLimit < 0 )) {
+                    this.addOptionError('nonNegative', 'imageInstanceLimit');
                     isValid = false;
                 }
             }.bind(this)
@@ -425,7 +425,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerArgs.trigger('change', image['dockerArgs'] || '');
         this.selectDeployment(image['sourceDeployment']);
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
-        this.$maxInstances.trigger('change', image['maxInstances'] || '');
+        this.$imageInstanceLimit.trigger('change', image['imageInstanceLimit'] || '');
 
         BS.Kube.ImageDialog.showCentered();
     },
@@ -483,7 +483,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerArgs.trigger('change', '');
         this.selectDeployment('');
         this.$agentNamePrefix.trigger('change', '');
-        this.$maxInstances.trigger('change', '');
+        this.$imageInstanceLimit.trigger('change', '');
     }
 });
 
