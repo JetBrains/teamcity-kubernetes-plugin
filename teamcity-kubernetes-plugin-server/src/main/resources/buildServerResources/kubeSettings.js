@@ -13,7 +13,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 <td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
         </tr>')},
 
-    _dataKeys: [ 'imageDescription', 'dockerImage', 'pool', 'maxInstances', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment' ],
+    _dataKeys: [ 'imageDescription', 'dockerImage', 'pool', 'maxInstances', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
 
     selectors: {
         rmImageLink: '.removeVmImageLink',
@@ -46,7 +46,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerCommand = $j('#dockerCmd');
         this.$dockerArgs = $j('#dockerArgs');
         this.$deploymentName = $j('#sourceDeployment');
-        this.$customPodTemplate = $j('#customPodTemplate');
+        this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$maxInstances = $j('#maxInstances');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
@@ -163,12 +163,12 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
-        this.$customPodTemplate.on('change', function (e, value) {
+        this.$agentNamePrefix.on('change', function (e, value) {
             if (arguments.length === 1) {
-                this._image['customPodTemplate'] = this.$customPodTemplate.val();
+                this._image['agentNamePrefix'] = this.$agentNamePrefix.val();
                 this._updateImageDescription(this._image);
             } else {
-                this.$customPodTemplate.val(value);
+                this.$agentNamePrefix.val(value);
             }
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
@@ -310,14 +310,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 }
             }.bind(this),
 
-            customPodTemplate : function () {
-                var valueToValidate = this._image['customPodTemplate'];
-                if (this._image['podTemplateMode'] === 'custom-pod-template' && (!valueToValidate || valueToValidate === '')) {
-                    this.addOptionError('required', 'customPodTemplate');
-                    isValid = false;
-                }
-            }.bind(this),
-
             maxInstances: function () {
                 var maxInstances = this._image['maxInstances'];
                 if (maxInstances && (!$j.isNumeric(maxInstances) || maxInstances < 0 )) {
@@ -432,7 +424,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerCommand.trigger('change', image['dockerCmd'] || '');
         this.$dockerArgs.trigger('change', image['dockerArgs'] || '');
         this.selectDeployment(image['sourceDeployment']);
-        this.$customPodTemplate.trigger('change', image['customPodTemplate'] || '');
+        this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
 
         BS.Kube.ImageDialog.showCentered();
@@ -490,7 +482,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerCommand.trigger('change', '');
         this.$dockerArgs.trigger('change', '');
         this.selectDeployment('');
-        this.$customPodTemplate.trigger('change', '');
+        this.$agentNamePrefix.trigger('change', '');
         this.$maxInstances.trigger('change', '');
     }
 });
