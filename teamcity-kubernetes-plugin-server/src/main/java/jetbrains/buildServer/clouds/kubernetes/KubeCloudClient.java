@@ -153,6 +153,6 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public String generateAgentName(@NotNull AgentDescription agentDescription) {
-        return agentDescription.getAvailableParameters().get(KubeAgentProperties.INSTANCE_NAME);
+        return agentDescription.getAvailableParameters().get(KubeAgentProperties.AGENT_NAME);
     }
 }

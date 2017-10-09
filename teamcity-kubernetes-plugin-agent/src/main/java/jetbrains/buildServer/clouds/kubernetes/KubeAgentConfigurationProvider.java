@@ -41,5 +41,6 @@ public class KubeAgentConfigurationProvider {
         myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.PROFILE_ID, env.get(KubeContainerEnvironment.PROFILE_ID));
         myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.IMAGE_NAME, env.get(KubeContainerEnvironment.IMAGE_NAME));
         myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.INSTANCE_NAME, env.get(KubeContainerEnvironment.INSTANCE_NAME));
+        myAgentConfigurationEx.addConfigurationParameter(KubeAgentProperties.AGENT_NAME, env.get(KubeContainerEnvironment.AGENT_NAME));
     }
 }

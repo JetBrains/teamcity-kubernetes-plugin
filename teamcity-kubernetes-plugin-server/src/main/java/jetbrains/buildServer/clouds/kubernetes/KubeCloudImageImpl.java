@@ -9,6 +9,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,6 +52,13 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @Override
     public int getInstanceLimit() {
         return myImageData.getInstanceLimit();
+    }
+
+    @NotNull
+    @Override
+    public String getAgentName(@NotNull String instanceName) {
+        final String agentNamePrefix = myImageData.getAgentNamePrefix();
+        return StringUtil.isEmpty(agentNamePrefix) ? instanceName : agentNamePrefix + instanceName;
     }
 
     @Nullable

@@ -6,6 +6,8 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.AGENT_NAME_PREFIX;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 12.06.17.
  */
@@ -54,5 +56,9 @@ public class KubeCloudImageData {
         String parameter = myRawImageData.getParameter(KubeParametersConstants.IMAGE_INSTANCE_LIMIT);
         if(StringUtil.isEmpty(parameter)) return -1;
         return Integer.parseInt(parameter);
+    }
+
+    public String getAgentNamePrefix() {
+        return myRawImageData.getParameter(AGENT_NAME_PREFIX);
     }
 }

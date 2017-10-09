@@ -58,13 +58,13 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
             throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);
 
         final String agentNameProvided = cloudInstanceUserData.getAgentName();
-        final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
+        final String instanceName = StringUtil.isEmpty(agentNameProvided) ? sourceDeploymentName + ":" + UUID.randomUUID().toString() : agentNameProvided;
         final String serverAddress = cloudInstanceUserData.getServerAddress();
 
         PodTemplateSpec podTemplateSpec = sourceDeployment.getSpec().getTemplate();
 
         ObjectMeta metadata = podTemplateSpec.getMetadata();
-        metadata.setName(agentName);
+        metadata.setName(instanceName);
         metadata.setNamespace(kubeClientParams.getNamespace());
 
         String serverUUID = myServerSettings.getServerUUID();
@@ -89,9 +89,9 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
             for (Pair<String, String> env : Arrays.asList(
                     new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
                     new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudProfileId),
-                    new Pair<>(KubeContainerEnvironment.AGENT_NAME, agentName),
+                    new Pair<>(KubeContainerEnvironment.AGENT_NAME, kubeCloudImage.getAgentName(instanceName)),
                     new Pair<>(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getName()),
-                    new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, agentName))){
+                    new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))){
                 patchedEnvData.put(env.first, env.second);
             }
 

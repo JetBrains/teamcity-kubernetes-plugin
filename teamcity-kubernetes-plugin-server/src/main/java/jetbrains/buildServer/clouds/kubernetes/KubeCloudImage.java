@@ -36,4 +36,7 @@ public interface KubeCloudImage extends CloudImage {
     int getInstanceCount();
 
     int getInstanceLimit();
+
+    @NotNull
+    String getAgentName(@NotNull String instanceName);
 }
