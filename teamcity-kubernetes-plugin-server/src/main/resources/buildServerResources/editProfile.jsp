@@ -234,8 +234,8 @@
                 <span class="error option-error option-error_${cons.maxInstances}"></span>
             </td>
         </tr>
-        <tr class="advancedSetting">
-            <th><label for="${cons.agentPoolIdField}">Agent pool:</label></th>
+        <tr>
+            <th><label for="${cons.agentPoolIdField}">Agent pool: <l:star/></label></th>
             <td>
                 <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
                     <props:option value=""><c:out value="<Please select agent pool>"/></props:option>
