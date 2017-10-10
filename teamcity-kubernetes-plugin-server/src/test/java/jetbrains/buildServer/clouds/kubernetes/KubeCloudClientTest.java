@@ -34,13 +34,13 @@ public class KubeCloudClientTest extends BaseTestCase {
     }
 
     @NotNull
-    private KubeCloudClient createClient(KubeApiConnector api, List<KubeCloudImage> images, KubeCloudClientParametersImpl kubeParams, BuildAgentPodTemplateProviders podTemplateProviders) {
-        return createClient("defaultServerUuid", "defaultProfileId", api, images, kubeParams, podTemplateProviders);
+    private KubeCloudClient createClient(List<KubeCloudImage> images) {
+        return createClient("defaultServerUuid", "defaultProfileId", images);
     }
 
     @NotNull
-    private KubeCloudClient createClient(String serverUuid, String profileId, KubeApiConnector api, List<KubeCloudImage> images, KubeCloudClientParametersImpl kubeParams, BuildAgentPodTemplateProviders podTemplateProviders) {
-        return new KubeCloudClient(serverUuid, profileId, api, images, kubeParams, podTemplateProviders);
+    private KubeCloudClient createClient(String serverUuid, String profileId, List<KubeCloudImage> images) {
+        return new KubeCloudClient(serverUuid, profileId, myApi, images, new KubeCloudClientParametersImpl(new CloudClientParameters()), myPodTemplateProviders);
     }
 
     @AfterMethod
@@ -51,12 +51,12 @@ public class KubeCloudClientTest extends BaseTestCase {
 
     @Test
     public void testIsInitialized() throws Exception {
-        assertTrue(createClient(myApi, Collections.emptyList(), new KubeCloudClientParametersImpl(new CloudClientParameters()), myPodTemplateProviders).isInitialized());
+        assertTrue(createClient(Collections.emptyList()).isInitialized());
     }
 
     @Test
     public void testCanStartNewInstance_UnknownImage() throws Exception {
-        KubeCloudClient cloudClient = createClient(myApi, Collections.emptyList(), new KubeCloudClientParametersImpl(new CloudClientParameters()), myPodTemplateProviders);
+        KubeCloudClient cloudClient = createClient(Collections.emptyList());
         CloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
             allowing(image).getId(); will(returnValue("image-1-id"));
@@ -74,7 +74,7 @@ public class KubeCloudClientTest extends BaseTestCase {
             allowing(image).getInstanceLimit(); will(returnValue(0));
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
-        KubeCloudClient cloudClient = createClient(myApi, images, new KubeCloudClientParametersImpl(new CloudClientParameters()), myPodTemplateProviders);
+        KubeCloudClient cloudClient = createClient(images);
         assertTrue(cloudClient.canStartNewInstance(image));
     }
 
@@ -89,7 +89,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         List<KubeCloudImage> images = Collections.singletonList(image);
         CloudClientParameters cloudClientParameters = new CloudClientParameters();
         cloudClientParameters.setParameter(PROFILE_INSTANCE_LIMIT, "1");
-        KubeCloudClient cloudClient = createClient(myApi, images, new KubeCloudClientParametersImpl(cloudClientParameters), myPodTemplateProviders);
+        KubeCloudClient cloudClient = createClient(images);
         assertFalse(cloudClient.canStartNewInstance(image));
     }
 
@@ -103,7 +103,7 @@ public class KubeCloudClientTest extends BaseTestCase {
             allowing(image).getInstanceLimit(); will(returnValue(1));
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
-        KubeCloudClient cloudClient = createClient(myApi, images, new KubeCloudClientParametersImpl(new CloudClientParameters()), myPodTemplateProviders);
+        KubeCloudClient cloudClient = createClient(images);
         assertFalse(cloudClient.canStartNewInstance(image));
     }
 }
