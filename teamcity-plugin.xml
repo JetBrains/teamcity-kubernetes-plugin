@@ -2,7 +2,7 @@
 <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
     <name>teamcity-kubernetes-plugin</name>
-    <display-name>teamcity-kubernetes-plugin</display-name>
+    <display-name>Kubernetes support</display-name>
     <version>@Version@</version>
     <description>Allows running TeamCity agents in a Kubernetes cluster</description>
     <download-url>https://plugins.jetbrains.com/plugin/9818-kubernetes-cloud-support</download-url>
