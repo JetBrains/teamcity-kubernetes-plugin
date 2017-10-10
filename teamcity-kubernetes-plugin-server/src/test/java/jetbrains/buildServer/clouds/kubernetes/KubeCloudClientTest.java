@@ -36,12 +36,17 @@ public class KubeCloudClientTest extends BaseTestCase {
 
     @NotNull
     private KubeCloudClient createClient(List<KubeCloudImage> images) {
-        return createClient("defaultServerUuid", "defaultProfileId", images);
+        return createClient("defaultServerUuid", "defaultProfileId", images, new CloudClientParameters());
     }
 
     @NotNull
-    private KubeCloudClient createClient(String serverUuid, String profileId, List<KubeCloudImage> images) {
-        return new KubeCloudClient(serverUuid, profileId, myApi, images, new KubeCloudClientParametersImpl(new CloudClientParameters()), myPodTemplateProviders);
+    private KubeCloudClient createClient(List<KubeCloudImage> images, CloudClientParameters cloudClientParameters) {
+        return createClient("defaultServerUuid", "defaultProfileId", images, cloudClientParameters);
+    }
+
+    @NotNull
+    private KubeCloudClient createClient(String serverUuid, String profileId, List<KubeCloudImage> images, CloudClientParameters cloudClientParameters) {
+        return new KubeCloudClient(serverUuid, profileId, myApi, images, new KubeCloudClientParametersImpl(cloudClientParameters), myPodTemplateProviders);
     }
 
     @AfterMethod
@@ -83,14 +88,14 @@ public class KubeCloudClientTest extends BaseTestCase {
     public void testCanStartNewInstance_ProfileLimit() throws Exception {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
-            allowing(image).getName(); will(returnValue("image-1-name"));
             allowing(image).getId(); will(returnValue("image-1-id"));
             allowing(image).getInstanceCount(); will(returnValue(1));
+            allowing(image).getInstanceLimit(); will(returnValue(2));
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
         CloudClientParameters cloudClientParameters = new CloudClientParameters();
         cloudClientParameters.setParameter(PROFILE_INSTANCE_LIMIT, "1");
-        KubeCloudClient cloudClient = createClient(images);
+        KubeCloudClient cloudClient = createClient(images, cloudClientParameters);
         assertFalse(cloudClient.canStartNewInstance(image));
     }
 
@@ -112,6 +117,14 @@ public class KubeCloudClientTest extends BaseTestCase {
     public void testDuplicateImageName() throws Exception {
         KubeCloudImage image1 = m.mock(KubeCloudImage.class, "1");
         KubeCloudImage image2 = m.mock(KubeCloudImage.class, "2");
+        m.checking(new Expectations(){{
+            allowing(image1).getId(); will(returnValue("image-1-id"));
+            allowing(image1).getName(); will(returnValue("image"));
+            allowing(image1).getInstanceCount(); will(returnValue(0));
+            allowing(image2).getId(); will(returnValue("image-2-id"));
+            allowing(image2).getName(); will(returnValue("image"));
+            allowing(image2).getInstanceCount(); will(returnValue(0));
+        }});
         createClient(Arrays.asList(image1, image2));
     }
 }
