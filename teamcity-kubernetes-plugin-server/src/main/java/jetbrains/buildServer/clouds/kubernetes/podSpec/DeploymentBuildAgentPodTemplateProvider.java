@@ -58,7 +58,7 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
             throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);
 
         final String agentNameProvided = cloudInstanceUserData.getAgentName();
-        final String instanceName = StringUtil.isEmpty(agentNameProvided) ? sourceDeploymentName + ":" + UUID.randomUUID().toString() : agentNameProvided;
+        final String instanceName = StringUtil.isEmpty(agentNameProvided) ? sourceDeploymentName + "-" + UUID.randomUUID().toString() : agentNameProvided;
         final String serverAddress = cloudInstanceUserData.getServerAddress();
 
         PodTemplateSpec podTemplateSpec = sourceDeployment.getSpec().getTemplate();
