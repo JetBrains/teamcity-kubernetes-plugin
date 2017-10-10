@@ -257,6 +257,23 @@
     </div>
 </bs:dialog>
 
+<bs:dialog dialogId="KubeDeleteImageDialog" title="Delete Kubernetes Cloud Image" closeCommand="BS.Kube.DeleteImageDialog.close()"
+           dialogClass="KubeDeleteImageDialog" titleId="KubeDeleteImageDialogTitle">
+    <div id="deleteImageDialogText"><p>Are you sure you want to remove the image %image name%?</p></div>
+    <div id="deleteImageDialogTerminateInstances">
+        Following cloud instance(s) will be terminated
+        <ul>
+            <li>ec2-54-88-47-151-5</li>
+            <li>ec2-54-88-47-151-6</li>
+            <li>ec2-54-88-47-151-7</li>
+        </ul>
+    </div>
+    <div class="popupSaveButtonsBlock">
+        <forms:submit label="Delete" type="button" id="kubeDeleteImageButton"/>
+        <forms:button title="Cancel" id="kubeCancelDeleteImageButton">Cancel</forms:button>
+    </div>
+</bs:dialog>
+
 <script type="text/javascript">
     $j.ajax({
         url: "<c:url value="${teamcityPluginResourcesPath}kubeSettings.js"/>",

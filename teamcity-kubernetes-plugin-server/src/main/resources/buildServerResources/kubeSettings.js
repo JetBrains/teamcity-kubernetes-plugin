@@ -33,12 +33,15 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     initialize: function(){
         this.$imagesTable = $j('#kubeImagesTable');
         this.$imagesTableWrapper = $j('.imagesTableWrapper');
-        this.$emptyImagesListMessage = $j('.emptyImagesListMessage'); //TODO: implement
+
+        this.$authStrategySelector = $j('#authStrategy');
 
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
         this.$addImageButton = $j('#kubeAddImageButton');
         this.$cancelAddImageButton = $j('#kubeCancelAddImageButton');
-        this.$authStrategySelector = $j('#authStrategy');
+
+        this.$deleteImageButton = $j('#kubeDeleteImageButton');
+        this.$cancelDeleteImageButton = $j('#kubeCancelDeleteImageButton');
 
         this.$podSpecModeSelector = $j('#podTemplateMode');
         this.$dockerImage = $j('#dockerImage');
@@ -81,17 +84,15 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         var self = this;
 
         //// Click Handlers
-        this.$showAddImageDialogButton.on('click', this._showDialogClickHandler.bind(this));
-        this.$addImageButton.on('click', this._submitDialogClickHandler.bind(this));
-        this.$cancelAddImageButton.on('click', this._cancelDialogClickHandler.bind(this));
-        this.$imagesTable.on('click', this.selectors.rmImageLink, function () {
-            var $this = $j(this),
-                id = $this.data('image-id'),
-                name = self.imagesData[id].dockerImage;
+        this.$showAddImageDialogButton.on('click', this._showAllImageDialogClickHandler.bind(this));
+        this.$addImageButton.on('click', this._submitImageDialogClickHandler.bind(this));
+        this.$cancelAddImageButton.on('click', this._cancelImageDialogClickHandler.bind(this));
 
-            if (confirm('Are you sure you want to remove the image "' + name + '"?')) {
-                self.removeImage($this);
-            }
+        this.$deleteImageButton.on('click', this._submitDeleteImageDialogClickHandler.bind(this));
+        this.$cancelDeleteImageButton.on('click', this._cancelDeleteImageDialogClickHandler.bind(this));
+
+        this.$imagesTable.on('click', this.selectors.rmImageLink, function () {
+            self.showDeleteImageDialog($j(this));
             return false;
         });
         var editDelegates = this.selectors.imagesTableRow + ' .highlight, ' + this.selectors.editImageLink;
@@ -213,19 +214,19 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         image['imageDescription'] = imageDescription;
     },
 
-    _showDialogClickHandler: function () {
+    _showAllImageDialogClickHandler: function () {
         if (! this.$showAddImageDialogButton.attr('disabled')) {
             this.showAddImageDialog();
         }
         return false;
     },
 
-    _cancelDialogClickHandler: function () {
+    _cancelImageDialogClickHandler: function () {
         BS.Kube.ImageDialog.close();
         return false;
     },
 
-    _submitDialogClickHandler: function() {
+    _submitImageDialogClickHandler: function() {
         if (this.validateOptions()) {
             if (this.$addImageButton.val().toLowerCase() === 'save') {
                 this.editImage(this.$addImageButton.data('image-id'));
@@ -234,6 +235,18 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             }
             BS.Kube.ImageDialog.close();
         }
+        return false;
+    },
+
+    _cancelDeleteImageDialogClickHandler: function () {
+        BS.Kube.DeleteImageDialog.close();
+        return false;
+    },
+
+    _submitDeleteImageDialogClickHandler: function() {
+        //TODO: terminate instances
+        this.removeImage($this);
+        BS.Kube.DeleteImageDialog.close();
         return false;
     },
 
@@ -273,7 +286,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     _toggleImagesTable: function () {
         var toggle = !!this._imagesDataLength;
         this.$imagesTableWrapper.removeClass('hidden');
-        this.$emptyImagesListMessage.toggleClass('hidden', toggle);
         this.$imagesTable.toggleClass('hidden', !toggle);
     },
 
@@ -449,6 +461,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         BS.Kube.ImageDialog.showCentered();
     },
 
+    showDeleteImageDialog: function () {
+        BS.Kube.DeleteImageDialog.showCentered();
+    },
+
     selectDeployment: function (deployment) {
         this.$deploymentName.trigger('change', deployment || '');
     },
@@ -510,6 +526,12 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 if(!BS.Kube.ImageDialog) BS.Kube.ImageDialog = OO.extend(BS.AbstractModalDialog, {
     getContainer: function() {
         return $('KubeImageDialog');
+    }
+});
+
+if(!BS.Kube.DeleteImageDialog) BS.Kube.DeleteImageDialog = OO.extend(BS.AbstractModalDialog, {
+    getContainer: function() {
+        return $('KubeDeleteImageDialog');
     }
 });
 
