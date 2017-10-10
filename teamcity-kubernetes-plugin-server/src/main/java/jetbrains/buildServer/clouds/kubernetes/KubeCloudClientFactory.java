@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
+import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
@@ -76,10 +77,10 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @Override
     public boolean canBeAgentOfType(@NotNull AgentDescription agentDescription) {
         final Map<String, String> map = agentDescription.getAvailableParameters();
-        return  map.containsKey(KubeAgentProperties.SERVER_UUID) &&
-                map.containsKey(KubeAgentProperties.PROFILE_ID) &&
-                map.containsKey(KubeAgentProperties.IMAGE_NAME) &&
-                map.containsKey(KubeAgentProperties.INSTANCE_NAME);
+        return  map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.SERVER_UUID) &&
+                map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID) &&
+                map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_NAME) &&
+                map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.INSTANCE_NAME);
     }
 
     @NotNull

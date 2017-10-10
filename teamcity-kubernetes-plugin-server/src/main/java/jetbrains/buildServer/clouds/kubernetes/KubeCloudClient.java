@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
@@ -106,12 +107,12 @@ public class KubeCloudClient implements CloudClientEx {
     public CloudInstance findInstanceByAgent(@NotNull AgentDescription agentDescription) {
         Map<String, String> agentParameters = agentDescription.getAvailableParameters();
 
-        if((myServerUuid != null && !myServerUuid.equals(agentParameters.get(KubeAgentProperties.SERVER_UUID))) ||
-                !myCloudProfileId.equals(agentParameters.get(KubeAgentProperties.PROFILE_ID)))
+        if((myServerUuid != null && !myServerUuid.equals(agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.SERVER_UUID))) ||
+                !myCloudProfileId.equals(agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID)))
             return null;
 
-        final String imageName = agentParameters.get(KubeAgentProperties.IMAGE_NAME);
-        final String instanceName = agentParameters.get(KubeAgentProperties.INSTANCE_NAME);
+        final String imageName = agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_NAME);
+        final String instanceName = agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.INSTANCE_NAME);
         if (imageName != null) {
             final KubeCloudImage cloudImage = myImageNameToImageMap.get(imageName);
             if (cloudImage != null) {
@@ -153,6 +154,6 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public String generateAgentName(@NotNull AgentDescription agentDescription) {
-        return agentDescription.getAvailableParameters().get(KubeAgentProperties.AGENT_NAME);
+        return agentDescription.getAvailableParameters().get(Constants.ENV_PREFIX + KubeContainerEnvironment.AGENT_NAME);
     }
 }

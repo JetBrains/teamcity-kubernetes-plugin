@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static jetbrains.buildServer.clouds.kubernetes.KubeAgentProperties.INSTANCE_NAME;
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.INSTANCE_NAME;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
