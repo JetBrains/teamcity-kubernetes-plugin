@@ -151,7 +151,7 @@
             <td>
                 <div>
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
-                    <props:selectProperty name="${cons.podSpecMode}">
+                    <props:selectProperty name="${cons.podSpecMode}" className="longField">
                         <props:option value="notSelected" selected="${empty selectedPodSpecMode}">--- Choose what you need ---</props:option>
                         <c:forEach var="podTemplateProvider" items="${podTemplateProviders}">
                             <props:option value="${podTemplateProvider.id}" selected="${not empty selectedPodSpecMode and podTemplateProvider.id eq selectedPodSpecMode}"><c:out value="${podTemplateProvider.displayName}"/></props:option>
