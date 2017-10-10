@@ -9,8 +9,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         imagesTableRow: $j('<tr class="imagesTableRow">\
 <td class="imageDescription highlight"></td>\
 <td class="imageInstanceLimit highlight"></td>\
-<td class="edit highlight"><a href="#" class="editVmImageLink">edit</a></td>\
-<td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
+<td class="edit highlight"><a href="#" class="editVmImageLink">Edit</a></td>\
+<td class="remove"><a href="#" class="removeVmImageLink">Delete...</a></td>\
         </tr>')},
 
     _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
