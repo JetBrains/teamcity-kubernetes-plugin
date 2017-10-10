@@ -26,7 +26,6 @@ public class KubeCloudClient implements CloudClientEx {
     private final static Logger LOG = Logger.getInstance(KubeCloudClient.class.getName());
 
     private final KubeApiConnector myApiConnector;
-    private final ConcurrentHashMap<String, KubeCloudImage> myImageNameToImageMap;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParametersImpl myKubeClientParams;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
@@ -45,7 +44,6 @@ public class KubeCloudClient implements CloudClientEx {
         myServerUuid = serverUuid;
         myCloudProfileId = cloudProfileId;
         myApiConnector = apiConnector;
-        myImageNameToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getName));
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getId));
         myKubeClientParams = kubeClientParams;
         myPodTemplateProviders = podTemplateProviders;
@@ -111,10 +109,10 @@ public class KubeCloudClient implements CloudClientEx {
                 !myCloudProfileId.equals(agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID)))
             return null;
 
-        final String imageName = agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_NAME);
+        final String imageId = agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_ID);
         final String instanceName = agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.INSTANCE_NAME);
-        if (imageName != null) {
-            final KubeCloudImage cloudImage = myImageNameToImageMap.get(imageName);
+        if (imageId != null) {
+            final KubeCloudImage cloudImage = myImageIdToImageMap.get(imageId);
             if (cloudImage != null) {
                 return cloudImage.findInstanceById(instanceName);
             }
@@ -125,7 +123,7 @@ public class KubeCloudClient implements CloudClientEx {
     @NotNull
     @Override
     public Collection<? extends CloudImage> getImages() throws CloudException {
-        return Collections.unmodifiableCollection(myImageNameToImageMap.values());
+        return Collections.unmodifiableCollection(myImageIdToImageMap.values());
     }
 
     @Nullable
