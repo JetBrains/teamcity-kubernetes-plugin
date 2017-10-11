@@ -302,6 +302,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         if(selectedStrategyId) {
             $j('.' + selectedStrategyId).removeClass('hidden');
         }
+        //workaround for TW-51797
+        BS.MultilineProperties.updateVisible();
     },
 
     _togglePodSpecMode: function () {
