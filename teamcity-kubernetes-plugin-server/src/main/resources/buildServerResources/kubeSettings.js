@@ -244,10 +244,17 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _submitDeleteImageDialogClickHandler: function() {
-        //TODO: terminate instances
-        this.removeImage($this);
-        BS.Kube.DeleteImageDialog.close();
-        return false;
+        var imageId = BS.Kube.DeleteImageDialog.currentImageId;
+        BS.ajaxRequest(BS.Kube.DeleteImageDialog.url + window.location.search, {
+            method: 'post',
+            parameters : {
+                imageId : imageId
+            },
+            onComplete: function() {
+                BS.Kube.ProfileSettingsForm.removeImage(imageId);
+                BS.Kube.DeleteImageDialog.close();
+            }
+        });
     },
 
     _renderImagesTable: function () {
@@ -470,7 +477,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 imageId : imageId
             },
             onComplete: function() {
-                BS.Kube.DeleteImageDialog.showCentered();
+                BS.Kube.DeleteImageDialog.show(imageId);
             }
         });
     },
@@ -498,10 +505,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this._renderImagesTable();
     },
 
-    removeImage: function ($elem) {
-        delete this.imagesData[$elem.data('image-id')];
+    removeImage: function (imageId) {
+        delete this.imagesData[imageId];
         this._imagesDataLength -= 1;
-        $elem.parents(this.selectors.imagesTableRow).remove();
+        this.$imagesTable.find('tr[data-image-id=\'' + imageId + '\']').remove();
         this.saveImagesData();
         this._toggleImagesTable();
     },
@@ -541,9 +548,15 @@ if(!BS.Kube.ImageDialog) BS.Kube.ImageDialog = OO.extend(BS.AbstractModalDialog,
 
 if(!BS.Kube.DeleteImageDialog) BS.Kube.DeleteImageDialog = OO.extend(BS.AbstractModalDialog, {
     url: '',
+    currentImageId: '',
 
     getContainer: function() {
         return $('KubeDeleteImageDialog');
+    },
+
+    show: function (imageId) {
+        BS.Kube.DeleteImageDialog.currentImageId = imageId;
+        BS.Kube.DeleteImageDialog.showCentered();
     }
 });
 
