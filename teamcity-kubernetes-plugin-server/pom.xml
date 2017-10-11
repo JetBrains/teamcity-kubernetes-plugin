@@ -63,6 +63,13 @@
       </dependency>
 
     <dependency>
+      <groupId>org.jetbrains.teamcity</groupId>
+      <artifactId>cloud-server-api</artifactId>
+      <version>${teamcity-version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-client</artifactId>
       <version>${kubernetes-client.version}</version>

@@ -18,6 +18,7 @@
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="namespaceChooserUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="deploymentChooserUrl" class="java.lang.String" scope="request"/>
+<jsp:useBean id="deleteImageUrl" class="java.lang.String" scope="request"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -259,15 +260,9 @@
 
 <bs:dialog dialogId="KubeDeleteImageDialog" title="Delete Kubernetes Cloud Image" closeCommand="BS.Kube.DeleteImageDialog.close()"
            dialogClass="KubeDeleteImageDialog" titleId="KubeDeleteImageDialogTitle">
-    <div id="deleteImageDialogText"><p>Are you sure you want to remove the image %image name%?</p></div>
-    <div id="deleteImageDialogTerminateInstances">
-        Following cloud instance(s) will be terminated
-        <ul>
-            <li>ec2-54-88-47-151-5</li>
-            <li>ec2-54-88-47-151-6</li>
-            <li>ec2-54-88-47-151-7</li>
-        </ul>
-    </div>
+
+    <div id="kubeDeleteImageDialogBody"></div>
+
     <div class="popupSaveButtonsBlock">
         <forms:submit label="Delete" type="button" id="kubeDeleteImageButton"/>
         <forms:button title="Cancel" id="kubeCancelDeleteImageButton">Cancel</forms:button>
@@ -281,6 +276,7 @@
         cache: true,
         success: function () {
             BS.Kube.ProfileSettingsForm.testConnectionUrl = '<c:url value="${testConnectionUrl}"/>';
+            BS.Kube.DeleteImageDialog.url = '<c:url value="${deleteImageUrl}"/>';
             BS.Kube.ProfileSettingsForm.initialize();
         }
     });

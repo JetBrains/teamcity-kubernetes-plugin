@@ -461,8 +461,18 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         BS.Kube.ImageDialog.showCentered();
     },
 
-    showDeleteImageDialog: function () {
-        BS.Kube.DeleteImageDialog.showCentered();
+    showDeleteImageDialog: function ($elem) {
+        var imageId = $elem.parents(this.selectors.imagesTableRow).data('image-id');
+
+        BS.ajaxUpdater($("kubeDeleteImageDialogBody"), BS.Kube.DeleteImageDialog.url + window.location.search, {
+            method: 'get',
+            parameters : {
+                imageId : imageId
+            },
+            onComplete: function() {
+                BS.Kube.DeleteImageDialog.showCentered();
+            }
+        });
     },
 
     selectDeployment: function (deployment) {
@@ -530,6 +540,8 @@ if(!BS.Kube.ImageDialog) BS.Kube.ImageDialog = OO.extend(BS.AbstractModalDialog,
 });
 
 if(!BS.Kube.DeleteImageDialog) BS.Kube.DeleteImageDialog = OO.extend(BS.AbstractModalDialog, {
+    url: '',
+
     getContainer: function() {
         return $('KubeDeleteImageDialog');
     }

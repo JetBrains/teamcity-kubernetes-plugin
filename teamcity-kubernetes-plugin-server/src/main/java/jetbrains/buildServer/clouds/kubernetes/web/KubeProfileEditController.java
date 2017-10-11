@@ -46,6 +46,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
     private final KubeNamespaceChooserController myKubeNamespaceChooserController;
     private final KubeDeploymentChooserController myKubeDeploymentChooserController;
+    private final KubeDeleteImageDialogController myKubeDeleteImageDialogController;
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
                                      @NotNull final WebControllerManager web,
@@ -54,7 +55,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
                                      @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
                                      @NotNull final KubeNamespaceChooserController kubeNamespaceChooserController,
-                                     @NotNull final KubeDeploymentChooserController kubeDeploymentChooserController) {
+                                     @NotNull final KubeDeploymentChooserController kubeDeploymentChooserController,
+                                     @NotNull final KubeDeleteImageDialogController kubeDeleteImageDialogController) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myPath = pluginDescriptor.getPluginResourcesPath(EDIT_KUBE_HTML);
@@ -63,6 +65,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         myPodTemplateProviders = podTemplateProviders;
         myKubeNamespaceChooserController = kubeNamespaceChooserController;
         myKubeDeploymentChooserController = kubeDeploymentChooserController;
+        myKubeDeleteImageDialogController = kubeDeleteImageDialogController;
         web.registerController(myPath, this);
     }
 
@@ -73,6 +76,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
         model.put("testConnectionUrl", myPath + "?testConnection=true");
         model.put("namespaceChooserUrl", myKubeNamespaceChooserController.getUrl());
         model.put("deploymentChooserUrl", myKubeDeploymentChooserController.getUrl());
+        model.put("deleteImageUrl", myKubeDeleteImageDialogController.getUrl());
         final String projectId = httpServletRequest.getParameter("projectId");
 
         final List<AgentPool> pools = new ArrayList<>();
