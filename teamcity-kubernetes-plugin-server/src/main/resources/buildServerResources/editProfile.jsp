@@ -241,7 +241,7 @@
                 <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
                     <props:option value=""><c:out value="<Please select agent pool>"/></props:option>
                     <c:forEach var="ap" items="${agentPools}">
-                        <props:option value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
+                        <props:option selected="${ap.agentPoolId eq propertiesBean.properties['agent_pool_id']}" value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
                     </c:forEach>
                 </select>
                 <span id="error_${cons.agentPoolIdField}" class="error"></span>
