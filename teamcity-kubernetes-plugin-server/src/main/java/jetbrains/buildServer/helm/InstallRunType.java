@@ -1,13 +1,17 @@
 package jetbrains.buildServer.helm;
 
+import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.RunTypeRegistry;
+import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
@@ -41,7 +45,14 @@ public class InstallRunType extends RunType {
     @Nullable
     @Override
     public PropertiesProcessor getRunnerPropertiesProcessor() {
-        return null;
+        return properties -> {
+            List<InvalidProperty> result = new Vector<InvalidProperty>();
+            final String chart = properties.get(HelmConstants.CHART);
+            if (PropertiesUtil.isEmptyOrNull(chart)) {
+                result.add(new InvalidProperty(HelmConstants.CHART, "Chart must be specified"));
+            }
+            return result;
+        };
     }
 
     @Nullable
@@ -60,5 +71,12 @@ public class InstallRunType extends RunType {
     @Override
     public Map<String, String> getDefaultRunnerProperties() {
         return null;
+    }
+
+    @NotNull
+    @Override
+    public String describeParameters(@NotNull Map<String, String> parameters) {
+        String flags = parameters.get(HelmConstants.ADDITIONAL_FLAGS);
+        return String.format("Chart: %s\nAdditional flags: %s", parameters.get(HelmConstants.CHART), flags != null ? flags : "not specified");
     }
 }
