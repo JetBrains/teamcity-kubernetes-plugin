@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import static jetbrains.buildServer.helm.HelmConstants.HELM_INSTALL_RUN_TYPE;
+
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
  */
@@ -27,7 +29,7 @@ public class InstallRunType extends RunType {
     @NotNull
     @Override
     public String getType() {
-        return "helm-install";
+        return HELM_INSTALL_RUN_TYPE;
     }
 
     @NotNull
