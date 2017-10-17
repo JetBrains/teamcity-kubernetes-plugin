@@ -2,6 +2,7 @@ package jetbrains.buildServer.helm;
 
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
+import jetbrains.buildServer.serverSide.RunTypeRegistry;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,8 +15,9 @@ import java.util.Map;
 public class FetchRunType extends RunType {
     private final PluginDescriptor myPluginDescriptor;
 
-    public FetchRunType(PluginDescriptor pluginDescriptor) {
+    public FetchRunType(PluginDescriptor pluginDescriptor, RunTypeRegistry runTypeRegistry) {
         myPluginDescriptor = pluginDescriptor;
+        runTypeRegistry.registerRunType(this);
     }
 
     @NotNull
