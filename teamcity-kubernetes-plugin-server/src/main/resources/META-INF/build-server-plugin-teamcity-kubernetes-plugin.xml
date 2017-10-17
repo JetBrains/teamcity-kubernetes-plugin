@@ -14,4 +14,5 @@
 
     <!--helm support-->
     <bean id="installRunType" class="jetbrains.buildServer.helm.InstallRunType" />
+    <bean id="fetchRunType" class="jetbrains.buildServer.helm.FetchRunType" />
 </beans>
