@@ -11,4 +11,7 @@
     <bean id="kubeNamespaceChooserController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeNamespaceChooserController" />
     <bean id="kubeDeploymentChooserController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeDeploymentChooserController" />
     <bean id="kubeDeleteImageDialogController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeDeleteImageDialogController" />
+
+    <!--helm support-->
+    <bean id="installRunType" class="jetbrains.buildServer.helm.InstallRunType" />
 </beans>
