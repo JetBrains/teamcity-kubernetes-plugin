@@ -6,4 +6,6 @@
        default-autowire="constructor">
     <bean id="kubeAgentConfigurationProvider" class="jetbrains.buildServer.clouds.kubernetes.KubeAgentConfigurationProvider" />
     <bean id="installBuildServiceFactory" class="jetbrains.buildServer.helm.InstallBuildServiceFactory" />
+    <bean id="testBuildServiceFactory" class="jetbrains.buildServer.helm.TestBuildServiceFactory" />
+    <bean id="deleteBuildServiceFactory" class="jetbrains.buildServer.helm.DeleteBuildServiceFactory" />
 </beans>

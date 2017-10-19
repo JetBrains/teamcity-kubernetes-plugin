@@ -11,4 +11,8 @@ public class HelmConstantsBean {
     public String getAddtionalFlagsKey() {
         return HelmConstants.ADDITIONAL_FLAGS;
     }
+
+    public String getReleaseName() {
+        return HelmConstants.RELEASE_NAME;
+    }
 }
