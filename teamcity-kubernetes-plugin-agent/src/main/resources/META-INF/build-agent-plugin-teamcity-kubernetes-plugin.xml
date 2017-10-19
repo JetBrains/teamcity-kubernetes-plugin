@@ -8,4 +8,5 @@
     <bean id="installBuildServiceFactory" class="jetbrains.buildServer.helm.InstallBuildServiceFactory" />
     <bean id="testBuildServiceFactory" class="jetbrains.buildServer.helm.TestBuildServiceFactory" />
     <bean id="deleteBuildServiceFactory" class="jetbrains.buildServer.helm.DeleteBuildServiceFactory" />
+    <bean id="upgradeBuildServiceFactory" class="jetbrains.buildServer.helm.UpgradeBuildServiceFactory" />
 </beans>

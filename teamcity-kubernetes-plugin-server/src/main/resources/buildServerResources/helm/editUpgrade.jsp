@@ -15,14 +15,27 @@
             <i class="icon-magic" style="cursor:pointer;" title="Choose releases" ></i>
         </span>
         <span class="error" id="error_${constants.releaseName}"></span>
-        <span class="smallNote">Release name to delete from Kubernetes. Removes all of the resources associated with the last release of the chart.</span>
+        <span class="smallNote">Release to upgrade.</span>
+    </td>
+</tr>
+
+<tr>
+    <th><label for="${constants.chartKey}">Chart: <l:star/></label></th>
+    <td>
+      <span>
+        <props:textProperty name="${constants.chartKey}" className="longField"/>
+        <bs:vcsTree fieldId="${constants.chartKey}" treeId="${constants.chartKey}"/>
+        <i class="icon-magic" style="cursor:pointer;" title="Choose chart reference" ></i>
+      </span>
+        <span class="smallNote">New version of chart.</span>
+        <span class="error" id="error_${constants.chartKey}"></span>
     </td>
 </tr>
 
 <tr class="advancedSetting">
-    <th><label for="${constants.addtionalFlagsKey}">Additional 'helm delete' command flags: </label></th>
+    <th><label for="${constants.addtionalFlagsKey}">Additional 'helm upgrade' command flags: </label></th>
     <td><props:textProperty name="${constants.addtionalFlagsKey}" className="longField"/>
         <span class="error" id="error_${constants.addtionalFlagsKey}"></span>
-        <span class="smallNote">Additional options for 'helm delete' command line</span>
+        <span class="smallNote">Additional options for 'helm upgrade' command line</span>
     </td>
 </tr>
