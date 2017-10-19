@@ -15,4 +15,8 @@ public class HelmConstantsBean {
     public String getReleaseName() {
         return HelmConstants.RELEASE_NAME;
     }
+
+    public String getRevision() {
+        return HelmConstants.REVISION;
+    }
 }

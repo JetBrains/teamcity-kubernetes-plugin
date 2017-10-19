@@ -9,4 +9,5 @@
     <bean id="testBuildServiceFactory" class="jetbrains.buildServer.helm.TestBuildServiceFactory" />
     <bean id="deleteBuildServiceFactory" class="jetbrains.buildServer.helm.DeleteBuildServiceFactory" />
     <bean id="upgradeBuildServiceFactory" class="jetbrains.buildServer.helm.UpgradeBuildServiceFactory" />
+    <bean id="rollbackBuildServiceFactory" class="jetbrains.buildServer.helm.RollbackBuildServiceFactory" />
 </beans>

@@ -24,4 +24,5 @@ public interface HelmConstants {
     String CHART = "teamcity.helm.chart";
     String ADDITIONAL_FLAGS = "teamcity.helm.additionalFlags";
     String RELEASE_NAME = "teamcity.helm.releaseName";
+    String REVISION = "teamcity.helm.revision";
 }
