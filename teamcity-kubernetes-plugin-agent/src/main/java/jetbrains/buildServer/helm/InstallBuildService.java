@@ -6,7 +6,7 @@ import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +36,11 @@ public class InstallBuildService extends BuildServiceAdapter {
             @Override
             public List<String> getArguments() throws RunBuildException {
                 Map<String, String> runnerParameters = getRunnerParameters();
-                return Arrays.asList(HELM_INSTALL_COMMAND, StringUtil.emptyIfNull(runnerParameters.get(CHART)), StringUtil.emptyIfNull(runnerParameters.get(ADDITIONAL_FLAGS)));
+                List<String> result = new LinkedList<String>();
+                result.add(HELM_INSTALL_COMMAND);
+                result.add(StringUtil.emptyIfNull(runnerParameters.get(CHART)));
+                result.add(StringUtil.emptyIfNull(runnerParameters.get(ADDITIONAL_FLAGS)));
+                return result;
             }
 
             @NotNull
