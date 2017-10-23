@@ -37,7 +37,7 @@ public class RollbackBuildService extends BuildServiceAdapter {
             public List<String> getArguments() throws RunBuildException {
                 Map<String, String> runnerParameters = getRunnerParameters();
                 List<String> result = new LinkedList<String>();
-                result.add(HELM_UPGRADE_COMMAND);
+                result.add(HELM_ROLLBACK_COMMAND);
                 result.add(StringUtil.emptyIfNull(runnerParameters.get(RELEASE_NAME)));
                 result.add(StringUtil.emptyIfNull(runnerParameters.get(REVISION)));
                 result.add(StringUtil.emptyIfNull(runnerParameters.get(ADDITIONAL_FLAGS)));
