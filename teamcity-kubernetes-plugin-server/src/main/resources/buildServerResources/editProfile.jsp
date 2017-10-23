@@ -37,8 +37,10 @@
     <tr>
         <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
         <td>
-            <props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
-            <i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i>
+            <div style="white-space: nowrap">
+                <props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
+                <i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i>
+            </div>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
             <span class="smallNote">Kubernetes namespace to use. Leave blank to use default namespace.</span>
         </td>
@@ -218,12 +220,12 @@
         <tr class="hidden deployment-base pod-spec-ui">
             <th>Deployment name:&nbsp;<l:star/></th>
             <td>
-                <div>
+                <div style="white-space: nowrap">
                     <input type="text" id="${cons.sourceDeployment}" value="" class="longField" data-id="${cons.sourceDeployment}" data-err-id="${cons.sourceDeployment}"/>
                     <i class="icon-magic" style="cursor:pointer;" title="Choose deployment" onclick="BS.Kube.DeploymentChooser.showPopup(this, '<c:url value="${deploymentChooserUrl}"/>')"></i>
-                    <div class="smallNoteAttention">Deployment to use as a pod template.</div>
-                    <span class="error option-error option-error_${cons.sourceDeployment}"></span>
                 </div>
+                <div class="smallNoteAttention">Deployment to use as a pod template.</div>
+                <span class="error option-error option-error_${cons.sourceDeployment}"></span>
             </td>
         </tr>
         <tr class="advancedSetting">

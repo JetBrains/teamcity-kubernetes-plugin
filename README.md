@@ -11,7 +11,7 @@ The plugin is compatible with TeamCity 2017.1.x and later.
 
 ## Installation
 
-You can [download the plugin](https://teamcity.jetbrains.com/repository/download/TeamCityPluginsByJetBrains_TeamCityKubernetesPlugin_Build/lastSuccessful/teamcity-kubernetes-plugin.zip) and install it as an [additional TeamCity plugin](https://confluence.jetbrains.com/display/TCDL/Installing+Additional+Plugins).
+You can [download the plugin](https://teamcity.jetbrains.com/guestAuth/app/rest/builds/buildType:TeamCityPluginsByJetBrains_TeamCityKubernetesPlugin_Build,tags:release/artifacts/content/teamcity-kubernetes-plugin.zip) and install it as an [additional TeamCity plugin](https://confluence.jetbrains.com/display/TCDL/Installing+Additional+Plugins).
 
 ## Configuration
 
