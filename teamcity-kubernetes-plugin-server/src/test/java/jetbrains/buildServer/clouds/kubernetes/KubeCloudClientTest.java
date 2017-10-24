@@ -25,6 +25,7 @@ public class KubeCloudClientTest extends BaseTestCase {
     private Mockery m;
     private KubeApiConnector myApi;
     private BuildAgentPodTemplateProviders myPodTemplateProviders;
+    private KubeDataCache myCache;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -32,6 +33,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         m = new Mockery();
         myApi = m.mock(KubeApiConnector.class);
         myPodTemplateProviders = m.mock(BuildAgentPodTemplateProviders.class);
+        myCache = new KubeDataCacheImpl();
     }
 
     @NotNull
@@ -46,7 +48,7 @@ public class KubeCloudClientTest extends BaseTestCase {
 
     @NotNull
     private KubeCloudClient createClient(String serverUuid, String profileId, List<KubeCloudImage> images, CloudClientParameters cloudClientParameters) {
-        return new KubeCloudClient(serverUuid, profileId, myApi, images, new KubeCloudClientParametersImpl(cloudClientParameters), myPodTemplateProviders);
+        return new KubeCloudClient(serverUuid, profileId, myApi, images, new KubeCloudClientParametersImpl(cloudClientParameters), myPodTemplateProviders, myCache);
     }
 
     @AfterMethod
