@@ -4,6 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
     <bean id="kubeCloudClientFactory" class="jetbrains.buildServer.clouds.kubernetes.KubeCloudClientFactory" />
+    <bean id="kubeDataCache" class="jetbrains.buildServer.clouds.kubernetes.KubeDataCacheImpl" />
     <bean id="kubeAuthStrategyProvider" class="jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl" />
     <bean id="podTemplateProviders" class="jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvidersImpl" />
     <bean id="deploymentContentProvider" class="jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentContentProviderImpl" />

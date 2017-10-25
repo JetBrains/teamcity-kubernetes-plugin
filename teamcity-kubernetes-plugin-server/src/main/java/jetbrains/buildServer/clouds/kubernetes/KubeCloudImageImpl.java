@@ -23,13 +23,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KubeCloudImageImpl implements KubeCloudImage {
     private final KubeApiConnector myApiConnector;
     private final KubeCloudImageData myImageData;
+    private final KubeDataCache myCache;
     private Map<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<String, KubeCloudInstance>();
     private CloudErrorInfo myCurrentError;
 
-    public KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
-                              @NotNull final KubeApiConnector apiConnector) {
+    KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
+                       @NotNull final KubeApiConnector apiConnector,
+                       @NotNull final KubeDataCache cache) {
         myImageData = kubeCloudImageData;
         myApiConnector = apiConnector;
+        myCache = cache;
     }
 
     @NotNull
@@ -142,7 +145,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         try{
             //TODO: filter pods more carefully using all setted labels
             for (Pod pod : myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()))){
-                KubeCloudInstanceImpl cloudInstance = new KubeCloudInstanceImpl(this, pod, myApiConnector);
+                KubeCloudInstance cloudInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, pod, myApiConnector), myCache);
                 myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance);
             }
             myCurrentError = null;

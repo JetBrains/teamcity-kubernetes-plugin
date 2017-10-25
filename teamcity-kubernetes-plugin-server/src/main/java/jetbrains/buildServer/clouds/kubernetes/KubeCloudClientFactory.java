@@ -29,18 +29,21 @@ public class KubeCloudClientFactory implements CloudClientFactory {
 
     private final PluginDescriptor myPluginDescriptor;
     private final ServerSettings myServerSettings;
-    private KubeAuthStrategyProvider myAuthStrategies;
-    private BuildAgentPodTemplateProviders myPodTemplateProviders;
+    private final KubeDataCache myCache;
+    private final KubeAuthStrategyProvider myAuthStrategies;
+    private final BuildAgentPodTemplateProviders myPodTemplateProviders;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
                                   @NotNull final PluginDescriptor pluginDescriptor,
                                   @NotNull final ServerSettings serverSettings,
                                   @NotNull final KubeAuthStrategyProvider authStrategies,
-                                  @NotNull final BuildAgentPodTemplateProviders podTemplateProviders) {
+                                  @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
+                                  @NotNull final KubeDataCache cache) {
         myPluginDescriptor = pluginDescriptor;
         myServerSettings = serverSettings;
         myAuthStrategies = authStrategies;
         myPodTemplateProviders = podTemplateProviders;
+        myCache = cache;
         registrar.registerCloudFactory(this);
     }
 
@@ -89,11 +92,11 @@ public class KubeCloudClientFactory implements CloudClientFactory {
         final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
         final KubeApiConnector apiConnector = KubeApiConnectorImpl.create(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
         List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
-            KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
+            KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myCache);
             //TODO: defer this
             kubeCloudImage.populateInstances();
             return kubeCloudImage;
         });
-        return new KubeCloudClient(myServerSettings.getServerUUID(), cloudState.getProfileId(), apiConnector, images, kubeClientParams, myPodTemplateProviders);
+        return new KubeCloudClient(myServerSettings.getServerUUID(), cloudState.getProfileId(), apiConnector, images, kubeClientParams, myPodTemplateProviders, myCache);
     }
 }

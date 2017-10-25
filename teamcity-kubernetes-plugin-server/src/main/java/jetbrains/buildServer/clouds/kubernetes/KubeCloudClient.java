@@ -29,6 +29,8 @@ public class KubeCloudClient implements CloudClientEx {
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParametersImpl myKubeClientParams;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
+    private final KubeDataCache myCache;
+
     @Nullable private final String myServerUuid;
     private final String myCloudProfileId;
 
@@ -40,13 +42,15 @@ public class KubeCloudClient implements CloudClientEx {
                            @NotNull KubeApiConnector apiConnector,
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParametersImpl kubeClientParams,
-                           @NotNull BuildAgentPodTemplateProviders podTemplateProviders) {
+                           @NotNull BuildAgentPodTemplateProviders podTemplateProviders,
+                           @NotNull KubeDataCache cache) {
         myServerUuid = serverUuid;
         myCloudProfileId = cloudProfileId;
         myApiConnector = apiConnector;
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getId));
         myKubeClientParams = kubeClientParams;
         myPodTemplateProviders = podTemplateProviders;
+        myCache = cache;
         for(KubeCloudImage image : images) {
             myCurrentlyRunningInstancesCount += image.getInstanceCount();
         }
@@ -72,7 +76,7 @@ public class KubeCloudClient implements CloudClientEx {
             final Pod podTemplate = podTemplateProvider.getPodTemplate(cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
             final Pod newPod = myApiConnector.createPod(podTemplate);
             myCurrentError = null;
-            final KubeCloudInstanceImpl newInstance = new KubeCloudInstanceImpl(kubeCloudImage, newPod, myApiConnector);
+            final KubeCloudInstance newInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(kubeCloudImage, newPod, myApiConnector), myCache);
             kubeCloudImage.addInstance(newInstance);
             myCurrentlyRunningInstancesCount++;
             return newInstance;
