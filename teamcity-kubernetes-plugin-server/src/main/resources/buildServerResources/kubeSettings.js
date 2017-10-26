@@ -24,7 +24,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     _errors: {
         badParam: 'Bad parameter',
         required: 'This field cannot be blank',
-        notSeleted: 'Something should be seleted',
+        notSelected: 'Something should be seleted',
         nonNegative: 'Must be non-negative number'
     },
 
@@ -322,7 +322,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             podTemplateMode : function () {
                 var podTemplateMode = this._image['podTemplateMode'];
                 if (!podTemplateMode || podTemplateMode === 'notSelected' || podTemplateMode === 'undefined') {
-                    this.addOptionError('notSeleted', 'podTemplateMode');
+                    this.addOptionError('notSelected', 'podTemplateMode');
                     isValid = false;
                 }
             }.bind(this),
@@ -352,7 +352,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             agent_pool_id : function () {
                 var agentPoolId = this._image['agent_pool_id'];
                 if (!agentPoolId || agentPoolId === '' || agentPoolId === 'undefined') {
-                    this.addOptionError('notSeleted', 'agent_pool_id');
+                    this.addOptionError('notSelected', 'agent_pool_id');
                     isValid = false;
                 }
             }.bind(this)
