@@ -10,7 +10,7 @@ public interface KubeApiConnection {
     @NotNull
     String getApiServerUrl();
 
-    @Nullable
+    @NotNull
     String getNamespace();
 
     @Nullable

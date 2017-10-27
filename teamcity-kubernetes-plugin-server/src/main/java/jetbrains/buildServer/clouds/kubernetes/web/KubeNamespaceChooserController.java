@@ -6,6 +6,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.internal.PluginPropertiesUtil;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jetbrains.annotations.NotNull;
@@ -55,10 +56,11 @@ public class KubeNamespaceChooserController extends BaseController {
                 return props.get(API_SERVER_URL);
             }
 
-            @Nullable
+            @NotNull
             @Override
             public String getNamespace() {
-                return props.get(KUBERNETES_NAMESPACE);
+                String explicitNameSpace = props.get(KUBERNETES_NAMESPACE);
+                return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;
             }
 
             @Nullable
