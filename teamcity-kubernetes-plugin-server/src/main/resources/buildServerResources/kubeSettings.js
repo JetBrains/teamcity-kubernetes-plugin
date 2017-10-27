@@ -61,12 +61,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
         var self = this;
         var rawImagesData = this.$imagesDataElem.val() || '[]';
-        this._lastImageId = this._imagesDataLength = 0;
+        this._imagesDataLength = 0;
         try {
             var imagesData = JSON.parse(rawImagesData);
             this.imagesData = imagesData.reduce(function (accumulator, imageDataStr) {
-                accumulator[self._lastImageId++] = imageDataStr;
-                self._imagesDataLength++;
+                accumulator[self._imagesDataLength++] = imageDataStr;
                 return accumulator;
             }, {});
         } catch (e) {
@@ -494,14 +493,21 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     addImage: function () {
-        var newImageId = this._lastImageId++,
+        var newImageId = this.generateNewImageId(),
             newImage = this._image;
+        console.info("new image id: " + newImageId);
         newImage['source-id'] = newImageId;
         this._renderImageRow(newImage, newImageId);
         this.imagesData[newImageId] = newImage;
         this._imagesDataLength += 1;
         this.saveImagesData();
         this._toggleImagesTable();
+    },
+
+    generateNewImageId: function () {
+        return Math.max.apply(Math, $j.map(this.imagesData, function callback(currentValue) {
+            return currentValue['source-id'];
+        })) + 1;
     },
 
     editImage: function (id) {
