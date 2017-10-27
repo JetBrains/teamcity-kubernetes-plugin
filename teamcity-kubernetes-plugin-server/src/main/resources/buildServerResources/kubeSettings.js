@@ -31,7 +31,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     _displayedErrors: {},
 
     defaults: {
-        maxInstances: '<Unlimited>'
+        imageInstanceLimit: '<Unlimited>'
     },
 
     initialize: function(){
