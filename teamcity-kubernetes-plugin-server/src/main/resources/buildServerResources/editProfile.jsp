@@ -246,7 +246,7 @@
                         <props:option selected="${ap.agentPoolId eq propertiesBean.properties['agent_pool_id']}" value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
                     </c:forEach>
                 </select>
-                <span id="error_${cons.agentPoolIdField}" class="error"></span>
+                <span class="error option-error option-error_${cons.agentPoolIdField}"></span>
             </td>
         </tr>
     </table>
