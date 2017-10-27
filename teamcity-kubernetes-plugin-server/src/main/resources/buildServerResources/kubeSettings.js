@@ -583,7 +583,8 @@ if(!BS.Kube.NamespaceChooser){
     BS.Kube.NamespaceChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl
+            url: dataLoadUrl,
+            shift:{x:15,y:15}
         });
     };
 
@@ -604,7 +605,8 @@ if(!BS.Kube.DeploymentChooser){
     BS.Kube.DeploymentChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl
+            url: dataLoadUrl,
+            shift:{x:15,y:15}
         });
     };
 
