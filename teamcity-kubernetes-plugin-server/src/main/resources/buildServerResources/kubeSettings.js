@@ -30,6 +30,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     _displayedErrors: {},
 
+    defaults: {
+        maxInstances: '<Unlimited>'
+    },
+
     initialize: function(){
         this.$imagesTable = $j('#kubeImagesTable');
         this.$imagesTableWrapper = $j('.imagesTableWrapper');
@@ -276,9 +280,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     _renderImageRow: function (props, id) {
         var $row = this.templates.imagesTableRow.clone().attr('data-image-id', id);
+        var defaults = this.defaults;
 
         this._dataKeys.forEach(function (className) {
-            $row.find('.' + className).text(props[className]);
+            $row.find('.' + className).text(props[className] || defaults[className]);
         });
 
         $row.find(this.selectors.rmImageLink).data('image-id', id);
