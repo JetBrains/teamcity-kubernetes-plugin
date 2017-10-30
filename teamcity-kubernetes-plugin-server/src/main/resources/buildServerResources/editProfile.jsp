@@ -50,7 +50,7 @@
         <td>
             <div>
                 <c:set var="selectedAuthStrategy" value="${propertiesBean.properties[cons.authStrategy]}" />
-                <props:selectProperty name="${cons.authStrategy}">
+                <props:selectProperty name="${cons.authStrategy}" className="longField">
                     <props:option value="" selected="${empty selectedAuthStrategy}">--- Choose authentication strategy ---</props:option>
                     <c:forEach var="authStrategy" items="${authStrategies}">
                         <props:option value="${authStrategy.id}" selected="${not empty selectedAuthStrategy and authStrategy.id eq selectedAuthStrategy}"><c:out value="${authStrategy.displayName}"/></props:option>
@@ -106,7 +106,7 @@
     <tr>
         <th><label for="${cons.profileInstanceLimit}">Maximum instances count:</label></th>
         <td>
-            <props:textProperty name="${cons.profileInstanceLimit}" className="settings"/>
+            <props:textProperty name="${cons.profileInstanceLimit}" className="settings longField"/>
             <span id="error_${cons.profileInstanceLimit}" class="error"></span>
             <span class="smallNote">Maximum number of instances that can be started. Use blank to have no limit</span>
         </td>
