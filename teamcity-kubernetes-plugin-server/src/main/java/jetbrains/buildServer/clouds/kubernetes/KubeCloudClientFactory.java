@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
@@ -89,14 +90,22 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @NotNull
     @Override
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
-        final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
-        final KubeApiConnector apiConnector = KubeApiConnectorImpl.create(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
-        List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
-            KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myCache);
-            //TODO: defer this
-            kubeCloudImage.populateInstances();
-            return kubeCloudImage;
-        });
-        return new KubeCloudClient(myServerSettings.getServerUUID(), cloudState.getProfileId(), apiConnector, images, kubeClientParams, myPodTemplateProviders, myCache);
+        try {
+            final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
+            final KubeApiConnector apiConnector = KubeApiConnectorImpl.create(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
+            List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
+                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myCache);
+                //TODO: defer this
+                kubeCloudImage.populateInstances();
+                return kubeCloudImage;
+            });
+            return new KubeCloudClient(myServerSettings.getServerUUID(), cloudState.getProfileId(), apiConnector, images, kubeClientParams, myPodTemplateProviders, myCache);
+        } catch (Throwable ex){
+            if(ex instanceof KubernetesClientException){
+                final Throwable cause = ex.getCause();
+                if(cause != null) throw new CloudException(cause.getMessage(), cause);
+                else throw ex;
+            } else throw ex;
+        }
     }
 }
