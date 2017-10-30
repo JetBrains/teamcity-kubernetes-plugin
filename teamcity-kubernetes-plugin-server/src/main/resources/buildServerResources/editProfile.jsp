@@ -35,7 +35,7 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
+        <th><label for="${cons.kubernetesNamespace}">Kubernetes namespace: </label></th>
         <td>
             <div style="white-space: nowrap">
                 <props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
@@ -46,7 +46,7 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${cons.authStrategy}">Authentication Strategy: <l:star/></label></th>
+        <th><label for="${cons.authStrategy}">Authentication strategy: <l:star/></label></th>
         <td>
             <div>
                 <c:set var="selectedAuthStrategy" value="${propertiesBean.properties[cons.authStrategy]}" />
@@ -81,7 +81,7 @@
         </td>
     </tr>
     <tr class="hidden client-cert auth-ui">
-        <th><label for="${cons.clientCertData}">Client Certificate: <l:star/></label></th>
+        <th><label for="${cons.clientCertData}">Client certificate: <l:star/></label></th>
         <td><props:multilineProperty name="secure:${cons.clientCertData}"
                                      className="longField"
                                      linkTitle="Enter X509 Client Sertificate Content"
@@ -120,7 +120,7 @@
         <table id="kubeImagesTable" class="settings imagesTable hidden">
             <tbody>
             <tr>
-                <th class="name">Image Description</th>
+                <th class="name">Image description</th>
                 <th class="name">Max # of instances</th>
                 <th class="name" colspan="2"></th>
             </tr>
@@ -150,7 +150,7 @@
             </td>
         </tr>
         <tr>
-            <th><label for="${cons.podSpecMode}">Pod Specification: <l:star/></label></th>
+            <th><label for="${cons.podSpecMode}">Pod specification: <l:star/></label></th>
             <td>
                 <div>
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
@@ -207,7 +207,7 @@
             </td>
         </tr>
         <tr class="hidden simple pod-spec-ui">
-            <th>Docker Arguments:</th>
+            <th>Docker arguments:</th>
             <td>
                 <div>
                     <input type="text" id="${cons.dockerArguments}" value="" class="longField" data-id="${cons.dockerArguments}" data-err-id="${cons.dockerArguments}"/>
