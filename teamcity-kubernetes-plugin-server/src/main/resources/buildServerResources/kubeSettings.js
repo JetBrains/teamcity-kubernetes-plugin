@@ -24,11 +24,15 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     _errors: {
         badParam: 'Bad parameter',
         required: 'This field cannot be blank',
-        notSeleted: 'Something should be seleted',
+        notSelected: 'Something should be seleted',
         nonNegative: 'Must be non-negative number'
     },
 
     _displayedErrors: {},
+
+    defaults: {
+        imageInstanceLimit: '<Unlimited>'
+    },
 
     initialize: function(){
         this.$imagesTable = $j('#kubeImagesTable');
@@ -57,12 +61,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
         var self = this;
         var rawImagesData = this.$imagesDataElem.val() || '[]';
-        this._lastImageId = this._imagesDataLength = 0;
+        this._imagesDataLength = 0;
         try {
             var imagesData = JSON.parse(rawImagesData);
             this.imagesData = imagesData.reduce(function (accumulator, imageDataStr) {
-                accumulator[self._lastImageId++] = imageDataStr;
-                self._imagesDataLength++;
+                accumulator[self._imagesDataLength++] = imageDataStr;
                 return accumulator;
             }, {});
         } catch (e) {
@@ -276,9 +279,10 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     _renderImageRow: function (props, id) {
         var $row = this.templates.imagesTableRow.clone().attr('data-image-id', id);
+        var defaults = this.defaults;
 
         this._dataKeys.forEach(function (className) {
-            $row.find('.' + className).text(props[className]);
+            $row.find('.' + className).text(props[className] || defaults[className]);
         });
 
         $row.find(this.selectors.rmImageLink).data('image-id', id);
@@ -322,7 +326,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             podTemplateMode : function () {
                 var podTemplateMode = this._image['podTemplateMode'];
                 if (!podTemplateMode || podTemplateMode === 'notSelected' || podTemplateMode === 'undefined') {
-                    this.addOptionError('notSeleted', 'podTemplateMode');
+                    this.addOptionError('notSelected', 'podTemplateMode');
                     isValid = false;
                 }
             }.bind(this),
@@ -352,7 +356,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             agent_pool_id : function () {
                 var agentPoolId = this._image['agent_pool_id'];
                 if (!agentPoolId || agentPoolId === '' || agentPoolId === 'undefined') {
-                    this.addOptionError('notSeleted', 'agent_pool_id');
+                    this.addOptionError('notSelected', 'agent_pool_id');
                     isValid = false;
                 }
             }.bind(this)
@@ -489,7 +493,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     addImage: function () {
-        var newImageId = this._lastImageId++,
+        var newImageId = this.generateNewImageId(),
             newImage = this._image;
         newImage['source-id'] = newImageId;
         this._renderImageRow(newImage, newImageId);
@@ -497,6 +501,12 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this._imagesDataLength += 1;
         this.saveImagesData();
         this._toggleImagesTable();
+    },
+
+    generateNewImageId: function () {
+        return Math.max.apply(Math, $j.map(this.imagesData, function callback(currentValue) {
+            return currentValue['source-id'];
+        })) + 1;
     },
 
     editImage: function (id) {
@@ -573,7 +583,8 @@ if(!BS.Kube.NamespaceChooser){
     BS.Kube.NamespaceChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl
+            url: dataLoadUrl,
+            shift:{x:15,y:15}
         });
     };
 
@@ -594,7 +605,8 @@ if(!BS.Kube.DeploymentChooser){
     BS.Kube.DeploymentChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl
+            url: dataLoadUrl,
+            shift:{x:15,y:15}
         });
     };
 

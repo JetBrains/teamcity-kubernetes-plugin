@@ -20,11 +20,3 @@ ul.chooser {
     margin: 0;
     padding: 0;
 }
-
-select.longField {
-    width: 30em;
-}
-
-input.longField {
-    width: 29em;
-}

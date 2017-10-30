@@ -13,10 +13,17 @@
         <span class="testConnectionFailed"><c:out value="${error}"/></span>
     </c:when>
     <c:otherwise>
-        <ul class="chooser">
-            <c:forEach var="namespace" items="${namespaces}">
-                <li><a style="cursor:pointer;" onclick="BS.Kube.NamespaceChooser.selectNamespace('${namespace}')"><c:out value="${namespace}"/></a></li>
-            </c:forEach>
-        </ul>
+        <c:choose>
+            <c:when test="${empty namespaces}">
+                No namespaces found
+            </c:when>
+            <c:otherwise>
+                <ul class="chooser">
+                    <c:forEach var="namespace" items="${namespaces}">
+                        <li><a style="cursor:pointer;" onclick="BS.Kube.NamespaceChooser.selectNamespace('${namespace}')"><c:out value="${namespace}"/></a></li>
+                    </c:forEach>
+                </ul>
+            </c:otherwise>
+        </c:choose>
     </c:otherwise>
 </c:choose>

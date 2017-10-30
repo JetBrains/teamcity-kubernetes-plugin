@@ -14,8 +14,6 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
  * Created by ekoshkin (koshkinev@gmail.com) on 29.05.17.
  */
 public class KubeCloudClientParametersImpl implements KubeCloudClientParameters {
-    private static final String DEFAULT_NAMESPACE = "default";
-
     private final CloudClientParameters myParameters;
 
     public KubeCloudClientParametersImpl(CloudClientParameters parameters) {
@@ -33,6 +31,8 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
         return myParameters.getParameter(API_SERVER_URL);
     }
 
+    @NotNull
+    @Override
     public String getNamespace(){
         String explicitNameSpace = myParameters.getParameter(KUBERNETES_NAMESPACE);
         return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;

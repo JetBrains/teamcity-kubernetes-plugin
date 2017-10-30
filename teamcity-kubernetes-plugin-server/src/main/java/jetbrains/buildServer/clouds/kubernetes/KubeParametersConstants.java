@@ -6,6 +6,8 @@ import jetbrains.buildServer.clouds.CloudImageParameters;
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeParametersConstants {
+    public static final String DEFAULT_NAMESPACE = "default";
+
     public static final String API_SERVER_URL = "api-server-url";
     public static final String AUTH_STRATEGY = "authStrategy";
     public static final String KUBERNETES_NAMESPACE = "kubernetes-namespace";

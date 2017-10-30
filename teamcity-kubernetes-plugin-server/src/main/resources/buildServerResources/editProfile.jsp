@@ -35,7 +35,7 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${cons.kubernetesNamespace}">Kubernetes Namespace: </label></th>
+        <th><label for="${cons.kubernetesNamespace}">Kubernetes namespace: </label></th>
         <td>
             <div style="white-space: nowrap">
                 <props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
@@ -46,11 +46,11 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${cons.authStrategy}">Authentication Strategy: <l:star/></label></th>
+        <th><label for="${cons.authStrategy}">Authentication strategy: <l:star/></label></th>
         <td>
             <div>
                 <c:set var="selectedAuthStrategy" value="${propertiesBean.properties[cons.authStrategy]}" />
-                <props:selectProperty name="${cons.authStrategy}">
+                <props:selectProperty name="${cons.authStrategy}" className="longField">
                     <props:option value="" selected="${empty selectedAuthStrategy}">--- Choose authentication strategy ---</props:option>
                     <c:forEach var="authStrategy" items="${authStrategies}">
                         <props:option value="${authStrategy.id}" selected="${not empty selectedAuthStrategy and authStrategy.id eq selectedAuthStrategy}"><c:out value="${authStrategy.displayName}"/></props:option>
@@ -81,8 +81,8 @@
         </td>
     </tr>
     <tr class="hidden client-cert auth-ui">
-        <th><label for="${cons.clientCertData}">Client Certificate: <l:star/></label></th>
-        <td><props:multilineProperty name="${cons.clientCertData}"
+        <th><label for="${cons.clientCertData}">Client certificate: <l:star/></label></th>
+        <td><props:multilineProperty name="secure:${cons.clientCertData}"
                                      className="longField"
                                      linkTitle="Enter X509 Client Sertificate Content"
                                      cols="35" rows="3"
@@ -106,7 +106,7 @@
     <tr>
         <th><label for="${cons.profileInstanceLimit}">Maximum instances count:</label></th>
         <td>
-            <props:textProperty name="${cons.profileInstanceLimit}" className="settings"/>
+            <props:textProperty name="${cons.profileInstanceLimit}" className="settings longField"/>
             <span id="error_${cons.profileInstanceLimit}" class="error"></span>
             <span class="smallNote">Maximum number of instances that can be started. Use blank to have no limit</span>
         </td>
@@ -120,7 +120,7 @@
         <table id="kubeImagesTable" class="settings imagesTable hidden">
             <tbody>
             <tr>
-                <th class="name">Image Description</th>
+                <th class="name">Image description</th>
                 <th class="name">Max # of instances</th>
                 <th class="name" colspan="2"></th>
             </tr>
@@ -150,7 +150,7 @@
             </td>
         </tr>
         <tr>
-            <th><label for="${cons.podSpecMode}">Pod Specification: <l:star/></label></th>
+            <th><label for="${cons.podSpecMode}">Pod specification: <l:star/></label></th>
             <td>
                 <div>
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
@@ -207,7 +207,7 @@
             </td>
         </tr>
         <tr class="hidden simple pod-spec-ui">
-            <th>Docker Arguments:</th>
+            <th>Docker arguments:</th>
             <td>
                 <div>
                     <input type="text" id="${cons.dockerArguments}" value="" class="longField" data-id="${cons.dockerArguments}" data-err-id="${cons.dockerArguments}"/>
@@ -246,7 +246,7 @@
                         <props:option selected="${ap.agentPoolId eq propertiesBean.properties['agent_pool_id']}" value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
                     </c:forEach>
                 </select>
-                <span id="error_${cons.agentPoolIdField}" class="error"></span>
+                <span class="error option-error option-error_${cons.agentPoolIdField}"></span>
             </td>
         </tr>
     </table>

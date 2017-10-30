@@ -16,6 +16,7 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil;
+import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.DEFAULT_NAMESPACE;
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.KUBERNETES_NAMESPACE;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
@@ -104,10 +107,11 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     return props.get(KubeParametersConstants.API_SERVER_URL);
                 }
 
-                @Nullable
+                @NotNull
                 @Override
                 public String getNamespace() {
-                    return props.get(KubeParametersConstants.KUBERNETES_NAMESPACE);
+                    String explicitNameSpace = props.get(KUBERNETES_NAMESPACE);
+                    return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;
                 }
 
                 @Nullable
