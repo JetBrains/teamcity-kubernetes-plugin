@@ -13,8 +13,17 @@
      <file>
          <source>target/teamcity-kubernetes-plugin-agent.zip</source>
          <outputDirectory>agent</outputDirectory>
-     </file> 
+     </file>
   </files>
+    <fileSets>
+        <fileSet>
+            <directory>../kotlin-dsl/</directory>
+            <outputDirectory>kotlin-dsl</outputDirectory>
+            <includes>
+                <include>*.xml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
   <moduleSets>
     <moduleSet>
        <useAllReactorProjects>true</useAllReactorProjects>
