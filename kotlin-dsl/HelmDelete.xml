@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2000 - 2017 JetBrains s.r.o.
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License").
+  ~  See LICENSE in the project root for license information.
+  -->
+
+<dsl-extension kind="buildStep" type="helm-delete" generateDslJar="true">
+    <class name="HelmDeleteStep">
+        <description>
+            A [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm delete' command
+        </description>
+    </class>
+    <function name="helmDelete">
+        <description>
+            Adds a [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm delete' command
+            @see HelmDeleteStep
+        </description>
+    </function>
+    <params>
+        <param name="teamcity.helm.releaseName" dslName="releaseName" type="String">
+            <description>Release name to delete from Kubernetes. Removes all of the resources associated with the last release of the chart.</description>
+        </param>
+        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags" type="String">
+            <description>Additional options for 'helm delete' command line.</description>
+        </param>
+    </params>
+</dsl-extension>
