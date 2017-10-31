@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2000 - 2017 JetBrains s.r.o.
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License").
+  ~  See LICENSE in the project root for license information.
+  -->
+
+<dsl-extension kind="buildStep" type="helm-test" generateDslJar="true">
+    <class name="HelmTestStep">
+        <description>
+            A [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm test' command
+        </description>
+    </class>
+    <function name="helmTest">
+        <description>
+            Adds a [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm test' command
+            @see HelmTestStep
+        </description>
+    </function>
+    <params>
+        <param name="teamcity.helm.releaseName" dslName="release">
+            <description>Release name to test. The tests to be run are defined in the chart that was installed.</description>
+        </param>
+        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags">
+            <description>Additional options for 'helm test' command line.</description>
+        </param>
+    </params>
+</dsl-extension>

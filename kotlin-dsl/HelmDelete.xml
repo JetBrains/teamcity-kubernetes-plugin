@@ -19,10 +19,10 @@
         </description>
     </function>
     <params>
-        <param name="teamcity.helm.releaseName" dslName="releaseName" type="String">
+        <param name="teamcity.helm.releaseName" dslName="release">
             <description>Release name to delete from Kubernetes. Removes all of the resources associated with the last release of the chart.</description>
         </param>
-        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags" type="String">
+        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags">
             <description>Additional options for 'helm delete' command line.</description>
         </param>
     </params>

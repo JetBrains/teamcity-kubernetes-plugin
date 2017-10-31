@@ -15,7 +15,7 @@
             <i class="icon-magic" style="cursor:pointer;" title="Choose releases" ></i>
         </span>
         <span class="error" id="error_${constants.releaseName}"></span>
-        <span class="smallNote">Release to upgrade.</span>
+        <span class="smallNote">Release to rolls back.</span>
     </td>
 </tr>
 
@@ -26,7 +26,7 @@
         <props:textProperty name="${constants.revision}" className="longField"/>
         <i class="icon-magic" style="cursor:pointer;" title="Choose revision" ></i>
       </span>
-        <span class="smallNote">Old release revision.</span>
+        <span class="smallNote">Previous release revision.</span>
         <span class="error" id="error_${constants.revision}"></span>
     </td>
 </tr>
