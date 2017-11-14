@@ -24,7 +24,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     private final KubeApiConnector myApiConnector;
     private final KubeCloudImageData myImageData;
     private final KubeDataCache myCache;
-    private Map<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<String, KubeCloudInstance>();
+    private Map<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
     private CloudErrorInfo myCurrentError;
 
     KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
