@@ -89,7 +89,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         m.checking(new Expectations(){{
             allowing(image).getName(); will(returnValue("image-1-name"));
             allowing(image).getId(); will(returnValue("image-1-id"));
-            allowing(image).getInstanceCount(); will(returnValue(0));
+            allowing(image).getRunningInstanceCount(); will(returnValue(0));
             allowing(image).getInstanceLimit(); will(returnValue(0));
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
@@ -102,7 +102,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
             allowing(image).getId(); will(returnValue("image-1-id"));
-            allowing(image).getInstanceCount(); will(returnValue(1));
+            allowing(image).getRunningInstanceCount(); will(returnValue(1));
             allowing(image).getInstanceLimit(); will(returnValue(2));
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
@@ -118,7 +118,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         m.checking(new Expectations(){{
             allowing(image).getName(); will(returnValue("image-1-name"));
             allowing(image).getId(); will(returnValue("image-1-id"));
-            allowing(image).getInstanceCount(); will(returnValue(1));
+            allowing(image).getRunningInstanceCount(); will(returnValue(1));
             allowing(image).getInstanceLimit(); will(returnValue(1));
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
@@ -133,10 +133,10 @@ public class KubeCloudClientTest extends BaseTestCase {
         m.checking(new Expectations(){{
             allowing(image1).getId(); will(returnValue("image-1-id"));
             allowing(image1).getName(); will(returnValue("image"));
-            allowing(image1).getInstanceCount(); will(returnValue(0));
+            allowing(image1).getRunningInstanceCount(); will(returnValue(0));
             allowing(image2).getId(); will(returnValue("image-2-id"));
             allowing(image2).getName(); will(returnValue("image"));
-            allowing(image2).getInstanceCount(); will(returnValue(0));
+            allowing(image2).getRunningInstanceCount(); will(returnValue(0));
         }});
         createClient(Arrays.asList(image1, image2));
     }

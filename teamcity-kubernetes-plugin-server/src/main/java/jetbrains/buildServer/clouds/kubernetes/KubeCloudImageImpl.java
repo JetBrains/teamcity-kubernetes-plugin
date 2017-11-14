@@ -48,8 +48,8 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     }
 
     @Override
-    public int getInstanceCount() {
-        return myIdToInstanceMap.size();
+    public int getRunningInstanceCount() {
+        return (int) myIdToInstanceMap.values().stream().filter(kubeCloudInstance -> kubeCloudInstance.getStatus().isStartingOrStarted()).count();
     }
 
     @Override
