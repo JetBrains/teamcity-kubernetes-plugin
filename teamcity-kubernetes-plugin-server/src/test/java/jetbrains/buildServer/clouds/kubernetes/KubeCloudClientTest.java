@@ -26,6 +26,17 @@ public class KubeCloudClientTest extends BaseTestCase {
     private KubeApiConnector myApi;
     private BuildAgentPodTemplateProviders myPodTemplateProviders;
     private KubeDataCache myCache;
+    private KubeBackgroundUpdater myUpdater = new KubeBackgroundUpdater() {
+        @Override
+        public void registerClient(@NotNull KubeCloudClient client) {
+
+        }
+
+        @Override
+        public void unregisterClient(@NotNull KubeCloudClient client) {
+
+        }
+    };
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -48,7 +59,7 @@ public class KubeCloudClientTest extends BaseTestCase {
 
     @NotNull
     private KubeCloudClient createClient(String serverUuid, String profileId, List<KubeCloudImage> images, CloudClientParameters cloudClientParameters) {
-        return new KubeCloudClient(serverUuid, profileId, myApi, images, new KubeCloudClientParametersImpl(cloudClientParameters), myPodTemplateProviders, myCache);
+        return new KubeCloudClient(serverUuid, profileId, myApi, images, new KubeCloudClientParametersImpl(cloudClientParameters), myPodTemplateProviders, myCache, myUpdater);
     }
 
     @AfterMethod

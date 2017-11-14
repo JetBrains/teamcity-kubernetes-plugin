@@ -33,18 +33,21 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     private final KubeDataCache myCache;
     private final KubeAuthStrategyProvider myAuthStrategies;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
+    private final KubeBackgroundUpdater myUpdater;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
                                   @NotNull final PluginDescriptor pluginDescriptor,
                                   @NotNull final ServerSettings serverSettings,
                                   @NotNull final KubeAuthStrategyProvider authStrategies,
                                   @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
-                                  @NotNull final KubeDataCache cache) {
+                                  @NotNull final KubeDataCache cache,
+                                  @NotNull final KubeBackgroundUpdater updater) {
         myPluginDescriptor = pluginDescriptor;
         myServerSettings = serverSettings;
         myAuthStrategies = authStrategies;
         myPodTemplateProviders = podTemplateProviders;
         myCache = cache;
+        myUpdater = updater;
         registrar.registerCloudFactory(this);
     }
 
@@ -98,7 +101,15 @@ public class KubeCloudClientFactory implements CloudClientFactory {
                 kubeCloudImage.populateInstances();
                 return kubeCloudImage;
             });
-            return new KubeCloudClient(myServerSettings.getServerUUID(), cloudState.getProfileId(), apiConnector, images, kubeClientParams, myPodTemplateProviders, myCache);
+            return new KubeCloudClient(
+                    myServerSettings.getServerUUID(),
+                    cloudState.getProfileId(),
+                    apiConnector,
+                    images,
+                    kubeClientParams,
+                    myPodTemplateProviders,
+                    myCache,
+                    myUpdater);
         } catch (Throwable ex){
             if(ex instanceof KubernetesClientException){
                 final Throwable cause = ex.getCause();
