@@ -29,7 +29,7 @@ public interface KubeCloudImage extends CloudImage {
     @Nullable
     String getSourceDeploymentName();
 
-    int getInstanceCount();
+    int getRunningInstanceCount();
 
     int getInstanceLimit();
 
