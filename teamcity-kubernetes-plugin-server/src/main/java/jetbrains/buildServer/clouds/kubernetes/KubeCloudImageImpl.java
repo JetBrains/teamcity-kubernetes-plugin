@@ -131,19 +131,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myCurrentError;
     }
 
-    @Override
-    public void addInstance(@NotNull KubeCloudInstance instance){
-        myIdToInstanceMap.put(instance.getInstanceId(), instance);
-    }
-
-    @Override
-    public boolean deleteInstance(@NotNull KubeCloudInstance instance){
-        return myIdToInstanceMap.remove(instance.getInstanceId()) != null;
-    }
-
+    //TODO: syncronize access to myIdToInstanceMap
+    //TODO: filter pods more carefully using all setted labels
     public void populateInstances(){
         try{
-            //TODO: filter pods more carefully using all setted labels
             for (Pod pod : myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()))){
                 KubeCloudInstance cloudInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, pod, myApiConnector), myCache);
                 myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance);

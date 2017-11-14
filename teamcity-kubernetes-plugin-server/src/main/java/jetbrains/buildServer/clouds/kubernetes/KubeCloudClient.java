@@ -77,7 +77,7 @@ public class KubeCloudClient implements CloudClientEx {
             final Pod newPod = myApiConnector.createPod(podTemplate);
             myCurrentError = null;
             final KubeCloudInstance newInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(kubeCloudImage, newPod, myApiConnector), myCache);
-            kubeCloudImage.addInstance(newInstance);
+            kubeCloudImage.populateInstances();
             myCurrentlyRunningInstancesCount++;
             return newInstance;
         } catch (KubeCloudException | KubernetesClientException ex){
