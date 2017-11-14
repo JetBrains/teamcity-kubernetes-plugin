@@ -30,6 +30,7 @@ public class KubeCloudClient implements CloudClientEx {
     private final KubeCloudClientParametersImpl myKubeClientParams;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
     private final KubeDataCache myCache;
+    private final KubeBackgroundUpdater myUpdater;
 
     @Nullable private final String myServerUuid;
     private final String myCloudProfileId;
@@ -43,7 +44,8 @@ public class KubeCloudClient implements CloudClientEx {
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParametersImpl kubeClientParams,
                            @NotNull BuildAgentPodTemplateProviders podTemplateProviders,
-                           @NotNull KubeDataCache cache) {
+                           @NotNull KubeDataCache cache,
+                           @NotNull KubeBackgroundUpdater updater) {
         myServerUuid = serverUuid;
         myCloudProfileId = cloudProfileId;
         myApiConnector = apiConnector;
@@ -51,14 +53,16 @@ public class KubeCloudClient implements CloudClientEx {
         myKubeClientParams = kubeClientParams;
         myPodTemplateProviders = podTemplateProviders;
         myCache = cache;
+        myUpdater = updater;
         for(KubeCloudImage image : images) {
             myCurrentlyRunningInstancesCount += image.getInstanceCount();
         }
+        myUpdater.registerClient(this);
     }
 
     @Override
     public boolean isInitialized() {
-        //TODO: wait while all images populate list of their instances
+        myUpdater.unregisterClient(this);
         return true;
     }
 
