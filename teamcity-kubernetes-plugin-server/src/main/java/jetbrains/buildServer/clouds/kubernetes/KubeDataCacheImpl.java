@@ -44,6 +44,11 @@ public class KubeDataCacheImpl implements KubeDataCache {
         return myInstanceStatusCache.get(instanceId).getData();
     }
 
+    @Override
+    public void cleanInstanceStatus(@NotNull String instanceId) {
+        myInstanceStatusCache.remove(instanceId);
+    }
+
     private class CacheEntry<T> {
         private long myTimestamp;
         private T myData;

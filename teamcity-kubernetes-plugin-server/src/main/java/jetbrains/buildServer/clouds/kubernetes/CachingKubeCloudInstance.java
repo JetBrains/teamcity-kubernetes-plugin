@@ -24,6 +24,7 @@ public class CachingKubeCloudInstance implements KubeCloudInstance {
     @Override
     public void terminate() {
         myInner.terminate();
+        myCache.cleanInstanceStatus(myInner.getInstanceId());
     }
 
     @NotNull
