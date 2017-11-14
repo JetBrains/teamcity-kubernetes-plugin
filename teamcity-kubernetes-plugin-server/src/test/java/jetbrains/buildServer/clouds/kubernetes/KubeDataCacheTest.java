@@ -66,8 +66,12 @@ public class KubeDataCacheTest extends BaseTestCase {
         };
         assertEquals(InstanceStatus.RUNNING, myCache.getInstanceStatus("foo", resolver));
         assertEquals(InstanceStatus.RUNNING, myCache.getInstanceStatus("foo", resolver));
+        assertEquals(1, invocationCount[0]);
         assertEquals(InstanceStatus.RUNNING, myCache.getInstanceStatus("boo", resolver));
         assertEquals(2, invocationCount[0]);
+        myCache.cleanInstanceStatus("foo");
+        assertEquals(InstanceStatus.RUNNING, myCache.getInstanceStatus("foo", resolver));
+        assertEquals(3, invocationCount[0]);
     }
 
     @Test

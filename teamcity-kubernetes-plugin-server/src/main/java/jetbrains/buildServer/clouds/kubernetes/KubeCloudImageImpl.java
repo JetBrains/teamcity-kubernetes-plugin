@@ -137,7 +137,9 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         try{
             for (Pod pod : myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()))){
                 KubeCloudInstance cloudInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, pod, myApiConnector), myCache);
-                myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance);
+                String instanceId = cloudInstance.getInstanceId();
+                myIdToInstanceMap.put(instanceId, cloudInstance);
+                myCache.cleanInstanceStatus(instanceId);
             }
             myCurrentError = null;
         } catch (KubernetesClientException ex){

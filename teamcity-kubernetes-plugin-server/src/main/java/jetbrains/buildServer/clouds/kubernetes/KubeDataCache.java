@@ -15,4 +15,6 @@ public interface KubeDataCache {
 
     @NotNull
     InstanceStatus getInstanceStatus(@NotNull String instanceId, @NotNull Callable<InstanceStatus> resolver) throws Exception;
+
+    void cleanInstanceStatus(@NotNull String instanceId);
 }
