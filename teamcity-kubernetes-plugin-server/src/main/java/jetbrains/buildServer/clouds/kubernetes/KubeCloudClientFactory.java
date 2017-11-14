@@ -95,7 +95,6 @@ public class KubeCloudClientFactory implements CloudClientFactory {
             final KubeApiConnector apiConnector = KubeApiConnectorImpl.create(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
                 KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myCache);
-                //TODO: defer this
                 kubeCloudImage.populateInstances();
                 return kubeCloudImage;
             });

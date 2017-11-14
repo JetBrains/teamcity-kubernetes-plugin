@@ -123,8 +123,8 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     public void terminate() {
         try{
             myApiConnector.deletePod(myPod);
+            myKubeCloudImage.populateInstances();
             myCurrentError = null;
-            myKubeCloudImage.deleteInstance(this);
         } catch (KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex);
         }
