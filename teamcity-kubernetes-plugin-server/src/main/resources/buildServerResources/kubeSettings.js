@@ -504,6 +504,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     generateNewImageId: function () {
+        if($j.isEmptyObject(this.imagesData)) return 1;
         return Math.max.apply(Math, $j.map(this.imagesData, function callback(currentValue) {
             return currentValue['source-id'];
         })) + 1;
