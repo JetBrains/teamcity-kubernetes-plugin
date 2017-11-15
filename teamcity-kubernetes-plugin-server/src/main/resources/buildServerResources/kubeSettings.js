@@ -355,7 +355,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
             agent_pool_id : function () {
                 var agentPoolId = this._image['agent_pool_id'];
-                if (!agentPoolId || agentPoolId === '' || agentPoolId === 'undefined') {
+                if (!agentPoolId || agentPoolId === '' || agentPoolId === undefined) {
                     this.addOptionError('notSelected', 'agent_pool_id');
                     isValid = false;
                 }
