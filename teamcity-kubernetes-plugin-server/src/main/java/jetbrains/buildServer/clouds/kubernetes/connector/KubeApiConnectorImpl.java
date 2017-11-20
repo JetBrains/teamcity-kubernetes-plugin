@@ -68,7 +68,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @Override
     public boolean deletePod(@NotNull Pod pod) {
-        return myKubernetesClient.pods().delete(pod);
+        return myKubernetesClient.pods().withName(pod.getMetadata().getName()).withGracePeriod(0).delete();
     }
 
     @NotNull
