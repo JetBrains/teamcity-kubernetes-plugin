@@ -10,6 +10,7 @@ import jetbrains.buildServer.clouds.InstanceStatus;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.PodConditionType;
 import jetbrains.buildServer.serverSide.AgentDescription;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,8 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.I
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeCloudInstanceImpl implements KubeCloudInstance {
+    private static final String TEAMCITY_KUBE_PODS_GRACE_PERIOD = "teamcity.kube.pods.gracePeriod";
+
     private SimpleDateFormat myPodTransitionTimeFormat;
     private SimpleDateFormat myPodStartTimeFormat;
 
@@ -121,9 +124,10 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
 
     @Override
     public void terminate() {
+        long gracePeriod = TeamCityProperties.getLong(TEAMCITY_KUBE_PODS_GRACE_PERIOD, 0);
         try{
             int failedDeleteAttempts = 0;
-            while (!myApiConnector.deletePod(myPod)){
+            while (!myApiConnector.deletePod(myPod, gracePeriod)){
                 failedDeleteAttempts++;
                 if(failedDeleteAttempts == 10) throw new KubeCloudException("Failed to delete pod " + myPod);
             }
