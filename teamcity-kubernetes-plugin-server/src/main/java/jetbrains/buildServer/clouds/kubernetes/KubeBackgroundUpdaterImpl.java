@@ -20,8 +20,8 @@ public class KubeBackgroundUpdaterImpl implements KubeBackgroundUpdater {
     private final Collection<KubeCloudClient> myRegisteredClients = new ArrayList<>();
 
     public KubeBackgroundUpdaterImpl(@NotNull ExecutorServices executorServices) {
-        long delay = TeamCityProperties.getLong(KUBE_POD_MONITORING_PERIOD, 1);
-        executorServices.getNormalExecutorService().scheduleWithFixedDelay(this::populateInstances, delay, delay, TimeUnit.MINUTES);
+        long delay = TeamCityProperties.getLong(KUBE_POD_MONITORING_PERIOD, 60);
+        executorServices.getNormalExecutorService().scheduleWithFixedDelay(this::populateInstances, delay, delay, TimeUnit.SECONDS);
     }
 
     @Override
