@@ -19,7 +19,6 @@ import java.util.Map;
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeApiConnectorImpl implements KubeApiConnector {
-
     private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
     private static final int DEFAULT_REQUEST_TIMEOUT_MS = 15 * 1000;
 
@@ -67,7 +66,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     }
 
     @Override
-    public boolean deletePod(@NotNull Pod pod) {
+    public boolean deletePod(@NotNull Pod pod, long gracePeriod) {
         return myKubernetesClient.pods().withName(pod.getMetadata().getName()).withGracePeriod(0).delete();
     }
 
