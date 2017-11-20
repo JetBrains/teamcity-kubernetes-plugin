@@ -58,13 +58,13 @@ public class KubeCloudClient implements CloudClientEx {
 
     @Override
     public boolean isInitialized() {
-        myUpdater.unregisterClient(this);
         return true;
     }
 
     @Override
     public void dispose() {
         LOG.debug("KubeCloudClient disposed.");
+        myUpdater.unregisterClient(this);
     }
 
     @NotNull
