@@ -122,7 +122,11 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @Override
     public void terminate() {
         try{
-            myApiConnector.deletePod(myPod);
+            int failedDeleteAttempts = 0;
+            while (!myApiConnector.deletePod(myPod)){
+                failedDeleteAttempts++;
+                if(failedDeleteAttempts == 10) throw new KubeCloudException("Failed to delete pod " + myPod);
+            }
             myKubeCloudImage.populateInstances();
             myCurrentError = null;
         } catch (KubernetesClientException ex){
