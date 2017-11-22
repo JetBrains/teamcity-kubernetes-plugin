@@ -131,10 +131,10 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
                 failedDeleteAttempts++;
                 if(failedDeleteAttempts == 10) throw new KubeCloudException("Failed to delete pod " + myPod);
             }
-            myKubeCloudImage.populateInstances();
             myCurrentError = null;
         } catch (KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex);
         }
+        myKubeCloudImage.populateInstances();
     }
 }
