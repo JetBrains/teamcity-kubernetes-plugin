@@ -7,6 +7,7 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import org.jetbrains.annotations.NotNull;
 
 import static jetbrains.buildServer.helm.HelmConstants.HELM_DELETE_RUN_TYPE;
+import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 18.10.17.
@@ -30,7 +31,7 @@ public class DeleteBuildServiceFactory implements CommandLineBuildServiceFactory
 
             @Override
             public boolean canRun(@NotNull BuildAgentConfiguration buildAgentConfiguration) {
-                return true;
+                return buildAgentConfiguration.getConfigurationParameters().containsKey(HELM_PATH_CONFIG_PARAM);
             }
         };
     }

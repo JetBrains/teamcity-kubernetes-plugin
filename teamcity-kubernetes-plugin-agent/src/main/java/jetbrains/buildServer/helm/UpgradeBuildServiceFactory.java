@@ -6,6 +6,7 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import org.jetbrains.annotations.NotNull;
 
+import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
 import static jetbrains.buildServer.helm.HelmConstants.HELM_UPGRADE_RUN_TYPE;
 
 /**
@@ -30,7 +31,7 @@ public class UpgradeBuildServiceFactory implements CommandLineBuildServiceFactor
 
             @Override
             public boolean canRun(@NotNull BuildAgentConfiguration buildAgentConfiguration) {
-                return true;
+                return buildAgentConfiguration.getConfigurationParameters().containsKey(HELM_PATH_CONFIG_PARAM);
             }
         };
     }

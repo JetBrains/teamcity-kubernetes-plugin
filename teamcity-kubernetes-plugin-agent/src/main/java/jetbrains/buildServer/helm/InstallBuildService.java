@@ -23,7 +23,7 @@ public class InstallBuildService extends BuildServiceAdapter {
             @NotNull
             @Override
             public String getExecutablePath() throws RunBuildException {
-                return HELM_EXEC_NAME;
+                return getConfigParameters().get(HELM_PATH_CONFIG_PARAM);
             }
 
             @NotNull

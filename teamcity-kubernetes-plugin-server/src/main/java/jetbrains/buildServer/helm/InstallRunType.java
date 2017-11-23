@@ -1,5 +1,7 @@
 package jetbrains.buildServer.helm;
 
+import jetbrains.buildServer.requirements.Requirement;
+import jetbrains.buildServer.requirements.RequirementType;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
@@ -9,11 +11,13 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import static jetbrains.buildServer.helm.HelmConstants.HELM_INSTALL_RUN_TYPE;
+import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
@@ -80,5 +84,11 @@ public class InstallRunType extends RunType {
     public String describeParameters(@NotNull Map<String, String> parameters) {
         String flags = parameters.get(HelmConstants.ADDITIONAL_FLAGS);
         return String.format("Chart: %s\nAdditional flags: %s", parameters.get(HelmConstants.CHART), flags != null ? flags : "not specified");
+    }
+
+    @NotNull
+    @Override
+    public List<Requirement> getRunnerSpecificRequirements(@NotNull Map<String, String> runParameters) {
+        return Collections.singletonList(new Requirement(HELM_PATH_CONFIG_PARAM, null, RequirementType.EXISTS));
     }
 }
