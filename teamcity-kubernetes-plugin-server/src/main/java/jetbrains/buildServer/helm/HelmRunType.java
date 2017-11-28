@@ -91,4 +91,13 @@ public class HelmRunType extends RunType {
     public List<Requirement> getRunnerSpecificRequirements(@NotNull Map<String, String> runParameters) {
         return Collections.singletonList(new Requirement(HELM_PATH_CONFIG_PARAM, null, RequirementType.EXISTS));
     }
+
+    @NotNull
+    @Override
+    public String describeParameters(@NotNull Map<String, String> parameters) {
+        HelmCommand helmCommand = HelmCommands.find(parameters.get(HelmConstants.COMMAND_ID));
+        return helmCommand == null
+                ? super.describeParameters(parameters)
+                : "Command: " + helmCommand.getDisplayName() + "\n" + helmCommand.describeParameters(parameters);
+    }
 }
