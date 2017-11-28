@@ -23,10 +23,10 @@ public interface HelmCommand {
     PropertiesProcessor getPropertiesProcessor();
 
     @Nullable
-    String getEditParamsJspFilePath();
+    String getEditParamsJspFile();
 
     @Nullable
-    String getViewParamsJspFilePath();
+    String getViewParamsJspFile();
 
     @NotNull
     String describeParameters(@NotNull Map<String, String> parameters);

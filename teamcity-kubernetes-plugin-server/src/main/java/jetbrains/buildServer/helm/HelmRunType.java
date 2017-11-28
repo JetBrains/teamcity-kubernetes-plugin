@@ -11,7 +11,10 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
 import static jetbrains.buildServer.helm.HelmConstants.HELM_RUN_TYPE;
@@ -19,9 +22,8 @@ import static jetbrains.buildServer.helm.HelmConstants.HELM_RUN_TYPE;
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 28.11.17.
  */
-public class HelmRunType extends RunType implements HelmCommandRegistry {
+public class HelmRunType extends RunType {
     private final PluginDescriptor myPluginDescriptor;
-    private final Map<String, HelmCommand> myCommandIdToCommandMap = new HashMap<>();
 
     public HelmRunType(PluginDescriptor pluginDescriptor, RunTypeRegistry runTypeRegistry) {
         myPluginDescriptor = pluginDescriptor;
@@ -55,7 +57,7 @@ public class HelmRunType extends RunType implements HelmCommandRegistry {
             if (PropertiesUtil.isEmptyOrNull(commandId)) {
                 result.add(new InvalidProperty(HelmConstants.COMMAND_ID, "Command to run must be specified"));
             }
-            final HelmCommand helmCommand = myCommandIdToCommandMap.get(commandId);
+            final HelmCommand helmCommand = HelmCommands.find(commandId);
             if(helmCommand != null){
                 PropertiesProcessor propertiesProcessor = helmCommand.getPropertiesProcessor();
                 if(propertiesProcessor != null) {
@@ -88,10 +90,5 @@ public class HelmRunType extends RunType implements HelmCommandRegistry {
     @Override
     public List<Requirement> getRunnerSpecificRequirements(@NotNull Map<String, String> runParameters) {
         return Collections.singletonList(new Requirement(HELM_PATH_CONFIG_PARAM, null, RequirementType.EXISTS));
-    }
-
-    @Override
-    public void registerCommand(@NotNull HelmCommand helmCommand) {
-        myCommandIdToCommandMap.put(helmCommand.getId(), helmCommand);
     }
 }

@@ -3,7 +3,6 @@ package jetbrains.buildServer.helm;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.util.PropertiesUtil;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +16,6 @@ import static jetbrains.buildServer.helm.HelmConstants.HELM_ROLLBACK_COMMAND_NAM
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
  */
 public class RollbackCommand implements HelmCommand {
-    private final PluginDescriptor myPluginDescriptor;
-
-    public RollbackCommand(PluginDescriptor pluginDescriptor, HelmCommandRegistry commandRegistry) {
-        myPluginDescriptor = pluginDescriptor;
-        commandRegistry.registerCommand(this);
-    }
-
     @NotNull
     @Override
     public String getId() {
@@ -61,14 +53,14 @@ public class RollbackCommand implements HelmCommand {
 
     @Nullable
     @Override
-    public String getEditParamsJspFilePath() {
-        return myPluginDescriptor.getPluginResourcesPath("helm/editRollback.jsp");
+    public String getEditParamsJspFile() {
+        return "editRollback.jsp";
     }
 
     @Nullable
     @Override
-    public String getViewParamsJspFilePath() {
-        return myPluginDescriptor.getPluginResourcesPath("helm/viewRollback.jsp");
+    public String getViewParamsJspFile() {
+        return "viewRollback.jsp";
     }
 
     @NotNull

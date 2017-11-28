@@ -3,7 +3,6 @@ package jetbrains.buildServer.helm;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.util.PropertiesUtil;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +16,6 @@ import static jetbrains.buildServer.helm.HelmConstants.HELM_DELETE_COMMAND_NAME;
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
  */
 public class DeleteCommand implements HelmCommand {
-    private final PluginDescriptor myPluginDescriptor;
-
-    public DeleteCommand(PluginDescriptor pluginDescriptor, HelmCommandRegistry commandRegistry) {
-        myPluginDescriptor = pluginDescriptor;
-        commandRegistry.registerCommand(this);
-    }
-
     @NotNull
     @Override
     public String getId() {
@@ -57,14 +49,14 @@ public class DeleteCommand implements HelmCommand {
 
     @Nullable
     @Override
-    public String getEditParamsJspFilePath() {
-        return myPluginDescriptor.getPluginResourcesPath("helm/editDelete.jsp");
+    public String getEditParamsJspFile() {
+        return "editDelete.jsp";
     }
 
     @Nullable
     @Override
-    public String getViewParamsJspFilePath() {
-        return myPluginDescriptor.getPluginResourcesPath("helm/viewDelete.jsp");
+    public String getViewParamsJspFile() {
+        return "viewDelete.jsp";
     }
 
     @NotNull
