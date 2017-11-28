@@ -25,4 +25,5 @@ public interface HelmConstants {
     String ADDITIONAL_FLAGS = "teamcity.helm.additionalFlags";
     String RELEASE_NAME = "teamcity.helm.releaseName";
     String REVISION = "teamcity.helm.revision";
+    String COMMAND = "teamcity.helm.command";
 }
