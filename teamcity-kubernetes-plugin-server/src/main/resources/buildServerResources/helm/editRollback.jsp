@@ -12,7 +12,6 @@
     <td>
         <span>
             <props:textProperty name="${constants.releaseName}" className="longField"/>
-            <i class="icon-magic" style="cursor:pointer;" title="Choose releases" ></i>
         </span>
         <span class="error" id="error_${constants.releaseName}"></span>
         <span class="smallNote">Release to rolls back.</span>
@@ -24,7 +23,6 @@
     <td>
       <span>
         <props:textProperty name="${constants.revision}" className="longField"/>
-        <i class="icon-magic" style="cursor:pointer;" title="Choose revision" ></i>
       </span>
         <span class="smallNote">Previous release revision.</span>
         <span class="error" id="error_${constants.revision}"></span>

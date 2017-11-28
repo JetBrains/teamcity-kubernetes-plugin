@@ -13,7 +13,6 @@
       <span>
         <props:textProperty name="${constants.chartKey}" className="longField"/>
         <bs:vcsTree fieldId="${constants.chartKey}" treeId="${constants.chartKey}"/>
-        <i class="icon-magic" style="cursor:pointer;" title="Choose chart reference" ></i>
       </span>
         <span class="smallNote">Chart to install. Can be a chart reference, path to packaged chart or unpacked chart directory, or absolute URL</span>
         <span class="error" id="error_${constants.chartKey}"></span>

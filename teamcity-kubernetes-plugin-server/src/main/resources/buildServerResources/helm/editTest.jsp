@@ -12,7 +12,6 @@
     <td>
         <span>
             <props:textProperty name="${constants.releaseName}" className="longField"/>
-            <i class="icon-magic" style="cursor:pointer;" title="Choose releases" ></i>
         </span>
         <span class="error" id="error_${constants.releaseName}"></span>
         <span class="smallNote">Release name to test. The tests to be run are defined in the chart that was installed.</span>

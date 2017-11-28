@@ -12,7 +12,6 @@
     <td>
         <span>
             <props:textProperty name="${constants.releaseName}" className="longField"/>
-            <i class="icon-magic" style="cursor:pointer;" title="Choose releases" ></i>
         </span>
         <span class="error" id="error_${constants.releaseName}"></span>
         <span class="smallNote">Release name to delete from Kubernetes. Removes all of the resources associated with the last release of the chart.</span>

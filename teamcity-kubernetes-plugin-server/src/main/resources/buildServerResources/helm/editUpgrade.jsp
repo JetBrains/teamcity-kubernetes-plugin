@@ -12,7 +12,6 @@
     <td>
         <span>
             <props:textProperty name="${constants.releaseName}" className="longField"/>
-            <i class="icon-magic" style="cursor:pointer;" title="Choose releases" ></i>
         </span>
         <span class="error" id="error_${constants.releaseName}"></span>
         <span class="smallNote">Release to upgrade.</span>
@@ -25,7 +24,6 @@
       <span>
         <props:textProperty name="${constants.chartKey}" className="longField"/>
         <bs:vcsTree fieldId="${constants.chartKey}" treeId="${constants.chartKey}"/>
-        <i class="icon-magic" style="cursor:pointer;" title="Choose chart reference" ></i>
       </span>
         <span class="smallNote">New version of chart.</span>
         <span class="error" id="error_${constants.chartKey}"></span>
