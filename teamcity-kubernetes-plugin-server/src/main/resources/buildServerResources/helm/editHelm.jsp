@@ -11,6 +11,7 @@
 
 <c:set var="commandTitle">Command:<bs:help urlPrefix="https://docs.helm.sh/helm/#helm" file=""/></c:set>
 <props:selectSectionProperty name="${helmParametersBean.commandKey}" title="${commandTitle}" note="">
+    <props:selectSectionPropertyContent value="" caption="--Please select Helm command--"/>
     <c:forEach items="${helmParametersBean.commands}" var="command">
         <props:selectSectionPropertyContent value="${command.id}" caption="${command.displayName}">
             <jsp:include page="${teamcityPluginResourcesPath}/helm/${command.editParamsJspFile}"/>
