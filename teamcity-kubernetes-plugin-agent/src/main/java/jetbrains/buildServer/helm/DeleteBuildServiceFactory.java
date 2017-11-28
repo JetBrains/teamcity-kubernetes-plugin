@@ -6,7 +6,7 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildService;
 import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import org.jetbrains.annotations.NotNull;
 
-import static jetbrains.buildServer.helm.HelmConstants.HELM_DELETE_RUN_TYPE;
+import static jetbrains.buildServer.helm.HelmConstants.HELM_DELETE_COMMAND_NAME;
 import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
 
 /**
@@ -26,7 +26,7 @@ public class DeleteBuildServiceFactory implements CommandLineBuildServiceFactory
             @NotNull
             @Override
             public String getType() {
-                return HELM_DELETE_RUN_TYPE;
+                return HELM_DELETE_COMMAND_NAME;
             }
 
             @Override

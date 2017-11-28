@@ -2,8 +2,6 @@ package jetbrains.buildServer.helm;
 
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
-import jetbrains.buildServer.serverSide.RunType;
-import jetbrains.buildServer.serverSide.RunTypeRegistry;
 import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
@@ -13,40 +11,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import static jetbrains.buildServer.helm.HelmConstants.HELM_TEST_RUN_TYPE;
+import static jetbrains.buildServer.helm.HelmConstants.HELM_DELETE_COMMAND_NAME;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
  */
-public class TestRunType extends RunType {
+public class DeleteCommand implements HelmCommand {
     private final PluginDescriptor myPluginDescriptor;
 
-    public TestRunType(PluginDescriptor pluginDescriptor, RunTypeRegistry runTypeRegistry) {
+    public DeleteCommand(PluginDescriptor pluginDescriptor, HelmCommandRegistry commandRegistry) {
         myPluginDescriptor = pluginDescriptor;
-        runTypeRegistry.registerRunType(this);
+        commandRegistry.registerCommand(this);
     }
 
     @NotNull
     @Override
-    public String getType() {
-        return HELM_TEST_RUN_TYPE;
+    public String getId() {
+        return HELM_DELETE_COMMAND_NAME;
     }
 
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Helm Test";
+        return "Delete";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "Runs the tests for a release.";
+        return "Deletes the release from Kubernetes.";
     }
 
     @Nullable
     @Override
-    public PropertiesProcessor getRunnerPropertiesProcessor() {
+    public PropertiesProcessor getPropertiesProcessor() {
         return properties -> {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
             final String chart = properties.get(HelmConstants.RELEASE_NAME);
@@ -59,20 +57,14 @@ public class TestRunType extends RunType {
 
     @Nullable
     @Override
-    public String getEditRunnerParamsJspFilePath() {
-        return myPluginDescriptor.getPluginResourcesPath("helm/editTest.jsp");
+    public String getEditParamsJspFilePath() {
+        return myPluginDescriptor.getPluginResourcesPath("helm/editDelete.jsp");
     }
 
     @Nullable
     @Override
-    public String getViewRunnerParamsJspFilePath() {
-        return myPluginDescriptor.getPluginResourcesPath("helm/viewTest.jsp");
-    }
-
-    @Nullable
-    @Override
-    public Map<String, String> getDefaultRunnerProperties() {
-        return null;
+    public String getViewParamsJspFilePath() {
+        return myPluginDescriptor.getPluginResourcesPath("helm/viewDelete.jsp");
     }
 
     @NotNull

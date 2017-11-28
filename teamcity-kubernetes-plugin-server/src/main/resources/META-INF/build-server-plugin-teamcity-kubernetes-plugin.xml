@@ -16,9 +16,9 @@
 
     <!--helm support-->
     <bean id="helmRunType" class="jetbrains.buildServer.helm.HelmRunType" />
-    <!--<bean id="installRunType" class="jetbrains.buildServer.helm.InstallRunType" />-->
-    <!--<bean id="deleteRunType" class="jetbrains.buildServer.helm.DeleteRunType" />-->
-    <!--<bean id="testRunType" class="jetbrains.buildServer.helm.TestRunType" />-->
-    <!--<bean id="upgradeRunType" class="jetbrains.buildServer.helm.UpgradeRunType" />-->
-    <!--<bean id="rollbackRunType" class="jetbrains.buildServer.helm.RollbackRunType" />-->
+    <bean id="installCommand" class="jetbrains.buildServer.helm.InstallCommand" />
+    <bean id="deleteCommand" class="jetbrains.buildServer.helm.DeleteCommand" />
+    <bean id="testCommand" class="jetbrains.buildServer.helm.TestCommand" />
+    <bean id="upgradeCommand" class="jetbrains.buildServer.helm.UpgradeCommand" />
+    <bean id="rollbackCommand" class="jetbrains.buildServer.helm.RollbackCommand" />
 </beans>

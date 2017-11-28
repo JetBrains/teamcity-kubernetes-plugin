@@ -2,8 +2,6 @@ package jetbrains.buildServer.helm;
 
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
-import jetbrains.buildServer.serverSide.RunType;
-import jetbrains.buildServer.serverSide.RunTypeRegistry;
 import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
@@ -13,29 +11,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import static jetbrains.buildServer.helm.HelmConstants.HELM_ROLLBACK_RUN_TYPE;
+import static jetbrains.buildServer.helm.HelmConstants.HELM_ROLLBACK_COMMAND_NAME;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
  */
-public class RollbackRunType extends RunType {
+public class RollbackCommand implements HelmCommand {
     private final PluginDescriptor myPluginDescriptor;
 
-    public RollbackRunType(PluginDescriptor pluginDescriptor, RunTypeRegistry runTypeRegistry) {
+    public RollbackCommand(PluginDescriptor pluginDescriptor, HelmCommandRegistry commandRegistry) {
         myPluginDescriptor = pluginDescriptor;
-        runTypeRegistry.registerRunType(this);
+        commandRegistry.registerCommand(this);
     }
 
     @NotNull
     @Override
-    public String getType() {
-        return HELM_ROLLBACK_RUN_TYPE;
+    public String getId() {
+        return HELM_ROLLBACK_COMMAND_NAME;
     }
 
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Helm Rollback";
+        return "Rollback";
     }
 
     @NotNull
@@ -46,7 +44,7 @@ public class RollbackRunType extends RunType {
 
     @Nullable
     @Override
-    public PropertiesProcessor getRunnerPropertiesProcessor() {
+    public PropertiesProcessor getPropertiesProcessor() {
         return properties -> {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
             final String releaseName = properties.get(HelmConstants.RELEASE_NAME);
@@ -63,20 +61,14 @@ public class RollbackRunType extends RunType {
 
     @Nullable
     @Override
-    public String getEditRunnerParamsJspFilePath() {
+    public String getEditParamsJspFilePath() {
         return myPluginDescriptor.getPluginResourcesPath("helm/editRollback.jsp");
     }
 
     @Nullable
     @Override
-    public String getViewRunnerParamsJspFilePath() {
+    public String getViewParamsJspFilePath() {
         return myPluginDescriptor.getPluginResourcesPath("helm/viewRollback.jsp");
-    }
-
-    @Nullable
-    @Override
-    public Map<String, String> getDefaultRunnerProperties() {
-        return null;
     }
 
     @NotNull

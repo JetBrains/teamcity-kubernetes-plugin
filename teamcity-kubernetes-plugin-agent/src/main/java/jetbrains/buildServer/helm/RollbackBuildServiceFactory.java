@@ -7,7 +7,7 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory;
 import org.jetbrains.annotations.NotNull;
 
 import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
-import static jetbrains.buildServer.helm.HelmConstants.HELM_ROLLBACK_RUN_TYPE;
+import static jetbrains.buildServer.helm.HelmConstants.HELM_ROLLBACK_COMMAND_NAME;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 18.10.17.
@@ -26,7 +26,7 @@ public class RollbackBuildServiceFactory implements CommandLineBuildServiceFacto
             @NotNull
             @Override
             public String getType() {
-                return HELM_ROLLBACK_RUN_TYPE;
+                return HELM_ROLLBACK_COMMAND_NAME;
             }
 
             @Override
