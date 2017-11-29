@@ -41,11 +41,11 @@ public class UpgradeCommand implements HelmCommand {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
             final String chart = properties.get(HelmConstants.CHART);
             if (PropertiesUtil.isEmptyOrNull(chart)) {
-                result.add(new InvalidProperty(HelmConstants.CHART, "Chart must be specified"));
+                result.add(new InvalidProperty(HELM_UPGRADE_COMMAND_NAME + HelmConstants.CHART, "Chart must be specified"));
             }
             final String releaseName = properties.get(HelmConstants.RELEASE_NAME);
             if (PropertiesUtil.isEmptyOrNull(releaseName)) {
-                result.add(new InvalidProperty(HelmConstants.RELEASE_NAME, "Release name must be specified"));
+                result.add(new InvalidProperty(HELM_UPGRADE_COMMAND_NAME + HelmConstants.RELEASE_NAME, "Release name must be specified"));
             }
             return result;
         };

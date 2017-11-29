@@ -15,14 +15,14 @@
         <bs:vcsTree fieldId="${constants.chartKey}" treeId="${constants.chartKey}"/>
       </span>
         <span class="smallNote">Chart to install. Can be a chart reference, path to packaged chart or unpacked chart directory, or absolute URL</span>
-        <span class="error" id="error_${constants.chartKey}"></span>
+        <span class="error" id="error_${constants.installCommandId}${constants.chartKey}"></span>
     </td>
 </tr>
 
 <tr class="advancedSetting">
-    <th><label for="${constants.addtionalFlagsKey}">Additional 'helm install' command flags: </label></th>
-    <td><props:textProperty name="${constants.addtionalFlagsKey}" className="longField"/>
-        <span class="error" id="error_${constants.addtionalFlagsKey}"></span>
+    <th><label for="${constants.additionalFlagsKey}">Additional 'helm install' command flags: </label></th>
+    <td><props:textProperty name="${constants.additionalFlagsKey}" className="longField"/>
+        <span class="error" id="error_${constants.installCommandId}${constants.additionalFlagsKey}"></span>
         <span class="smallNote">Additional options for 'helm install' command line</span>
     </td>
 </tr>

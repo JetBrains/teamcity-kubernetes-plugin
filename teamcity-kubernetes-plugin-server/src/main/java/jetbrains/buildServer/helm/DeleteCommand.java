@@ -41,7 +41,7 @@ public class DeleteCommand implements HelmCommand {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
             final String chart = properties.get(HelmConstants.RELEASE_NAME);
             if (PropertiesUtil.isEmptyOrNull(chart)) {
-                result.add(new InvalidProperty(HelmConstants.RELEASE_NAME, "Release name must be specified"));
+                result.add(new InvalidProperty(HELM_DELETE_COMMAND_NAME + HelmConstants.RELEASE_NAME, "Release name must be specified"));
             }
             return result;
         };

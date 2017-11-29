@@ -41,7 +41,7 @@ public class InstallCommand implements HelmCommand {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
             final String chart = properties.get(HelmConstants.CHART);
             if (PropertiesUtil.isEmptyOrNull(chart)) {
-                result.add(new InvalidProperty(HelmConstants.CHART, "Chart must be specified"));
+                result.add(new InvalidProperty(HELM_INSTALL_COMMAND_NAME + HelmConstants.CHART, "Chart must be specified"));
             }
             return result;
         };

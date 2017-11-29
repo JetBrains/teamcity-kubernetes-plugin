@@ -13,7 +13,7 @@
         <span>
             <props:textProperty name="${constants.releaseName}" className="longField"/>
         </span>
-        <span class="error" id="error_${constants.releaseName}"></span>
+        <span class="error" id="error_${constants.upgradeCommandId}${constants.releaseName}"></span>
         <span class="smallNote">Release to upgrade.</span>
     </td>
 </tr>
@@ -26,14 +26,14 @@
         <bs:vcsTree fieldId="${constants.chartKey}" treeId="${constants.chartKey}"/>
       </span>
         <span class="smallNote">New version of chart.</span>
-        <span class="error" id="error_${constants.chartKey}"></span>
+        <span class="error" id="error_${constants.upgradeCommandId}${constants.chartKey}"></span>
     </td>
 </tr>
 
 <tr class="advancedSetting">
-    <th><label for="${constants.addtionalFlagsKey}">Additional 'helm upgrade' command flags: </label></th>
-    <td><props:textProperty name="${constants.addtionalFlagsKey}" className="longField"/>
-        <span class="error" id="error_${constants.addtionalFlagsKey}"></span>
+    <th><label for="${constants.additionalFlagsKey}">Additional 'helm upgrade' command flags: </label></th>
+    <td><props:textProperty name="${constants.additionalFlagsKey}" className="longField"/>
+        <span class="error" id="error_${constants.upgradeCommandId}${constants.additionalFlagsKey}"></span>
         <span class="smallNote">Additional options for 'helm upgrade' command line</span>
     </td>
 </tr>

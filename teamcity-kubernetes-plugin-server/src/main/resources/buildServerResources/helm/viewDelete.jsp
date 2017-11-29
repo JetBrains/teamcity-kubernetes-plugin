@@ -9,5 +9,5 @@
 </div>
 
 <div class="parameter">
-    Additional command flags: <strong><props:displayValue name="${constants.addtionalFlagsKey}" emptyValue="not specified"/></strong>
+    Additional command flags: <strong><props:displayValue name="${constants.additionalFlagsKey}" emptyValue="not specified"/></strong>
 </div>

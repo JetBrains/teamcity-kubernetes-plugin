@@ -41,11 +41,11 @@ public class RollbackCommand implements HelmCommand {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
             final String releaseName = properties.get(HelmConstants.RELEASE_NAME);
             if (PropertiesUtil.isEmptyOrNull(releaseName)) {
-                result.add(new InvalidProperty(HelmConstants.RELEASE_NAME, "Release name must be specified"));
+                result.add(new InvalidProperty(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.RELEASE_NAME, "Release name must be specified"));
             }
             final Integer revision = PropertiesUtil.parseInt(properties.get(HelmConstants.REVISION));
             if (revision == null || revision <= 0) {
-                result.add(new InvalidProperty(HelmConstants.REVISION, "Revision must be specified as positive integer"));
+                result.add(new InvalidProperty(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.REVISION, "Revision must be specified as positive integer"));
             }
             return result;
         };

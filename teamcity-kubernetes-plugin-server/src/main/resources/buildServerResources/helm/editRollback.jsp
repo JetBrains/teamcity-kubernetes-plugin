@@ -13,7 +13,7 @@
         <span>
             <props:textProperty name="${constants.releaseName}" className="longField"/>
         </span>
-        <span class="error" id="error_${constants.releaseName}"></span>
+        <span class="error" id="error_${constants.rollbackCommandId}${constants.releaseName}"></span>
         <span class="smallNote">Release to rolls back.</span>
     </td>
 </tr>
@@ -25,14 +25,14 @@
         <props:textProperty name="${constants.revision}" className="longField"/>
       </span>
         <span class="smallNote">Previous release revision.</span>
-        <span class="error" id="error_${constants.revision}"></span>
+        <span class="error" id="error_${constants.rollbackCommandId}${constants.revision}"></span>
     </td>
 </tr>
 
 <tr class="advancedSetting">
-    <th><label for="${constants.addtionalFlagsKey}">Additional 'helm rollback' command flags: </label></th>
-    <td><props:textProperty name="${constants.addtionalFlagsKey}" className="longField"/>
-        <span class="error" id="error_${constants.addtionalFlagsKey}"></span>
+    <th><label for="${constants.additionalFlagsKey}">Additional 'helm rollback' command flags: </label></th>
+    <td><props:textProperty name="${constants.additionalFlagsKey}" className="longField"/>
+        <span class="error" id="error_${constants.rollbackCommandId}${constants.additionalFlagsKey}"></span>
         <span class="smallNote">Additional options for 'helm rollback' command line</span>
     </td>
 </tr>
