@@ -5,9 +5,9 @@
 <jsp:useBean id="constants" class="jetbrains.buildServer.helm.HelmConstantsBean"/>
 
 <div class="parameter">
-    Chart: <strong><props:displayValue name="${constants.chartKey}" emptyValue="not specified"/></strong>
+    Chart: <strong><props:displayValue name="${constants.installCommandId}${constants.chartKey}" emptyValue="not specified"/></strong>
 </div>
 
 <div class="parameter">
-    Additional command flags: <strong><props:displayValue name="${constants.additionalFlagsKey}" emptyValue="not specified"/></strong>
+    Additional command flags: <strong><props:displayValue name="${constants.installCommandId}${constants.additionalFlagsKey}" emptyValue="not specified"/></strong>
 </div>

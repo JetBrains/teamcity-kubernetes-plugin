@@ -11,8 +11,8 @@
     <th><label for="${constants.chartKey}">Helm chart: <l:star/></label></th>
     <td>
       <span>
-        <props:textProperty name="${constants.chartKey}" className="longField"/>
-        <bs:vcsTree fieldId="${constants.chartKey}" treeId="${constants.chartKey}"/>
+        <props:textProperty name="${constants.installCommandId}${constants.chartKey}" className="longField"/>
+        <bs:vcsTree fieldId="${constants.installCommandId}${constants.chartKey}" treeId="${constants.installCommandId}${constants.chartKey}"/>
       </span>
         <span class="smallNote">Chart to install. Can be a chart reference, path to packaged chart or unpacked chart directory, or absolute URL</span>
         <span class="error" id="error_${constants.installCommandId}${constants.chartKey}"></span>
@@ -20,8 +20,8 @@
 </tr>
 
 <tr class="advancedSetting">
-    <th><label for="${constants.additionalFlagsKey}">Additional 'helm install' command flags: </label></th>
-    <td><props:textProperty name="${constants.additionalFlagsKey}" className="longField"/>
+    <th><label for="${constants.installCommandId}${constants.additionalFlagsKey}">Additional 'helm install' command flags: </label></th>
+    <td><props:textProperty name="${constants.installCommandId}${constants.additionalFlagsKey}" className="longField"/>
         <span class="error" id="error_${constants.installCommandId}${constants.additionalFlagsKey}"></span>
         <span class="smallNote">Additional options for 'helm install' command line</span>
     </td>

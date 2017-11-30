@@ -3,19 +3,23 @@ package jetbrains.buildServer.helm;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
-import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static jetbrains.buildServer.helm.HelmConstants.*;
+import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
 
 /**
- * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 19.10.17.
+ * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 29.11.17.
  */
-public class DeleteBuildService extends BuildServiceAdapter {
+public class HelmBuildService extends BuildServiceAdapter {
+    private final HelmCommandArgumentsProviders myArgumentsProviders;
+
+    HelmBuildService(HelmCommandArgumentsProviders argumentsProviders) {
+        myArgumentsProviders = argumentsProviders;
+    }
+
     @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
@@ -36,11 +40,15 @@ public class DeleteBuildService extends BuildServiceAdapter {
             @Override
             public List<String> getArguments() throws RunBuildException {
                 Map<String, String> runnerParameters = getRunnerParameters();
-                List<String> result = new LinkedList<String>();
-                result.add(HELM_DELETE_COMMAND);
-                result.add(StringUtil.emptyIfNull(runnerParameters.get(ADDITIONAL_FLAGS)));
-                result.add(StringUtil.emptyIfNull(runnerParameters.get(RELEASE_NAME)));
-                return result;
+                String commandId = runnerParameters.get(HelmConstants.COMMAND_ID);
+                if(commandId == null){
+                    throw new RunBuildException(HelmConstants.COMMAND_ID + " parameter value is null");
+                }
+                HelmCommandArgumentsProvider argumentsProvider = myArgumentsProviders.find(commandId);
+                if (argumentsProvider == null) {
+                    throw new RunBuildException("Can't find argumentsProvider for command with id " + commandId);
+                }
+                return argumentsProvider.getArguments(runnerParameters);
             }
 
             @NotNull

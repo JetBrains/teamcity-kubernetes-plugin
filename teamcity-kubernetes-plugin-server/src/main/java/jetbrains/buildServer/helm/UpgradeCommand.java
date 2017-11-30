@@ -39,11 +39,11 @@ public class UpgradeCommand implements HelmCommand {
     public PropertiesProcessor getPropertiesProcessor() {
         return properties -> {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
-            final String chart = properties.get(HelmConstants.CHART);
+            final String chart = properties.get(HELM_UPGRADE_COMMAND_NAME + HelmConstants.CHART);
             if (PropertiesUtil.isEmptyOrNull(chart)) {
                 result.add(new InvalidProperty(HELM_UPGRADE_COMMAND_NAME + HelmConstants.CHART, "Chart must be specified"));
             }
-            final String releaseName = properties.get(HelmConstants.RELEASE_NAME);
+            final String releaseName = properties.get(HELM_UPGRADE_COMMAND_NAME + HelmConstants.RELEASE_NAME);
             if (PropertiesUtil.isEmptyOrNull(releaseName)) {
                 result.add(new InvalidProperty(HELM_UPGRADE_COMMAND_NAME + HelmConstants.RELEASE_NAME, "Release name must be specified"));
             }
@@ -66,7 +66,7 @@ public class UpgradeCommand implements HelmCommand {
     @NotNull
     @Override
     public String describeParameters(@NotNull Map<String, String> parameters) {
-        String flags = parameters.get(HelmConstants.ADDITIONAL_FLAGS);
-        return String.format("Release: %s\nChart: %s\nAdditional flags: %s", parameters.get(HelmConstants.RELEASE_NAME), parameters.get(HelmConstants.CHART), flags != null ? flags : "not specified");
+        String flags = parameters.get(HELM_UPGRADE_COMMAND_NAME + HelmConstants.ADDITIONAL_FLAGS);
+        return String.format("Release: %s\nChart: %s\nAdditional flags: %s", parameters.get(HELM_UPGRADE_COMMAND_NAME + HelmConstants.RELEASE_NAME), parameters.get(HELM_UPGRADE_COMMAND_NAME + HelmConstants.CHART), flags != null ? flags : "not specified");
     }
 }

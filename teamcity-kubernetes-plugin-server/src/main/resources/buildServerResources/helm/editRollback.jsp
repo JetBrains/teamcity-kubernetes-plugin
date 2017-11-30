@@ -8,10 +8,10 @@
 <jsp:useBean id="constants" class="jetbrains.buildServer.helm.HelmConstantsBean"/>
 
 <tr>
-    <th><label for="${constants.releaseName}">Release name: <l:star/></label></th>
+    <th><label for="${constants.rollbackCommandId}${constants.releaseName}">Release name: <l:star/></label></th>
     <td>
         <span>
-            <props:textProperty name="${constants.releaseName}" className="longField"/>
+            <props:textProperty name="${constants.rollbackCommandId}${constants.releaseName}" className="longField"/>
         </span>
         <span class="error" id="error_${constants.rollbackCommandId}${constants.releaseName}"></span>
         <span class="smallNote">Release to rolls back.</span>
@@ -19,10 +19,10 @@
 </tr>
 
 <tr>
-    <th><label for="${constants.revision}">Revision: <l:star/></label></th>
+    <th><label for="${constants.rollbackCommandId}${constants.revision}">Revision: <l:star/></label></th>
     <td>
       <span>
-        <props:textProperty name="${constants.revision}" className="longField"/>
+        <props:textProperty name="${constants.rollbackCommandId}${constants.revision}" className="longField"/>
       </span>
         <span class="smallNote">Previous release revision.</span>
         <span class="error" id="error_${constants.rollbackCommandId}${constants.revision}"></span>
@@ -30,8 +30,8 @@
 </tr>
 
 <tr class="advancedSetting">
-    <th><label for="${constants.additionalFlagsKey}">Additional 'helm rollback' command flags: </label></th>
-    <td><props:textProperty name="${constants.additionalFlagsKey}" className="longField"/>
+    <th><label for="${constants.rollbackCommandId}${constants.additionalFlagsKey}">Additional 'helm rollback' command flags: </label></th>
+    <td><props:textProperty name="${constants.rollbackCommandId}${constants.additionalFlagsKey}" className="longField"/>
         <span class="error" id="error_${constants.rollbackCommandId}${constants.additionalFlagsKey}"></span>
         <span class="smallNote">Additional options for 'helm rollback' command line</span>
     </td>

@@ -39,11 +39,11 @@ public class RollbackCommand implements HelmCommand {
     public PropertiesProcessor getPropertiesProcessor() {
         return properties -> {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
-            final String releaseName = properties.get(HelmConstants.RELEASE_NAME);
+            final String releaseName = properties.get(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.RELEASE_NAME);
             if (PropertiesUtil.isEmptyOrNull(releaseName)) {
                 result.add(new InvalidProperty(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.RELEASE_NAME, "Release name must be specified"));
             }
-            final Integer revision = PropertiesUtil.parseInt(properties.get(HelmConstants.REVISION));
+            final Integer revision = PropertiesUtil.parseInt(properties.get(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.REVISION));
             if (revision == null || revision <= 0) {
                 result.add(new InvalidProperty(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.REVISION, "Revision must be specified as positive integer"));
             }
@@ -66,7 +66,7 @@ public class RollbackCommand implements HelmCommand {
     @NotNull
     @Override
     public String describeParameters(@NotNull Map<String, String> parameters) {
-        String flags = parameters.get(HelmConstants.ADDITIONAL_FLAGS);
-        return String.format("Release: %s\nRevision: %s\nAdditional flags: %s", parameters.get(HelmConstants.RELEASE_NAME), parameters.get(HelmConstants.REVISION), flags != null ? flags : "not specified");
+        String flags = parameters.get(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.ADDITIONAL_FLAGS);
+        return String.format("Release: %s\nRevision: %s\nAdditional flags: %s", parameters.get(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.RELEASE_NAME), parameters.get(HELM_ROLLBACK_COMMAND_NAME + HelmConstants.REVISION), flags != null ? flags : "not specified");
     }
 }

@@ -8,10 +8,10 @@
 <jsp:useBean id="constants" class="jetbrains.buildServer.helm.HelmConstantsBean"/>
 
 <tr>
-    <th><label for="${constants.releaseName}">Release name: <l:star/></label></th>
+    <th><label for="${constants.upgradeCommandId}${constants.releaseName}">Release name: <l:star/></label></th>
     <td>
         <span>
-            <props:textProperty name="${constants.releaseName}" className="longField"/>
+            <props:textProperty name="${constants.upgradeCommandId}${constants.releaseName}" className="longField"/>
         </span>
         <span class="error" id="error_${constants.upgradeCommandId}${constants.releaseName}"></span>
         <span class="smallNote">Release to upgrade.</span>
@@ -19,11 +19,11 @@
 </tr>
 
 <tr>
-    <th><label for="${constants.chartKey}">Chart: <l:star/></label></th>
+    <th><label for="${constants.upgradeCommandId}${constants.chartKey}">Chart: <l:star/></label></th>
     <td>
       <span>
-        <props:textProperty name="${constants.chartKey}" className="longField"/>
-        <bs:vcsTree fieldId="${constants.chartKey}" treeId="${constants.chartKey}"/>
+        <props:textProperty name="${constants.upgradeCommandId}${constants.chartKey}" className="longField"/>
+        <bs:vcsTree fieldId="${constants.upgradeCommandId}${constants.chartKey}" treeId="${constants.upgradeCommandId}${constants.chartKey}"/>
       </span>
         <span class="smallNote">New version of chart.</span>
         <span class="error" id="error_${constants.upgradeCommandId}${constants.chartKey}"></span>
@@ -31,8 +31,8 @@
 </tr>
 
 <tr class="advancedSetting">
-    <th><label for="${constants.additionalFlagsKey}">Additional 'helm upgrade' command flags: </label></th>
-    <td><props:textProperty name="${constants.additionalFlagsKey}" className="longField"/>
+    <th><label for="${constants.upgradeCommandId}${constants.additionalFlagsKey}">Additional 'helm upgrade' command flags: </label></th>
+    <td><props:textProperty name="${constants.upgradeCommandId}${constants.additionalFlagsKey}" className="longField"/>
         <span class="error" id="error_${constants.upgradeCommandId}${constants.additionalFlagsKey}"></span>
         <span class="smallNote">Additional options for 'helm upgrade' command line</span>
     </td>
