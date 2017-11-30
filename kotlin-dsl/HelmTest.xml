@@ -6,7 +6,7 @@
   ~  See LICENSE in the project root for license information.
   -->
 
-<dsl-extension kind="buildStep" type="helm-test" generateDslJar="true">
+<dsl-extension kind="buildStep" type="jetbrains.helm" applicable="params['teamcity.helm.command'] == 'helm-test'" generateDslJar="true">
     <class name="HelmTestStep">
         <description>
             A [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm test' command
@@ -18,11 +18,14 @@
             @see HelmTestStep
         </description>
     </function>
+    <init>
+        <param name="command" value="helm-test"/>
+    </init>
     <params>
-        <param name="teamcity.helm.releaseName" dslName="release">
+        <param name="helm-testteamcity.helm.releaseName" dslName="release">
             <description>Release name to test. The tests to be run are defined in the chart that was installed.</description>
         </param>
-        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags">
+        <param name="helm-testteamcity.helm.additionalFlags" dslName="additionalFlags">
             <description>Additional options for 'helm test' command line.</description>
         </param>
     </params>

@@ -6,7 +6,7 @@
   ~  See LICENSE in the project root for license information.
   -->
 
-<dsl-extension kind="buildStep" type="helm-install" generateDslJar="true">
+<dsl-extension kind="buildStep" type="jetbrains.helm" applicable="params['teamcity.helm.command'] == 'helm-install'" generateDslJar="true">
     <class name="HelmInstallStep">
         <description>
             A [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm install' command
@@ -18,11 +18,14 @@
             @see HelmInstallStep
         </description>
     </function>
+    <init>
+        <param name="command" value="helm-install"/>
+    </init>
     <params>
-        <param name="teamcity.helm.chart" dslName="chart">
+        <param name="helm-installteamcity.helm.chart" dslName="chart">
             <description>Chart to install. Can be a chart reference, path to packaged chart or unpacked chart directory, or absolute URL.</description>
         </param>
-        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags">
+        <param name="helm-installteamcity.helm.additionalFlags" dslName="additionalFlags">
             <description>Additional options for 'helm install' command line.</description>
         </param>
     </params>

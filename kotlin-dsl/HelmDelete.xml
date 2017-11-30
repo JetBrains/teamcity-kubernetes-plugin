@@ -6,7 +6,7 @@
   ~  See LICENSE in the project root for license information.
   -->
 
-<dsl-extension kind="buildStep" type="helm-delete" generateDslJar="true">
+<dsl-extension kind="buildStep" type="jetbrains.helm" applicable="params['teamcity.helm.command'] == 'helm-delete'" generateDslJar="true">
     <class name="HelmDeleteStep">
         <description>
             A [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm delete' command
@@ -18,11 +18,14 @@
             @see HelmDeleteStep
         </description>
     </function>
+    <init>
+        <param name="command" value="helm-delete"/>
+    </init>
     <params>
-        <param name="teamcity.helm.releaseName" dslName="release">
+        <param name="helm-deleteteamcity.helm.releaseName" dslName="release">
             <description>Release name to delete from Kubernetes. Removes all of the resources associated with the last release of the chart.</description>
         </param>
-        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags">
+        <param name="helm-deleteteamcity.helm.additionalFlags" dslName="additionalFlags">
             <description>Additional options for 'helm delete' command line.</description>
         </param>
     </params>

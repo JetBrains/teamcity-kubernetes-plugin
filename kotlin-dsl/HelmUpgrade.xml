@@ -6,7 +6,7 @@
   ~  See LICENSE in the project root for license information.
   -->
 
-<dsl-extension kind="buildStep" type="helm-upgrade" generateDslJar="true">
+<dsl-extension kind="buildStep" type="jetbrains.helm" applicable="params['teamcity.helm.command'] == 'helm-upgrade'" generateDslJar="true">
     <class name="HelmUpgradeStep">
         <description>
             A [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm upgrade' command
@@ -18,14 +18,17 @@
             @see HelmUpgradeStep
         </description>
     </function>
+    <init>
+        <param name="command" value="helm-upgrade"/>
+    </init>
     <params>
-        <param name="teamcity.helm.releaseName" dslName="release">
+        <param name="helm-upgradeteamcity.helm.releaseName" dslName="release">
             <description>Release to upgrade.</description>
         </param>
-        <param name="teamcity.helm.chart" dslName="chart">
+        <param name="helm-upgradeteamcity.helm.chart" dslName="chart">
             <description>New version of chart.</description>
         </param>
-        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags">
+        <param name="helm-upgradeteamcity.helm.additionalFlags" dslName="additionalFlags">
             <description>Additional options for 'helm upgrade' command line.</description>
         </param>
     </params>

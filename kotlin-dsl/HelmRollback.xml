@@ -6,7 +6,7 @@
   ~  See LICENSE in the project root for license information.
   -->
 
-<dsl-extension kind="buildStep" type="helm-rollback" generateDslJar="true">
+<dsl-extension kind="buildStep" type="jetbrains.helm" applicable="params['teamcity.helm.command'] == 'helm-rollback'" generateDslJar="true">
     <class name="HelmRollbackStep">
         <description>
             A [helm build step](https://github.com/JetBrains/teamcity-kubernetes-plugin) to run 'helm rollback' command
@@ -18,14 +18,17 @@
             @see HelmRollbackStep
         </description>
     </function>
+    <init>
+        <param name="command" value="helm-rollback"/>
+    </init>
     <params>
-        <param name="teamcity.helm.releaseName" dslName="release">
+        <param name="helm-rollbackteamcity.helm.releaseName" dslName="release">
             <description>Release name to rolls back.</description>
         </param>
-        <param name="teamcity.helm.revision" dslName="revision">
+        <param name="helm-rollbackteamcity.helm.revision" dslName="revision">
             <description>Previous release revision..</description>
         </param>
-        <param name="teamcity.helm.additionalFlags" dslName="additionalFlags">
+        <param name="helm-rollbackteamcity.helm.additionalFlags" dslName="additionalFlags">
             <description>Additional options for 'helm rollback' command line.</description>
         </param>
     </params>

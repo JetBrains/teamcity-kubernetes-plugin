@@ -26,6 +26,23 @@ The plugin supports Kubernetes cluster images to start new pods with a TeamCity 
 
 Add **Helm** build step to build configuration, choose one of supported commands: [install](https://docs.helm.sh/helm/#helm-install), [upgrade](https://docs.helm.sh/helm/#helm-upgrade), [rollback](https://docs.helm.sh/helm/#helm-rollback), [test](https://docs.helm.sh/helm/#helm-test), [delete](https://docs.helm.sh/helm/#helm-delete). 
 
+Or use Kotlin DSL
+
+```kotlin
+object Helm_Deployment : BuildType({
+    uuid = "866dd903-6f55-4a54-a621-065b380dd7fc"
+    extId = "Helm_Deployment"
+    name = "Deployment"
+
+    steps {
+        helmInstall {
+            chart = "stable/teamcity-server"
+            param("teamcity.helm.command", "helm-install")
+        }
+    }
+})
+```
+
 Build agent to be compatible with Helm runner should provide **Helm_Path** configuration parameter which should point to the location of Helm executable. 
 Plugin searches Helm in default location **/usr/local/bin/helm** on Linux machines.
 
