@@ -93,12 +93,9 @@
     <tr class="hidden token auth-ui">
         <th><label for="secure:${cons.authToken}">Token: <l:star/></label></th>
         <td>
-            <props:multilineProperty name="secure:${cons.authToken}"
-                                     className="longField"
-                                     linkTitle="Enter Bearer Token"
-                                     cols="35" rows="3"
-                                     expanded="true"/>
+            <props:passwordProperty name="secure:${cons.authToken}" className="longField"/>
             <span id="error_secure:${cons.authToken}" class="error"></span>
+            <span class="smallNote">Bearer Token.</span>
         </td>
     </tr>
     <tr>
