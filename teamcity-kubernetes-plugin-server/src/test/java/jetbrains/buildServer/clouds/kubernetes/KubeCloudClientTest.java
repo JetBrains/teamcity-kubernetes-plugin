@@ -3,18 +3,18 @@ package jetbrains.buildServer.clouds.kubernetes;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.clouds.CloudClientParameters;
 import jetbrains.buildServer.clouds.CloudImage;
+import jetbrains.buildServer.clouds.CloudImageParameters;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.PROFILE_INSTANCE_LIMIT;
 
@@ -49,7 +49,7 @@ public class KubeCloudClientTest extends BaseTestCase {
 
     @NotNull
     private KubeCloudClient createClient(List<KubeCloudImage> images) {
-        return createClient("defaultServerUuid", "defaultProfileId", images, new CloudClientParameters());
+        return createClient("defaultServerUuid", "defaultProfileId", images, new MockCloudClientParameters(Collections.emptyMap()));
     }
 
     @NotNull
@@ -106,8 +106,7 @@ public class KubeCloudClientTest extends BaseTestCase {
             allowing(image).getInstanceLimit(); will(returnValue(2));
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
-        CloudClientParameters cloudClientParameters = new CloudClientParameters();
-        cloudClientParameters.setParameter(PROFILE_INSTANCE_LIMIT, "1");
+        CloudClientParameters cloudClientParameters = new MockCloudClientParameters(Collections.singletonMap(PROFILE_INSTANCE_LIMIT, "1"));
         KubeCloudClient cloudClient = createClient(images, cloudClientParameters);
         assertFalse(cloudClient.canStartNewInstance(image));
     }
@@ -139,5 +138,43 @@ public class KubeCloudClientTest extends BaseTestCase {
             allowing(image2).getRunningInstanceCount(); will(returnValue(0));
         }});
         createClient(Arrays.asList(image1, image2));
+    }
+
+    private class MockCloudClientParameters extends CloudClientParameters {
+        private final Map<String, String> myParameters;
+
+        public MockCloudClientParameters(Map<String, String> parameters) {
+            myParameters = parameters;
+        }
+
+        @Nullable
+        @Override
+        public String getParameter(@NotNull String s) {
+            return myParameters.get(s);
+        }
+
+        @NotNull
+        @Override
+        public Collection<String> listParameterNames() {
+            return myParameters.keySet();
+        }
+
+        @NotNull
+        @Override
+        public Collection<CloudImageParameters> getCloudImages() {
+            return null;
+        }
+
+        @NotNull
+        @Override
+        public Map<String, String> getParameters() {
+            return Collections.unmodifiableMap(myParameters);
+        }
+
+        @NotNull
+        @Override
+        public String getProfileDescription() {
+            return null;
+        }
     }
 }

@@ -6,7 +6,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-      <teamcity-version>2017.1</teamcity-version>
+      <teamcity-version>2017.2</teamcity-version>
   </properties>
   <repositories>
     <repository>
@@ -40,7 +40,7 @@
                   <artifactId>teamcity-sdk-maven-plugin</artifactId>
                   <version>0.2</version>
                   <configuration>
-                      <teamcityDir>/home/lodkin/teamcity/trunk/buildserver/.idea_artifacts/dist-teamcity-tomcat</teamcityDir>
+                      <teamcityDir>/home/user/projects/teamcity/2017.2.x/buildserver/.idea_artifacts/dist-teamcity-tomcat</teamcityDir>
                       <serverDebugStr>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10111</serverDebugStr>
                   </configuration>
               </plugin>
