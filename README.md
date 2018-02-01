@@ -53,3 +53,19 @@ Apache 2.0
 ## Feedback
 
 Please feel free to post feedback in the repository [issues](https://github.com/JetBrains/teamcity-kubernetes-plugin/issues).
+
+## Contribution guidelines
+
+Follow general instructions to [build TeamCity plugins using Maven](https://confluence.jetbrains.com/display/TCD10/Developing+Plugins+Using+Maven).
+Plugin uses [TeamCity SDK Maven plugin](https://github.com/JetBrains/teamcity-sdk-maven-plugin)
+
+``` bash
+# build and package plugin
+mvn clean package
+
+# deploy packed plugin to local Teamcity installation and start server and build agent
+mvn tc-sdk:start
+
+# stop locally running server and build agent
+mvn tc-sdk:stop
+```
