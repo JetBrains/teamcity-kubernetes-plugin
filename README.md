@@ -16,13 +16,13 @@ You can [download the plugin](https://teamcity.jetbrains.com/guestAuth/app/rest/
 
 ## Configuration
 
-### Cloud Agents
+### Cloud agents
 
 Configure Kubernetes [Cloud Profile](https://confluence.jetbrains.com/display/TCD10/Agent+Cloud+Profile#AgentCloudProfile-ConfiguringCloudProfile) for your project in the Server Administration UI.
 
 The plugin supports Kubernetes cluster images to start new pods with a TeamCity build agent running in one of the containers. The plugin supports the [official TeamCity Build Agent Docker image](https://hub.docker.com/r/jetbrains/teamcity-agent) out of the box. You can use your own image as well.
 
-### Helm Steps
+### Helm steps
 
 Add **Helm** build step to build configuration, choose one of supported commands: [install](https://docs.helm.sh/helm/#helm-install), [upgrade](https://docs.helm.sh/helm/#helm-upgrade), [rollback](https://docs.helm.sh/helm/#helm-rollback), [test](https://docs.helm.sh/helm/#helm-test), [delete](https://docs.helm.sh/helm/#helm-delete). 
 
@@ -54,7 +54,7 @@ Apache 2.0
 
 Please feel free to post feedback in the repository [issues](https://github.com/JetBrains/teamcity-kubernetes-plugin/issues).
 
-## Contribution guidelines
+## Contributing guidelines
 
 Follow general instructions to [build TeamCity plugins using Maven](https://confluence.jetbrains.com/display/TCD10/Developing+Plugins+Using+Maven).
 Plugin uses [TeamCity SDK Maven plugin](https://github.com/JetBrains/teamcity-sdk-maven-plugin)
