@@ -6,6 +6,7 @@ import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.CustomPodTemplatetBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
@@ -39,6 +40,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @Override
     public String getPodSpecMode() {
         return myImageData.getPodSpecMode();
+    }
+
+    @Nullable
+    @Override
+    public String getCustomPodTemplateSpec() {
+        return myImageData.getCustomPodTemplateContent();
     }
 
     @Nullable
@@ -102,6 +109,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
                 return "Docker Image: " + getDockerImage();
             case DeploymentBuildAgentPodTemplateProvider.ID:
                 return "Deployment: " + getSourceDeploymentName();
+            case CustomPodTemplatetBuildAgentPodTemplateProvider.ID:
+                String agentNamePrefix = myImageData.getAgentNamePrefix();
+                String postfix = !StringUtil.isEmpty(agentNamePrefix) ? ": " + agentNamePrefix : "";
+                return "Custom Pod Template" + postfix;
             default:
                 return "UNKNOWN";
         }
