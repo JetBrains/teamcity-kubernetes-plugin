@@ -13,7 +13,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 <td class="remove"><a href="#" class="removeVmImageLink">Delete...</a></td>\
         </tr>')},
 
-    _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
+    _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
 
     selectors: {
         rmImageLink: '.removeVmImageLink',
@@ -56,6 +56,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$imageInstanceLimit = $j('#imageInstanceLimit');
         this.$agentPoolSelector = $j('#agent_pool_id');
+        this.$customPodTemplate = $j('#customPodTemplate');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
 
@@ -178,6 +179,16 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
+        this.$customPodTemplate.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['customPodTemplate'] = this.$customPodTemplate.val();
+                this._updateImageDescription(this._image);
+            } else {
+                this.$customPodTemplate.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
         this.$imageInstanceLimit.on('change', function (e, value) {
             if (arguments.length === 1) {
                 this._image['imageInstanceLimit'] = this.$imageInstanceLimit.val();
@@ -203,7 +214,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         if(podSpecMode){
             switch (podSpecMode){
                 case 'custom-pod-template':
-                    imageDescription = 'Custom pod template';
+                    var postfix = '';
+                    if (image['agentNamePrefix']) {
+                        postfix = ': ' + image['agentNamePrefix'];
+                    }
+                    imageDescription = 'Custom pod template' + postfix;
                     break;
                 case 'deployment-base':
                     imageDescription = 'Use deployment: ' + image['sourceDeployment'];
@@ -345,6 +360,14 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 }
             }.bind(this),
 
+            customPodTemplate : function () {
+                var valueToValidate = this._image['customPodTemplate'];
+                if (this._image['podTemplateMode'] === 'custom-pod-template' && (!valueToValidate || valueToValidate === '')) {
+                    this.addOptionError('required', 'customPodTemplate');
+                    isValid = false;
+                }
+            }.bind(this),
+
             imageInstanceLimit: function () {
                 var imageInstanceLimit = this._image['imageInstanceLimit'];
                 if (imageInstanceLimit && (!$j.isNumeric(imageInstanceLimit) || imageInstanceLimit < 0 )) {
@@ -470,6 +493,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$imageInstanceLimit.trigger('change', image['imageInstanceLimit'] || '');
         this.$agentPoolSelector.trigger('change', image['agent_pool_id'] || '');
+        this.$customPodTemplate.trigger('change', image['customPodTemplate'] || '');
 
         BS.Kube.ImageDialog.showCentered();
     },
@@ -550,6 +574,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$agentNamePrefix.trigger('change', '');
         this.$imageInstanceLimit.trigger('change', '');
         this.$agentPoolSelector.trigger('change', '');
+        this.$customPodTemplate.trigger('change', '');
     }
 });
 
