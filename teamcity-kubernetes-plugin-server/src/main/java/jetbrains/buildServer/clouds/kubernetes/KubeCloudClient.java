@@ -10,6 +10,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.serverSide.AgentDescription;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.IMAGE_ID;
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.INSTANCE_NAME;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 27.05.17.
@@ -111,8 +115,8 @@ public class KubeCloudClient implements CloudClientEx {
                 !myCloudProfileId.equals(agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID)))
             return null;
 
-        final String imageId = agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_ID);
-        final String instanceName = agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.INSTANCE_NAME);
+        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_ID);
+        final String instanceName = agentParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
         if (imageId != null) {
             final KubeCloudImage cloudImage = myImageIdToImageMap.get(imageId);
             if (cloudImage != null) {
@@ -153,6 +157,16 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public String generateAgentName(@NotNull AgentDescription agentDescription) {
-        return agentDescription.getAvailableParameters().get(Constants.ENV_PREFIX + KubeContainerEnvironment.AGENT_NAME);
+        final Map<String, String> configurationParameters = agentDescription.getConfigurationParameters();
+        final String imageId = configurationParameters.get(Constants.ENV_PREFIX + IMAGE_ID);
+        final String instanceName = configurationParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
+        if (!StringUtil.isNotEmpty(imageId) || !StringUtil.isNotEmpty(instanceName))
+            return null;
+
+        final KubeCloudImage cloudImage = myImageIdToImageMap.get(imageId);
+        if(cloudImage == null)
+            return null;
+
+        return cloudImage.getAgentName(instanceName);
     }
 }

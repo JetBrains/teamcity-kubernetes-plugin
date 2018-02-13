@@ -64,8 +64,7 @@ public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAge
                 .withName(agentName)
                 .withImage(kubeCloudImage.getDockerImage())
                 .withImagePullPolicy(imagePullPolicy == null ? ImagePullPolicy.IfNotPresent.getName() : imagePullPolicy.getName())
-                .withEnv(new EnvVar(KubeContainerEnvironment.AGENT_NAME, agentName, null),
-                         new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
+                .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
                          new EnvVar(KubeContainerEnvironment.SERVER_UUID, serverUUID, null),
                          new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
                          new EnvVar(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId(), null),

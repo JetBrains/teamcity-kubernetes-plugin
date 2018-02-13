@@ -89,7 +89,6 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
             for (Pair<String, String> env : Arrays.asList(
                     new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
                     new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudProfileId),
-                    new Pair<>(KubeContainerEnvironment.AGENT_NAME, kubeCloudImage.getAgentName(instanceName)),
                     new Pair<>(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId()),
                     new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))){
                 patchedEnvData.put(env.first, env.second);

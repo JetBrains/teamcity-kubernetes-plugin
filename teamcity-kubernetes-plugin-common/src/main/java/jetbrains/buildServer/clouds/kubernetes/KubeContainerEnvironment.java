@@ -4,7 +4,6 @@ package jetbrains.buildServer.clouds.kubernetes;
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
  */
 public class KubeContainerEnvironment {
-    public static final String AGENT_NAME = "TEAMCITY_KUBERNETES_AGENT_NAME";
     public static final String SERVER_URL = "TEAMCITY_KUBERNETES_SERVER_URL";
     public static final String SERVER_UUID = "TEAMCITY_KUBERNETES_SERVER_UUID";
     public static final String IMAGE_ID = "TEAMCITY_KUBERNETES_IMAGE_NAME";

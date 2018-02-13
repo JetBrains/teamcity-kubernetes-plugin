@@ -31,9 +31,6 @@ public class KubeAgentConfigurationProvider {
 
     private void appendKubeSpecificConfiguration() {
         Map<String, String> env = System.getenv();
-
-        String providedAgentName = env.get(KubeContainerEnvironment.AGENT_NAME);
-        if(!StringUtil.isEmpty(providedAgentName)) myAgentConfigurationEx.setName(providedAgentName);
         String providedServerUrl = env.get(KubeContainerEnvironment.SERVER_URL);
         if(!StringUtil.isEmpty(providedServerUrl)) myAgentConfigurationEx.setServerUrl(providedServerUrl);
     }
