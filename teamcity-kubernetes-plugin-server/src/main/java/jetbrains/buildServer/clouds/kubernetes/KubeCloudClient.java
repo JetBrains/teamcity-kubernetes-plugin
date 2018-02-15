@@ -157,9 +157,9 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public String generateAgentName(@NotNull AgentDescription agentDescription) {
-        final Map<String, String> configurationParameters = agentDescription.getConfigurationParameters();
-        final String imageId = configurationParameters.get(Constants.ENV_PREFIX + IMAGE_ID);
-        final String instanceName = configurationParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
+        final Map<String, String> agentParameters = agentDescription.getAvailableParameters();
+        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_ID);
+        final String instanceName = agentParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
         if (!StringUtil.isNotEmpty(imageId) || !StringUtil.isNotEmpty(instanceName))
             return null;
 
