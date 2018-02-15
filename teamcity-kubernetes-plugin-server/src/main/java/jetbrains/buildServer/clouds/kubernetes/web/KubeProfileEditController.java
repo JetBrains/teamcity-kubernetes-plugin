@@ -125,8 +125,10 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 KubeApiConnectorImpl apiConnector = KubeApiConnectorImpl.create(connectionSettings, myAuthStrategyProvider.get(authStrategy));
                 KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
                 if(!connectionCheckResult.isSuccess()){
+                    final String checkResultMessage = connectionCheckResult.getMessage();
+                    LOG.debug("Error while checking connection to k8s api. " + checkResultMessage);
                     final ActionErrors errors = new ActionErrors();
-                    errors.addError("connection", connectionCheckResult.getMessage());
+                    errors.addError("connection", checkResultMessage);
                     writeErrors(xmlResponse, errors);
                 }
             } catch (Exception ex){
