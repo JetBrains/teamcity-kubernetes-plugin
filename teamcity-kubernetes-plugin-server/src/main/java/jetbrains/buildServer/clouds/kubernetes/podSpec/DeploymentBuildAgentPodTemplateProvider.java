@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX;
+
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
@@ -92,6 +94,10 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
                     new Pair<>(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId()),
                     new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))){
                 patchedEnvData.put(env.first, env.second);
+            }
+
+            for(Map.Entry<String, String> customAgentParameter : cloudInstanceUserData.getCustomAgentConfigurationParameters().entrySet()){
+                patchedEnvData.put(TEAMCITY_KUBERNETES_PROVIDED_PREFIX + customAgentParameter.getKey(), customAgentParameter.getKey());
             }
 
             if(!patchedEnvData.containsKey(KubeContainerEnvironment.SERVER_URL)){
