@@ -1,6 +1,8 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import jetbrains.buildServer.clouds.CloudImage;
+import jetbrains.buildServer.clouds.CloudInstance;
+import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,4 +37,7 @@ public interface KubeCloudImage extends CloudImage {
 
     @NotNull
     String getAgentName(@NotNull String instanceName);
+
+    @NotNull
+    CloudInstance startNewInstance(@NotNull CloudInstanceUserData instanceUserData, @NotNull KubeCloudClientParametersImpl clientParams);
 }

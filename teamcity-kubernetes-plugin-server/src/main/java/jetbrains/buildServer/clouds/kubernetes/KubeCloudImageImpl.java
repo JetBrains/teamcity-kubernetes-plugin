@@ -4,8 +4,11 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
+import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
@@ -24,15 +27,19 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     private final KubeApiConnector myApiConnector;
     private final KubeCloudImageData myImageData;
     private final KubeDataCache myCache;
+    private final BuildAgentPodTemplateProviders myPodTemplateProviders;
+
     private Map<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
     private CloudErrorInfo myCurrentError;
 
     KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
                        @NotNull final KubeApiConnector apiConnector,
-                       @NotNull final KubeDataCache cache) {
+                       @NotNull final KubeDataCache cache,
+                       @NotNull final BuildAgentPodTemplateProviders podTemplateProviders) {
         myImageData = kubeCloudImageData;
         myApiConnector = apiConnector;
         myCache = cache;
+        myPodTemplateProviders = podTemplateProviders;
     }
 
     @NotNull
@@ -62,6 +69,24 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     public String getAgentName(@NotNull String instanceName) {
         final String agentNamePrefix = myImageData.getAgentNamePrefix();
         return StringUtil.isEmpty(agentNamePrefix) ? instanceName : agentNamePrefix + instanceName;
+    }
+
+    @NotNull
+    @Override
+    public CloudInstance startNewInstance(@NotNull CloudInstanceUserData instanceUserData, @NotNull KubeCloudClientParametersImpl clientParams) {
+        final KubeCloudInstance newInstance;
+        BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(getPodSpecMode());
+        try {
+            final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceUserData, this, clientParams);
+            final Pod newPod = myApiConnector.createPod(podTemplate);
+            myCurrentError = null;
+            newInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, newPod, myApiConnector), myCache);
+        } catch (KubeCloudException | KubernetesClientException ex){
+            myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
+            throw ex;
+        }
+        populateInstances();
+        return newInstance;
     }
 
     @Nullable

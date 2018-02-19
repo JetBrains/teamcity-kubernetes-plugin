@@ -2,13 +2,8 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
-import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -29,33 +24,22 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.I
 public class KubeCloudClient implements CloudClientEx {
     private final static Logger LOG = Logger.getInstance(KubeCloudClient.class.getName());
 
-    private final KubeApiConnector myApiConnector;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParametersImpl myKubeClientParams;
-    private final BuildAgentPodTemplateProviders myPodTemplateProviders;
-    private final KubeDataCache myCache;
     private final KubeBackgroundUpdater myUpdater;
 
     @Nullable private final String myServerUuid;
     private final String myCloudProfileId;
 
-    private CloudErrorInfo myCurrentError = null;
-
     public KubeCloudClient(@Nullable String serverUuid,
                            @NotNull String cloudProfileId,
-                           @NotNull KubeApiConnector apiConnector,
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParametersImpl kubeClientParams,
-                           @NotNull BuildAgentPodTemplateProviders podTemplateProviders,
-                           @NotNull KubeDataCache cache,
                            @NotNull KubeBackgroundUpdater updater) {
         myServerUuid = serverUuid;
         myCloudProfileId = cloudProfileId;
-        myApiConnector = apiConnector;
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getId));
         myKubeClientParams = kubeClientParams;
-        myPodTemplateProviders = podTemplateProviders;
-        myCache = cache;
         myUpdater = updater;
         myUpdater.registerClient(this);
     }
@@ -74,19 +58,7 @@ public class KubeCloudClient implements CloudClientEx {
     @NotNull
     @Override
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
-        final KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
-        BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
-        try {
-            final Pod podTemplate = podTemplateProvider.getPodTemplate(cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
-            final Pod newPod = myApiConnector.createPod(podTemplate);
-            myCurrentError = null;
-            final KubeCloudInstance newInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(kubeCloudImage, newPod, myApiConnector), myCache);
-            kubeCloudImage.populateInstances();
-            return newInstance;
-        } catch (KubeCloudException | KubernetesClientException ex){
-            myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
-            throw ex;
-        }
+        return ((KubeCloudImage) cloudImage).startNewInstance(cloudInstanceUserData, myKubeClientParams);
     }
 
     @Override
@@ -135,7 +107,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public CloudErrorInfo getErrorInfo() {
-        return myCurrentError;
+        return null;
     }
 
     @Override

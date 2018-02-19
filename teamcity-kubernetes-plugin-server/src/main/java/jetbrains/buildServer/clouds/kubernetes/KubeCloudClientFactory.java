@@ -97,18 +97,15 @@ public class KubeCloudClientFactory implements CloudClientFactory {
             final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
             final KubeApiConnector apiConnector = KubeApiConnectorImpl.create(kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
-                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myCache);
+                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myCache, myPodTemplateProviders);
                 kubeCloudImage.populateInstances();
                 return kubeCloudImage;
             });
             return new KubeCloudClient(
                     myServerSettings.getServerUUID(),
                     cloudState.getProfileId(),
-                    apiConnector,
                     images,
                     kubeClientParams,
-                    myPodTemplateProviders,
-                    myCache,
                     myUpdater);
         } catch (Throwable ex){
             if(ex instanceof KubernetesClientException){
