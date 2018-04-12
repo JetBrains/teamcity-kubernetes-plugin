@@ -96,10 +96,6 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
                 patchedEnvData.put(env.first, env.second);
             }
 
-            for(Map.Entry<String, String> customAgentParameter : cloudInstanceUserData.getCustomAgentConfigurationParameters().entrySet()){
-                patchedEnvData.put(TEAMCITY_KUBERNETES_PROVIDED_PREFIX + customAgentParameter.getKey(), customAgentParameter.getKey());
-            }
-
             if(!patchedEnvData.containsKey(KubeContainerEnvironment.SERVER_URL)){
                 patchedEnvData.put(KubeContainerEnvironment.SERVER_URL, serverAddress);
             }

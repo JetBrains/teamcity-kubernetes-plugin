@@ -74,10 +74,6 @@ public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAge
                          new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
                          new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
 
-        for(Map.Entry<String, String> customAgentParameter : cloudInstanceUserData.getCustomAgentConfigurationParameters().entrySet()){
-            containerBuilder.addToEnv(new EnvVar(TEAMCITY_KUBERNETES_PROVIDED_PREFIX + customAgentParameter.getKey(), customAgentParameter.getKey(), null));
-        }
-
         String dockerCommand = kubeCloudImage.getDockerCommand();
         if(!StringUtil.isEmpty(dockerCommand)) containerBuilder = containerBuilder.withCommand(dockerCommand);
         String dockerArguments = kubeCloudImage.getDockerArguments();
