@@ -121,7 +121,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     return props.containsKey(parameterName) ? props.get(parameterName) : props.get(SECURE_PROPERTY_PREFIX + parameterName);
                 }
 
-                @NotNull
+                @Nullable
                 @Override
                 public String getCACertData() {
                     return props.get(SECURE_PROPERTY_PREFIX + CA_CERT_DATA);

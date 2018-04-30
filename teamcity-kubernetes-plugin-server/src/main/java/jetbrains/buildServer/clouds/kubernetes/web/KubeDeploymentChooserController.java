@@ -69,7 +69,7 @@ public class KubeDeploymentChooserController extends BaseController {
                 return props.get(parameterName);
             }
 
-            @NotNull
+            @Nullable
             @Override
             public String getCACertData() {
                 return props.get(CA_CERT_DATA);

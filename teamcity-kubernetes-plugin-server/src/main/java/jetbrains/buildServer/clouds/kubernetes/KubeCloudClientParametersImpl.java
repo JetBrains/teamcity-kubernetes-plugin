@@ -44,7 +44,7 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
         return myParameters.getParameter(parameterName);
     }
 
-    @NotNull
+    @Nullable
     @Override
     public String getCACertData() {
         return myParameters.getParameter(CA_CERT_DATA);
