@@ -68,6 +68,12 @@ public class KubeNamespaceChooserController extends BaseController {
             public String getCustomParameter(@NotNull String parameterName) {
                 return props.get(parameterName);
             }
+
+            @NotNull
+            @Override
+            public String getCACertData() {
+                return props.get(CA_CERT_DATA);
+            }
         };
         String authStrategy = props.get(AUTH_STRATEGY);
 

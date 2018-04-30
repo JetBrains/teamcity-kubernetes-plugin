@@ -38,6 +38,12 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                 .withNamespace(connectionSettings.getNamespace())
                 .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
                 .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
+        final String caCertData = connectionSettings.getCACertData();
+        if(StringUtil.isEmptyOrSpaces(caCertData)){
+            configBuilder = configBuilder.withTrustCerts(true);
+        } else {
+            configBuilder = configBuilder.withCaCertData(caCertData);
+        }
         configBuilder = authStrategy.apply(configBuilder, connectionSettings);
         return new KubeApiConnectorImpl(connectionSettings, configBuilder.build());
     }

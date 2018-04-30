@@ -11,6 +11,7 @@ public class KubeParametersConstants {
     public static final String API_SERVER_URL = "api-server-url";
     public static final String AUTH_STRATEGY = "authStrategy";
     public static final String KUBERNETES_NAMESPACE = "kubernetes-namespace";
+    public static final String CA_CERT_DATA = "ca-cert-data";
     public static final String PROFILE_INSTANCE_LIMIT = "profileInstanceLimit";
     public static final String IMAGE_INSTANCE_LIMIT = "imageInstanceLimit";
     public static final String POD_TEMPLATE_MODE = "podTemplateMode";
@@ -27,6 +28,10 @@ public class KubeParametersConstants {
 
     public String getApiServerUrl() {
         return API_SERVER_URL;
+    }
+
+    public String getCaCertData() {
+        return CA_CERT_DATA;
     }
 
     public String getKubernetesNamespace() {

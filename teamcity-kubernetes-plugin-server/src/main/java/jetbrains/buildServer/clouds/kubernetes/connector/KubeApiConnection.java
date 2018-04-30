@@ -15,4 +15,7 @@ public interface KubeApiConnection {
 
     @Nullable
     String getCustomParameter(@NotNull String parameterName);
+
+    @NotNull
+    String getCACertData();
 }

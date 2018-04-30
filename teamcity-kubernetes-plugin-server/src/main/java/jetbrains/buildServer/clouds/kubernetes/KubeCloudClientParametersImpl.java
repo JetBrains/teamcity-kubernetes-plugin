@@ -46,6 +46,12 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
 
     @NotNull
     @Override
+    public String getCACertData() {
+        return myParameters.getParameter(CA_CERT_DATA);
+    }
+
+    @NotNull
+    @Override
     public Collection<KubeCloudImageData> getImages(){
         return CollectionsUtil.convertCollection(myParameters.getCloudImages(), KubeCloudImageData::new);
     }

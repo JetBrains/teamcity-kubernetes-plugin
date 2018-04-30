@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.CA_CERT_DATA;
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.DEFAULT_NAMESPACE;
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.KUBERNETES_NAMESPACE;
 
@@ -118,6 +119,12 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 @Override
                 public String getCustomParameter(@NotNull String parameterName) {
                     return props.containsKey(parameterName) ? props.get(parameterName) : props.get(SECURE_PROPERTY_PREFIX + parameterName);
+                }
+
+                @NotNull
+                @Override
+                public String getCACertData() {
+                    return props.get(SECURE_PROPERTY_PREFIX + CA_CERT_DATA);
                 }
             };
             final String authStrategy = props.get(KubeParametersConstants.AUTH_STRATEGY);
