@@ -92,12 +92,11 @@
         </td>
     </tr>
     <tr class="hidden client-cert auth-ui">
-        <th><label for="${cons.clientCertData}">Client certificate: <l:star/></label></th>
+        <th><label for="${cons.clientCertData}">Client certificate:</label></th>
         <td><props:multilineProperty name="secure:${cons.clientCertData}"
                                      className="longField"
                                      linkTitle="Enter X509 Client Sertificate Content"
-                                     cols="35" rows="3"
-                                     expanded="true"/>
+                                     cols="35" rows="3"/>
             <span id="error_${cons.clientCertData}" class="error"></span>
         </td>
     </tr>
