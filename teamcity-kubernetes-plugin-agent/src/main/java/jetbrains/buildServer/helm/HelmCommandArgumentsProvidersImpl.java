@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 29.11.17.
  */
-class HelmCommandArgumentsProvidersImpl implements HelmCommandArgumentsProviders {
+public class HelmCommandArgumentsProvidersImpl implements HelmCommandArgumentsProviders {
     private final Map<String, HelmCommandArgumentsProvider> myCommandIdToProviderMap = new HashMap<String, HelmCommandArgumentsProvider>();
 
     public HelmCommandArgumentsProvidersImpl() {
