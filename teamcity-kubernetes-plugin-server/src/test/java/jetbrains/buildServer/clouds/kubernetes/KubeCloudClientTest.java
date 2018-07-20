@@ -173,6 +173,12 @@ public class KubeCloudClientTest extends BaseTestCase {
 
         @NotNull
         @Override
+        public String getProfileId() {
+            return null;
+        }
+
+        @NotNull
+        @Override
         public String getProfileDescription() {
             return null;
         }
