@@ -228,6 +228,13 @@
                 </div>
             </td>
         </tr>
+        <tr class="hidden custom-pod-template pod-spec-ui">
+            <th>Pod Template Content:&nbsp;<l:star/></th>
+            <td>
+                <textarea id="${cons.customPodTemplate}" wrap="off" class="podTemplateContent"></textarea>
+                <span class="error option-error option-error_${cons.customPodTemplate}"></span>
+            </td>
+        </tr>
         <tr class="hidden deployment-base pod-spec-ui">
             <th>Deployment name:&nbsp;<l:star/></th>
             <td>

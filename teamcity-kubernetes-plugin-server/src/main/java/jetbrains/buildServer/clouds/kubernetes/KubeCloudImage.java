@@ -29,6 +29,9 @@ public interface KubeCloudImage extends CloudImage {
     String getPodSpecMode();
 
     @Nullable
+    String getCustomPodTemplateSpec();
+
+    @Nullable
     String getSourceDeploymentName();
 
     int getRunningInstanceCount();

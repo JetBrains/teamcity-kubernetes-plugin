@@ -50,6 +50,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     @Nullable
     @Override
+    public String getCustomPodTemplateSpec() {
+        return myImageData.getCustomPodTemplateContent();
+    }
+
+    @Nullable
+    @Override
     public String getSourceDeploymentName() {
         return myImageData.getDeploymentName();
     }
