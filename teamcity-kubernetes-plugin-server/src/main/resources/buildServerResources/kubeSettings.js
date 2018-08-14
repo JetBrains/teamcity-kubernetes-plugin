@@ -13,7 +13,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 <td class="remove"><a href="#" class="removeVmImageLink">Delete...</a></td>\
         </tr>')},
 
-    _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
+    _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
 
     selectors: {
         rmImageLink: '.removeVmImageLink',
@@ -53,6 +53,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$dockerCommand = $j('#dockerCmd');
         this.$dockerArgs = $j('#dockerArgs');
         this.$deploymentName = $j('#sourceDeployment');
+        this.$customPodTemplate = $j('#customPodTemplate');
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$imageInstanceLimit = $j('#imageInstanceLimit');
         this.$agentPoolSelector = $j('#agent_pool_id');
@@ -192,6 +193,16 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 this._image['agent_pool_id'] = this.$agentPoolSelector.val();
             } else {
                 this.$agentPoolSelector.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$customPodTemplate.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['customPodTemplate'] = this.$customPodTemplate.val();
+                this._updateImageDescription(this._image);
+            } else {
+                this.$customPodTemplate.val(value);
             }
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
@@ -359,6 +370,14 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                     this.addOptionError('notSelected', 'agent_pool_id');
                     isValid = false;
                 }
+            }.bind(this),
+
+            customPodTemplate : function () {
+                var valueToValidate = this._image['customPodTemplate'];
+                if (this._image['podTemplateMode'] === 'custom-pod-template' && (!valueToValidate || valueToValidate === '')) {
+                    this.addOptionError('required', 'customPodTemplate');
+                    isValid = false;
+                }
             }.bind(this)
         };
 
@@ -470,6 +489,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$imageInstanceLimit.trigger('change', image['imageInstanceLimit'] || '');
         this.$agentPoolSelector.trigger('change', image['agent_pool_id'] || '');
+        this.$customPodTemplate.trigger('change', image['customPodTemplate'] || '');
 
         BS.Kube.ImageDialog.showCentered();
     },
@@ -550,6 +570,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$agentNamePrefix.trigger('change', '');
         this.$imageInstanceLimit.trigger('change', '');
         this.$agentPoolSelector.trigger('change', '');
+        this.$customPodTemplate.trigger('change', '');
     }
 });
 
