@@ -85,6 +85,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     @NotNull
     @Override
+    public String getAgentNamePrefix() {
+        return myImageData.getAgentNamePrefix();
+    }
+
+    @NotNull
+    @Override
     public CloudInstance startNewInstance(@NotNull CloudInstanceUserData instanceUserData, @NotNull KubeCloudClientParametersImpl clientParams) {
         final KubeCloudInstance newInstance;
         BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(getPodSpecMode());
