@@ -18,10 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
-
-import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
@@ -71,6 +68,7 @@ public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAge
                          new EnvVar(KubeContainerEnvironment.SERVER_UUID, serverUUID, null),
                          new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
                          new EnvVar(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId(), null),
+                         new EnvVar(KubeContainerEnvironment.AGENT_NAME_PREFIX, kubeCloudImage.getAgentNamePrefix(), null),
                          new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
                          new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
 

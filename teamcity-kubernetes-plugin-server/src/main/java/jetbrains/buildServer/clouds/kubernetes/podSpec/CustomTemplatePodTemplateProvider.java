@@ -84,6 +84,7 @@ public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateP
                     new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
                     new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudProfileId),
                     new Pair<>(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId()),
+                    Pair.create(KubeContainerEnvironment.AGENT_NAME_PREFIX, kubeCloudImage.getAgentNamePrefix()),
                     new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))){
                 patchedEnvData.put(env.first, env.second);
             }

@@ -157,7 +157,6 @@
             <th><label for="${cons.agentNamePrefix}">Agent name prefix:</label></th>
             <td><input type="text" id="${cons.agentNamePrefix}" class="longField configParam"/>
                 <span id="error_${cons.agentNamePrefix}" class="error option-error option-error_${cons.agentNamePrefix}"></span>
-                <span class="smallNote">If no or incorrect prefix provided, default value <strong>KUBE</strong> will be used</span>
             </td>
         </tr>
         <tr>
