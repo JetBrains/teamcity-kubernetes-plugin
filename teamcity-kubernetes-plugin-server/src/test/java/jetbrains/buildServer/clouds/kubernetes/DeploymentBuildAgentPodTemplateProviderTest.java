@@ -5,7 +5,10 @@ import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.DeploymentBuilder;
 import io.fabric8.kubernetes.api.model.extensions.DeploymentSpecBuilder;
 import java.io.File;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import jetbrains.buildServer.BaseTestCase;
+import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.auth.UnauthorizedAccessStrategy;
@@ -43,12 +46,15 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         ServerSettings serverSettings = m.mock(ServerSettings.class);
         KubeAuthStrategyProvider authStrategies = m.mock(KubeAuthStrategyProvider.class);
         myDeploymentContentProvider = m.mock(DeploymentContentProvider.class);
+        final ExecutorServices executorServices = m.mock(ExecutorServices.class);
         m.checking(new Expectations(){{
             allowing(serverSettings).getServerUUID(); will(returnValue("server uuid"));
             allowing(authStrategies).get(with(UnauthorizedAccessStrategy.ID)); will(returnValue(myAuthStrategy));
+            ScheduledExecutorService ses = new ScheduledThreadPoolExecutor(1);
+            allowing(executorServices).getNormalExecutorService(); will(returnValue(ses));
         }});
-        final ServerPaths serverPaths = m.mock(ServerPaths.class);
-        final ExecutorServices executorServices = m.mock(ExecutorServices.class);
+        TempFiles tempFiles = new TempFiles();
+        final ServerPaths serverPaths = new ServerPaths(tempFiles.createTempDir());
         final EventDispatcher<BuildServerListener> eventDispatcher = EventDispatcher.create(BuildServerListener.class);
         myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(
           serverSettings, myDeploymentContentProvider, new KubePodNameGenerator(serverPaths, executorServices, eventDispatcher));
