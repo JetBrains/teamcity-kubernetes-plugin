@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.utils.Serialization;
+import java.io.File;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.serverSide.ServerSettings;
@@ -19,9 +20,11 @@ import java.util.*;
  */
 public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateProvider {
     private final ServerSettings myServerSettings;
+    private KubePodNameGenerator myPodNameGenerator;
 
-    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings) {
+    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
         myServerSettings = serverSettings;
+        myPodNameGenerator = podNameGenerator;
     }
 
     @NotNull
@@ -84,7 +87,6 @@ public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateP
                     new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
                     new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudProfileId),
                     new Pair<>(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId()),
-                    Pair.create(KubeContainerEnvironment.AGENT_NAME_PREFIX, kubeCloudImage.getAgentNamePrefix()),
                     new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))){
                 patchedEnvData.put(env.first, env.second);
             }

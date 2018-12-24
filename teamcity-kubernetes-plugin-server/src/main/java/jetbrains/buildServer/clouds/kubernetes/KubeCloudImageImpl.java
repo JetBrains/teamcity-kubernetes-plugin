@@ -1,7 +1,10 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.Collections;
+import javax.validation.constraints.Null;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
@@ -77,7 +80,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return StringUtil.isEmpty(agentNamePrefix) ? instanceName : agentNamePrefix + instanceName;
     }
 
-    @NotNull
+    @Nullable
     @Override
     public String getAgentNamePrefix() {
         return myImageData.getAgentNamePrefix();

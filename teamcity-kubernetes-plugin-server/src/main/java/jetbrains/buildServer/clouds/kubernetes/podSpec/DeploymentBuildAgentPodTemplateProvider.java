@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import java.io.File;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.serverSide.ServerSettings;
@@ -21,12 +22,15 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
 
     private final ServerSettings myServerSettings;
     private final DeploymentContentProvider myDeploymentContentProvider;
+    private KubePodNameGenerator myPodNameGenerator;
 
-    public DeploymentBuildAgentPodTemplateProvider(ServerSettings serverSettings,
-                                                   DeploymentContentProvider deploymentContentProvider) {
-        myServerSettings = serverSettings;
-        myDeploymentContentProvider = deploymentContentProvider;
-    }
+  public DeploymentBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings,
+                                                 @NotNull DeploymentContentProvider deploymentContentProvider,
+                                                 @NotNull final KubePodNameGenerator podNameGenerator) {
+    myServerSettings = serverSettings;
+    myDeploymentContentProvider = deploymentContentProvider;
+    myPodNameGenerator = podNameGenerator;
+  }
 
     @NotNull
     @Override
@@ -46,7 +50,7 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
         return null;
     }
 
-    @NotNull
+  @NotNull
     @Override
     public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters kubeClientParams) {
         String sourceDeploymentName = kubeCloudImage.getSourceDeploymentName();
@@ -90,7 +94,6 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
                     new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
                     new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudProfileId),
                     new Pair<>(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId()),
-                    Pair.create(KubeContainerEnvironment.AGENT_NAME_PREFIX, kubeCloudImage.getAgentNamePrefix()),
                     new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))){
                 patchedEnvData.put(env.first, env.second);
             }

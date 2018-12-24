@@ -40,8 +40,7 @@ public class KubeAgentConfigurationProvider {
                 if(!StringUtil.isEmpty(providedServerUrl)) agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.REQUIRED_PROFILE_ID_CONFIG_PARAM, profileId);
 
                 final String instanceName = env.get(KubeContainerEnvironment.INSTANCE_NAME);
-                final String agentNamePrefix = env.get(KubeContainerEnvironment.AGENT_NAME_PREFIX);
-                updateAgentNameIfNeeded(agentConfigurationEx, instanceName, agentNamePrefix);
+                updateAgentNameIfNeeded(agentConfigurationEx, instanceName);
 
                 for (Map.Entry<String, String> entry : env.entrySet()){
                     final String key = entry.getKey();
@@ -57,16 +56,14 @@ public class KubeAgentConfigurationProvider {
 
 
     public void updateAgentNameIfNeeded(@NotNull BuildAgentConfigurationEx conf,
-                                        @Nullable String containerName,
-                                        @Nullable String agentNamePrefix){
+                                        @Nullable String containerName){
         final File file = new File(conf.getAgentConfDirectory(), "k8s-"+containerName);
         if (file.exists()) {
             LOG.info(String.format("Marker file '%s' exists. Agent name will not be updated", file.getName()));
             return;
         }
         LOG.info(String.format("Marker file '%s' doesn't exist. Agent name will be updated", file.getName()));
-        final String actualPrefix = StringUtil.isEmpty(agentNamePrefix) ? "" : agentNamePrefix + "-";
-        conf.setName(String.format("%s%s", actualPrefix, containerName));
+        conf.setName(containerName);
         try {
             file.createNewFile();
         } catch (IOException e) {

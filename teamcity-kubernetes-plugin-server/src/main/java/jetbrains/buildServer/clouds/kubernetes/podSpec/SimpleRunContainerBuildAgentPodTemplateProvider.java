@@ -4,21 +4,20 @@ import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
+import java.io.File;
+import java.util.*;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudClientParameters;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage;
-import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment;
-import jetbrains.buildServer.clouds.kubernetes.KubeTeamCityLabels;
+import jetbrains.buildServer.clouds.kubernetes.*;
+import jetbrains.buildServer.clouds.kubernetes.auth.UnauthorizedAccessStrategy;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
+import jetbrains.buildServer.clouds.server.impl.profile.CloudClientParametersImpl;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.UUID;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
@@ -26,9 +25,11 @@ import java.util.UUID;
 public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAgentPodTemplateProvider {
     public static final String ID = "simple";
     private final ServerSettings myServerSettings;
+    private final KubePodNameGenerator myPodNameGenerator;
 
-    public SimpleRunContainerBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings) {
+    public SimpleRunContainerBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
         myServerSettings = serverSettings;
+        myPodNameGenerator = podNameGenerator;
     }
 
     @NotNull
@@ -52,8 +53,7 @@ public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAge
     @NotNull
     @Override
     public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters clientParameters) {
-        String agentNameProvided = cloudInstanceUserData.getAgentName();
-        final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
+        final String agentName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
 
         ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
         String serverAddress = cloudInstanceUserData.getServerAddress();
@@ -68,7 +68,6 @@ public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAge
                          new EnvVar(KubeContainerEnvironment.SERVER_UUID, serverUUID, null),
                          new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
                          new EnvVar(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId(), null),
-                         new EnvVar(KubeContainerEnvironment.AGENT_NAME_PREFIX, kubeCloudImage.getAgentNamePrefix(), null),
                          new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
                          new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
 

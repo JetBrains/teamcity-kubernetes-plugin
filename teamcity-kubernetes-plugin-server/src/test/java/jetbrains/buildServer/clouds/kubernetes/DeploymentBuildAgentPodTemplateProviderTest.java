@@ -4,6 +4,7 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.DeploymentBuilder;
 import io.fabric8.kubernetes.api.model.extensions.DeploymentSpecBuilder;
+import java.io.File;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
@@ -11,8 +12,12 @@ import jetbrains.buildServer.clouds.kubernetes.auth.UnauthorizedAccessStrategy;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentContentProvider;
+import jetbrains.buildServer.serverSide.BuildServerListener;
+import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.ServerSettings;
+import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.EventDispatcher;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.testng.annotations.AfterMethod;
@@ -42,7 +47,11 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(serverSettings).getServerUUID(); will(returnValue("server uuid"));
             allowing(authStrategies).get(with(UnauthorizedAccessStrategy.ID)); will(returnValue(myAuthStrategy));
         }});
-        myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(serverSettings, myDeploymentContentProvider);
+        final ServerPaths serverPaths = m.mock(ServerPaths.class);
+        final ExecutorServices executorServices = m.mock(ExecutorServices.class);
+        final EventDispatcher<BuildServerListener> eventDispatcher = EventDispatcher.create(BuildServerListener.class);
+        myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(
+          serverSettings, myDeploymentContentProvider, new KubePodNameGenerator(serverPaths, executorServices, eventDispatcher));
     }
 
     @AfterMethod
