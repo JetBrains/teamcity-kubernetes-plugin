@@ -18,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAgentPodTemplateProvider {
+public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider {
     public static final String ID = "simple";
     private final ServerSettings myServerSettings;
     private final KubePodNameGenerator myPodNameGenerator;
 
-    public SimpleRunContainerBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
+    public SimpleRunContainerProvider(@NotNull ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
         myServerSettings = serverSettings;
         myPodNameGenerator = podNameGenerator;
     }

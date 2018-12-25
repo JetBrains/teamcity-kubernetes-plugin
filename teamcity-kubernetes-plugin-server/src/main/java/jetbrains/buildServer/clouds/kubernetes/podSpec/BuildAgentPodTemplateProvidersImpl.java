@@ -1,9 +1,7 @@
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
-import java.io.File;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.KubePodNameGenerator;
-import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +19,7 @@ public class BuildAgentPodTemplateProvidersImpl implements BuildAgentPodTemplate
     public BuildAgentPodTemplateProvidersImpl(@NotNull ServerSettings serverSettings,
                                               @NotNull DeploymentContentProvider deploymentContentProvider,
                                               @NotNull KubePodNameGenerator podNameGenerator) {
-        registerProvider(new SimpleRunContainerBuildAgentPodTemplateProvider(serverSettings, podNameGenerator));
+        registerProvider(new SimpleRunContainerProvider(serverSettings, podNameGenerator));
         registerProvider(new DeploymentBuildAgentPodTemplateProvider(serverSettings, deploymentContentProvider, podNameGenerator));
         registerProvider(new CustomTemplatePodTemplateProvider(serverSettings, podNameGenerator));
     }

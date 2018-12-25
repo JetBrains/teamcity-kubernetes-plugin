@@ -1,10 +1,7 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
-import java.util.Collections;
-import javax.validation.constraints.Null;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
@@ -13,7 +10,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerBuildAgentPodTemplateProvider;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -138,7 +135,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @Override
     public String getName() {
         switch (getPodSpecMode()){
-            case SimpleRunContainerBuildAgentPodTemplateProvider.ID:
+            case SimpleRunContainerProvider.ID:
                 return "Docker Image: " + getDockerImage();
             case DeploymentBuildAgentPodTemplateProvider.ID:
                 return "Deployment: " + getSourceDeploymentName();
