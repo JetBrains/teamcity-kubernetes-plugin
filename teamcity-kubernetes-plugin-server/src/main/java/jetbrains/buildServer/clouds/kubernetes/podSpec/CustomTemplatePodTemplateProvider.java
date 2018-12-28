@@ -54,8 +54,8 @@ public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateP
 
         PodTemplateSpec podTemplateSpec = Serialization.unmarshal(new ByteArrayInputStream(customPodTemplateSpecContent.getBytes()), PodTemplateSpec.class);
 
-        final String agentNameProvided = cloudInstanceUserData.getAgentName();
-        final String instanceName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
+        final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
+
         final String serverAddress = cloudInstanceUserData.getServerAddress();
 
         ObjectMeta metadata = podTemplateSpec.getMetadata();
