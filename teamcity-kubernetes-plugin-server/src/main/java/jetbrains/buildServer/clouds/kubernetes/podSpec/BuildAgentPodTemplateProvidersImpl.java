@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
+import jetbrains.buildServer.clouds.kubernetes.KubePodNameGenerator;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,10 +17,11 @@ public class BuildAgentPodTemplateProvidersImpl implements BuildAgentPodTemplate
     private final Map<String, BuildAgentPodTemplateProvider> myIdToProviderMap = new HashMap<>();
 
     public BuildAgentPodTemplateProvidersImpl(@NotNull ServerSettings serverSettings,
-                                              @NotNull DeploymentContentProvider deploymentContentProvider) {
-        registerProvider(new SimpleRunContainerBuildAgentPodTemplateProvider(serverSettings));
-        registerProvider(new DeploymentBuildAgentPodTemplateProvider(serverSettings, deploymentContentProvider));
-        registerProvider(new CustomTemplatePodTemplateProvider(serverSettings));
+                                              @NotNull DeploymentContentProvider deploymentContentProvider,
+                                              @NotNull KubePodNameGenerator podNameGenerator) {
+        registerProvider(new SimpleRunContainerProvider(serverSettings, podNameGenerator));
+        registerProvider(new DeploymentBuildAgentPodTemplateProvider(serverSettings, deploymentContentProvider, podNameGenerator));
+        registerProvider(new CustomTemplatePodTemplateProvider(serverSettings, podNameGenerator));
     }
 
     @NotNull

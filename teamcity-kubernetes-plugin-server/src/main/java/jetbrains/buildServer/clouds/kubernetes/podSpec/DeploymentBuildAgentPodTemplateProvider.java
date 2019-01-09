@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import java.io.File;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.serverSide.ServerSettings;
@@ -13,8 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX;
-
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
@@ -23,12 +22,15 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
 
     private final ServerSettings myServerSettings;
     private final DeploymentContentProvider myDeploymentContentProvider;
+    private KubePodNameGenerator myPodNameGenerator;
 
-    public DeploymentBuildAgentPodTemplateProvider(ServerSettings serverSettings,
-                                                   DeploymentContentProvider deploymentContentProvider) {
-        myServerSettings = serverSettings;
-        myDeploymentContentProvider = deploymentContentProvider;
-    }
+  public DeploymentBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings,
+                                                 @NotNull DeploymentContentProvider deploymentContentProvider,
+                                                 @NotNull final KubePodNameGenerator podNameGenerator) {
+    myServerSettings = serverSettings;
+    myDeploymentContentProvider = deploymentContentProvider;
+    myPodNameGenerator = podNameGenerator;
+  }
 
     @NotNull
     @Override
@@ -48,7 +50,7 @@ public class DeploymentBuildAgentPodTemplateProvider implements BuildAgentPodTem
         return null;
     }
 
-    @NotNull
+  @NotNull
     @Override
     public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters kubeClientParams) {
         String sourceDeploymentName = kubeCloudImage.getSourceDeploymentName();

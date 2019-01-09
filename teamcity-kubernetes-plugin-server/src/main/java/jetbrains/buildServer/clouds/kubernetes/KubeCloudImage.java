@@ -42,5 +42,8 @@ public interface KubeCloudImage extends CloudImage {
     String getAgentName(@NotNull String instanceName);
 
     @NotNull
+    String getAgentNamePrefix();
+
+    @NotNull
     CloudInstance startNewInstance(@NotNull CloudInstanceUserData instanceUserData, @NotNull KubeCloudClientParametersImpl clientParams);
 }

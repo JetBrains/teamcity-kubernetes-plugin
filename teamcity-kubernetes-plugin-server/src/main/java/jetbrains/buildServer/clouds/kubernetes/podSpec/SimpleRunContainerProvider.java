@@ -4,11 +4,9 @@ import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
+import java.util.Collections;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudClientParameters;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage;
-import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment;
-import jetbrains.buildServer.clouds.kubernetes.KubeTeamCityLabels;
+import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.serverSide.ServerSettings;
@@ -17,21 +15,17 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
-
-import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX;
-
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAgentPodTemplateProvider {
+public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider {
     public static final String ID = "simple";
     private final ServerSettings myServerSettings;
+    private final KubePodNameGenerator myPodNameGenerator;
 
-    public SimpleRunContainerBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings) {
+    public SimpleRunContainerProvider(@NotNull ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
         myServerSettings = serverSettings;
+        myPodNameGenerator = podNameGenerator;
     }
 
     @NotNull
@@ -55,8 +49,7 @@ public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAge
     @NotNull
     @Override
     public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters clientParameters) {
-        String agentNameProvided = cloudInstanceUserData.getAgentName();
-        final String agentName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
+        final String agentName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
 
         ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
         String serverAddress = cloudInstanceUserData.getServerAddress();
@@ -68,11 +61,11 @@ public class SimpleRunContainerBuildAgentPodTemplateProvider implements BuildAge
                 .withImage(kubeCloudImage.getDockerImage())
                 .withImagePullPolicy(imagePullPolicy == null ? ImagePullPolicy.IfNotPresent.getName() : imagePullPolicy.getName())
                 .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
-                         new EnvVar(KubeContainerEnvironment.SERVER_UUID, serverUUID, null),
-                         new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
-                         new EnvVar(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId(), null),
-                         new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
-                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
+                        new EnvVar(KubeContainerEnvironment.SERVER_UUID, serverUUID, null),
+                        new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
+                        new EnvVar(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId(), null),
+                        new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
+                        new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
 
         String dockerCommand = kubeCloudImage.getDockerCommand();
         if(!StringUtil.isEmpty(dockerCommand)) containerBuilder = containerBuilder.withCommand(dockerCommand);

@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.utils.Serialization;
+import java.io.File;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.serverSide.ServerSettings;
@@ -19,9 +20,11 @@ import java.util.*;
  */
 public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateProvider {
     private final ServerSettings myServerSettings;
+    private KubePodNameGenerator myPodNameGenerator;
 
-    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings) {
+    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
         myServerSettings = serverSettings;
+        myPodNameGenerator = podNameGenerator;
     }
 
     @NotNull
@@ -51,8 +54,8 @@ public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateP
 
         PodTemplateSpec podTemplateSpec = Serialization.unmarshal(new ByteArrayInputStream(customPodTemplateSpecContent.getBytes()), PodTemplateSpec.class);
 
-        final String agentNameProvided = cloudInstanceUserData.getAgentName();
-        final String instanceName = StringUtil.isEmpty(agentNameProvided) ? UUID.randomUUID().toString() : agentNameProvided;
+        final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
+
         final String serverAddress = cloudInstanceUserData.getServerAddress();
 
         ObjectMeta metadata = podTemplateSpec.getMetadata();

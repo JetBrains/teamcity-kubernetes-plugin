@@ -65,4 +65,8 @@ public class KubeCloudImageData {
     public String getAgentNamePrefix() {
         return myRawImageData.getParameter(AGENT_NAME_PREFIX);
     }
+
+    public String getProfileId(){
+        return myRawImageData.getProfileId();
+    }
 }

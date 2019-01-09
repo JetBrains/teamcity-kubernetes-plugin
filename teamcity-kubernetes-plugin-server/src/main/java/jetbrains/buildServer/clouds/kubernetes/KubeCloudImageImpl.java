@@ -10,7 +10,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerBuildAgentPodTemplateProvider;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -77,6 +77,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return StringUtil.isEmpty(agentNamePrefix) ? instanceName : agentNamePrefix + instanceName;
     }
 
+    @Nullable
+    @Override
+    public String getAgentNamePrefix() {
+        return myImageData.getAgentNamePrefix();
+    }
+
     @NotNull
     @Override
     public CloudInstance startNewInstance(@NotNull CloudInstanceUserData instanceUserData, @NotNull KubeCloudClientParametersImpl clientParams) {
@@ -129,7 +135,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @Override
     public String getName() {
         switch (getPodSpecMode()){
-            case SimpleRunContainerBuildAgentPodTemplateProvider.ID:
+            case SimpleRunContainerProvider.ID:
                 return "Docker Image: " + getDockerImage();
             case DeploymentBuildAgentPodTemplateProvider.ID:
                 return "Deployment: " + getSourceDeploymentName();
@@ -166,7 +172,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     //TODO: filter pods more carefully using all setted labels
     public void populateInstances(){
         try{
-            final Collection<Pod> pods = myApiConnector.listPods(CollectionsUtil.asMap(KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId()));
+            final Collection<Pod> pods = myApiConnector.listPods(CollectionsUtil.asMap(
+              KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId(),
+              KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, myImageData.getProfileId()
+                                                                 ));
             myIdToInstanceMap.clear();
             for (Pod pod : pods){
                 KubeCloudInstance cloudInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, pod, myApiConnector), myCache);

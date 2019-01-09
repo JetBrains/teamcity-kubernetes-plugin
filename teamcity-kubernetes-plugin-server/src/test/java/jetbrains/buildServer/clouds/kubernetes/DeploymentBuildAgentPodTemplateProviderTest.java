@@ -4,15 +4,23 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.DeploymentBuilder;
 import io.fabric8.kubernetes.api.model.extensions.DeploymentSpecBuilder;
+import java.io.File;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import jetbrains.buildServer.BaseTestCase;
+import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.auth.UnauthorizedAccessStrategy;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentContentProvider;
+import jetbrains.buildServer.serverSide.BuildServerListener;
+import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.ServerSettings;
+import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.EventDispatcher;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.testng.annotations.AfterMethod;
@@ -24,6 +32,7 @@ import java.util.Collections;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 17.06.17.
  */
+@Test
 public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
     private Mockery m;
     private BuildAgentPodTemplateProvider myPodTemplateProvider;
@@ -38,11 +47,18 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         ServerSettings serverSettings = m.mock(ServerSettings.class);
         KubeAuthStrategyProvider authStrategies = m.mock(KubeAuthStrategyProvider.class);
         myDeploymentContentProvider = m.mock(DeploymentContentProvider.class);
+        final ExecutorServices executorServices = m.mock(ExecutorServices.class);
         m.checking(new Expectations(){{
             allowing(serverSettings).getServerUUID(); will(returnValue("server uuid"));
             allowing(authStrategies).get(with(UnauthorizedAccessStrategy.ID)); will(returnValue(myAuthStrategy));
+            ScheduledExecutorService ses = new ScheduledThreadPoolExecutor(1);
+            allowing(executorServices).getNormalExecutorService(); will(returnValue(ses));
         }});
-        myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(serverSettings, myDeploymentContentProvider);
+        TempFiles tempFiles = new TempFiles();
+        final ServerPaths serverPaths = new ServerPaths(tempFiles.createTempDir());
+        final EventDispatcher<BuildServerListener> eventDispatcher = EventDispatcher.create(BuildServerListener.class);
+        myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(
+          serverSettings, myDeploymentContentProvider, new KubePodNameGenerator(serverPaths, executorServices, eventDispatcher));
     }
 
     @AfterMethod
@@ -52,7 +68,6 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         super.tearDown();
     }
 
-    @Test
     public void testGetPodTemplate_UnknownDeployment() throws Exception {
         CloudInstanceUserData instanceTag = createInstanceTag();
         KubeCloudClientParameters clientParams = m.mock(KubeCloudClientParameters.class);
@@ -64,7 +79,6 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         assertExceptionThrown(() -> myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams), KubeCloudException.class);
     }
 
-    @Test
     public void testGetPodTemplate() throws Exception {
         CloudInstanceUserData instanceTag = createInstanceTag();
         KubeCloudClientParameters clientParams = m.mock(KubeCloudClientParameters.class);
@@ -103,7 +117,6 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         assertNotNull(podTemplate.getSpec());
     }
 
-    @Test
     public void testShouldNotsetContainerName(){
         CloudInstanceUserData instanceTag = createInstanceTag();
         KubeCloudClientParameters clientParams = m.mock(KubeCloudClientParameters.class);
@@ -141,8 +154,6 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         }
     }
 
-
-    @Test
     public void testDoNotLoseSpecAdditionalProperties() throws Exception {
         CloudInstanceUserData instanceTag = createInstanceTag();
         KubeCloudClientParameters clientParams = m.mock(KubeCloudClientParameters.class);
