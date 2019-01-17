@@ -11,13 +11,13 @@
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-agent" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-common" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-server" />
-    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-client:2.3.1" level="project" />
-    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-model:1.0.73" level="project" />
+    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-client:3.1.10" level="project" />
+    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-model:2.0.8" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.5" level="project" />
     <orderEntry type="library" name="Maven: javax.validation:validation-api:1.1.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.12.0" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okhttp3:logging-interceptor:3.7.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.9.1" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.13.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:logging-interceptor:3.9.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.7.7" level="project" />
     <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.15" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.7.7" level="project" />
