@@ -25,11 +25,13 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @NotNull
     private final KubeApiConnection myConnectionSettings;
-    private KubernetesClient myKubernetesClient;
+    private final KubernetesClient myKubernetesClient;
+    private final KubeAuthStrategy myAuthStrategy;
 
-    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull Config config) {
+    private KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull Config config, @NotNull KubeAuthStrategy authStrategy) {
         myConnectionSettings = connectionSettings;
         myKubernetesClient = new DefaultKubernetesClient(config);
+        myAuthStrategy = authStrategy;
     }
 
     @NotNull
@@ -41,12 +43,22 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                 .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
         final String caCertData = connectionSettings.getCACertData();
         if(StringUtil.isEmptyOrSpaces(caCertData)){
-            configBuilder = configBuilder.withTrustCerts(true);
+            configBuilder.withTrustCerts(true);
         } else {
-            configBuilder = configBuilder.withCaCertData(Base64.encodeBase64String(caCertData.getBytes()));
+            configBuilder.withCaCertData(Base64.encodeBase64String(caCertData.getBytes()));
         }
         configBuilder = authStrategy.apply(configBuilder, connectionSettings);
-        return new KubeApiConnectorImpl(connectionSettings, configBuilder.build());
+        if ("user-passwd".equals(connectionSettings.getCustomParameter("authStrategy")) &&
+          StringUtil.isNotEmpty(connectionSettings.getCustomParameter("username"))){
+            configBuilder
+              .withUsername(connectionSettings.getCustomParameter("username"))
+              .withPassword(connectionSettings.getCustomParameter("secure:password"));
+        }
+        if ("token".equals(connectionSettings.getCustomParameter("authStrategy")) &&
+          StringUtil.isNotEmpty(connectionSettings.getCustomParameter("secure:authToken"))){
+            configBuilder.withOauthToken(connectionSettings.getCustomParameter("secure:authToken"));
+        }
+        return new KubeApiConnectorImpl(connectionSettings, configBuilder.build(), authStrategy);
     }
 
     @NotNull
@@ -57,12 +69,18 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
             Namespace currentNamespace = myKubernetesClient.namespaces().withName(currentNamespaceName).get();
             return currentNamespace != null
                     ? KubeApiConnectionCheckResult.ok("Connection successful")
-                    : KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: invalid namespace %s", myConnectionSettings.getApiServerUrl(), StringUtil.isEmptyOrSpaces(currentNamespaceName) ? "Default" : currentNamespaceName));
+                    : KubeApiConnectionCheckResult.error(
+                      String.format("Error connecting to %s: invalid namespace %s", myConnectionSettings.getApiServerUrl(), StringUtil.isEmptyOrSpaces(currentNamespaceName) ? "Default" : currentNamespaceName),
+                    false);
         } catch (KubernetesClientException e) {
-            return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(),
-                    e.getCause() == null ? e.getMessage() : e.getCause().getMessage()));
+            boolean needRefresh = e.getStatus().getCode() == 401 && e.getStatus().getMessage().contains("expired");
+            return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getCause() == null ? e.getMessage() : e.getCause().getMessage()),
+                                                      needRefresh);
         } catch (Exception e) {
-            return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getMessage()));
+            return KubeApiConnectionCheckResult.error(
+              String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getMessage()),
+              false
+            );
         }
     }
 
@@ -113,5 +131,10 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Override
     public Collection<String> listDeployments() {
         return CollectionsUtil.convertCollection(myKubernetesClient.extensions().deployments().list().getItems(), namespace -> namespace.getMetadata().getName());
+    }
+
+    @Override
+    public void invalidate() {
+        myAuthStrategy.invalidate(myConnectionSettings);
     }
 }

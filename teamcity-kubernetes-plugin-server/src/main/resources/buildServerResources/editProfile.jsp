@@ -108,6 +108,32 @@
             <span class="smallNote">Bearer Token.</span>
         </td>
     </tr>
+    <tr class="hidden oidc auth-ui">
+        <th><label for="${cons.oidcIssuerUrl}">IDP Issuer URL: <l:star/></label></th>
+        <td><props:textProperty name="${cons.oidcIssuerUrl}" className="longField"/>
+            <span id="error_${cons.oidcIssuerUrl}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden oidc auth-ui">
+        <th><label for="${cons.oidcClientId}">Client ID: <l:star/></label></th>
+        <td><props:textProperty name="${cons.oidcClientId}" className="longField"/>
+            <span id="error_${cons.oidcClientId}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden oidc auth-ui">
+        <th><label for="secure:${cons.oidcClientSecret}">Client Secret: <l:star/></label></th>
+        <td>
+            <props:passwordProperty name="secure:${cons.oidcClientSecret}" className="longField"/>
+            <span id="error_secure:${cons.oidcClientSecret}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden oidc auth-ui">
+        <th><label for="secure:${cons.oidcRefreshToken}">Refresh Token: <l:star/></label></th>
+        <td>
+            <props:passwordProperty name="secure:${cons.oidcRefreshToken}" className="longField"/>
+            <span id="error_secure:${cons.oidcRefreshToken}" class="error"></span>
+        </td>
+    </tr>
     <tr>
         <th class="noBorder"></th>
         <td class="noBorder">

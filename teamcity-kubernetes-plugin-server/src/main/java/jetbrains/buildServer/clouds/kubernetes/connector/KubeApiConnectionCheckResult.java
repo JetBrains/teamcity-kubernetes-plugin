@@ -6,18 +6,20 @@ package jetbrains.buildServer.clouds.kubernetes.connector;
 public class KubeApiConnectionCheckResult {
     private final String myMessage;
     private final boolean mySuccess;
+    private final boolean myNeedRefresh;
 
-    private KubeApiConnectionCheckResult(String message, boolean success) {
+    private KubeApiConnectionCheckResult(String message, boolean success, boolean needRefresh) {
         myMessage = message;
         mySuccess = success;
+        myNeedRefresh = needRefresh;
     }
 
     public static KubeApiConnectionCheckResult ok(String message) {
-        return new KubeApiConnectionCheckResult(message, true);
+        return new KubeApiConnectionCheckResult(message, true, false);
     }
 
-    public static KubeApiConnectionCheckResult error(String message) {
-        return new KubeApiConnectionCheckResult(message, false);
+    public static KubeApiConnectionCheckResult error(String message, boolean needRefresh) {
+        return new KubeApiConnectionCheckResult(message, false, needRefresh);
     }
 
     public String getMessage() {
@@ -26,5 +28,9 @@ public class KubeApiConnectionCheckResult {
 
     public boolean isSuccess() {
         return mySuccess;
+    }
+
+    public boolean isNeedRefresh() {
+        return myNeedRefresh;
     }
 }

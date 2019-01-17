@@ -40,4 +40,6 @@ public interface KubeApiConnector {
 
     @NotNull
     Collection<String> listDeployments();
+
+    void invalidate();
 }

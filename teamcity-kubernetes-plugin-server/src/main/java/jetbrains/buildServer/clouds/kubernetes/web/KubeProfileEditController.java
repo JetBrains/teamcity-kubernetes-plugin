@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes.web;
 import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.BuildProject;
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
+import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectionCheckResult;
@@ -127,13 +128,21 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     return props.get(SECURE_PROPERTY_PREFIX + CA_CERT_DATA);
                 }
             };
-            final String authStrategy = props.get(KubeParametersConstants.AUTH_STRATEGY);
+            final String authStrategyName = props.get(KubeParametersConstants.AUTH_STRATEGY);
             try {
-                KubeApiConnectorImpl apiConnector = KubeApiConnectorImpl.create(connectionSettings, myAuthStrategyProvider.get(authStrategy));
+                final KubeAuthStrategy strategy = myAuthStrategyProvider.get(authStrategyName);
+                KubeApiConnectorImpl apiConnector = KubeApiConnectorImpl.create(connectionSettings, strategy);
                 KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
                 if(!connectionCheckResult.isSuccess()){
+                    if (strategy.isRefreshable() && connectionCheckResult.isNeedRefresh()){
+                        apiConnector.invalidate();
+                        connectionCheckResult = apiConnector.testConnection();
+                        if (connectionCheckResult.isSuccess()){
+                            return;
+                        }
+                    }
                     final String checkResultMessage = connectionCheckResult.getMessage();
-                    LOG.debug("Error while checking connection to k8s api. " + checkResultMessage);
+                    LOG.debug("Error while checking connection to k8s API. " + checkResultMessage);
                     final ActionErrors errors = new ActionErrors();
                     errors.addError("connection", checkResultMessage);
                     writeErrors(xmlResponse, errors);
