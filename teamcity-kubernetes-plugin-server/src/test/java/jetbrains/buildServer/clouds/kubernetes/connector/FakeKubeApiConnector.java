@@ -65,4 +65,9 @@ public class FakeKubeApiConnector implements KubeApiConnector {
   public Collection<String> listDeployments() {
     return null;
   }
+
+  @Override
+  public void invalidate() {
+
+  }
 }

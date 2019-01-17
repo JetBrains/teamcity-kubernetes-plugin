@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
+import jetbrains.buildServer.util.TimeService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,12 +15,13 @@ import java.util.Map;
 public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
     private final Map<String, KubeAuthStrategy> myIdToStrategyMap = new HashMap<>();
 
-    public KubeAuthStrategyProviderImpl() {
+    public KubeAuthStrategyProviderImpl(@NotNull TimeService timeService) {
         registerStrategy(new UserPasswdAuthStrategy());
         registerStrategy(new DefaultServiceAccountAuthStrategy());
         registerStrategy(new UnauthorizedAccessStrategy());
         registerStrategy(new ClientCertificateAuthStrategy());
         registerStrategy(new TokenAuthStrategy());
+        registerStrategy(new OIDCAuthStrategy(timeService));
     }
 
     @NotNull

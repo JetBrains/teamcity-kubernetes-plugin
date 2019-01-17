@@ -23,6 +23,10 @@ public class KubeParametersConstants {
     public static final String PASSWORD = "password";
     public static final String CLIENT_CERTIFICATE_DATA = "clientCertData";
     public static final String AUTH_TOKEN = "authToken";
+    public static final String OIDC_CLIENT_ID = "oidcClientId";
+    public static final String OIDC_CLIENT_SECRET = "oidcClientSecret";
+    public static final String OIDC_REFRESH_TOKEN = "oidcRefreshToken";
+    public static final String OIDC_ISSUER_URL = "issuer_url";
     public static final String CUSTOM_POD_TEMPLATE = "customPodTemplate";
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
     public static final String AGENT_NAME_PREFIX = "agentNamePrefix";
@@ -77,6 +81,22 @@ public class KubeParametersConstants {
 
     public String getAuthToken() {
         return AUTH_TOKEN;
+    }
+
+    public String getOidcClientId() {
+        return OIDC_CLIENT_ID;
+    }
+
+    public String getOidcClientSecret() {
+        return OIDC_CLIENT_SECRET;
+    }
+
+    public String getOidcRefreshToken() {
+        return OIDC_REFRESH_TOKEN;
+    }
+
+    public String getOidcIssuerUrl() {
+        return OIDC_ISSUER_URL;
     }
 
     public String getClientCertData() {
