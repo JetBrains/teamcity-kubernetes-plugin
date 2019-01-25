@@ -32,15 +32,27 @@ public class KubeAgentConfigurationProvider {
                 super.afterAgentConfigurationLoaded(agent);
                 final Map<String, String> env = System.getenv();
                 final String providedServerUrl = env.get(KubeContainerEnvironment.SERVER_URL);
-                LOG.info("Kube Server URL: " + providedServerUrl);
-                if(!StringUtil.isEmpty(providedServerUrl)) agentConfigurationEx.setServerUrl(providedServerUrl);
+                if(StringUtil.isNotEmpty(providedServerUrl)) {
+                    LOG.info("Provided TeamCity Server URL: " + providedServerUrl);
+                    agentConfigurationEx.setServerUrl(providedServerUrl);
+                } else {
+                    LOG.info("TeamCity Server URL was not provided. The instance wasn't started using TeamCity Kube integration.");
+                    return;
+                }
 
                 final String profileId = env.get(KubeContainerEnvironment.PROFILE_ID);
-                LOG.info("Profile Id: " + profileId);
-                if(!StringUtil.isEmpty(providedServerUrl)) agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.REQUIRED_PROFILE_ID_CONFIG_PARAM, profileId);
+                if(StringUtil.isNotEmpty(profileId)){
+                    LOG.info("Provided Profile Id: " + profileId);
+                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.REQUIRED_PROFILE_ID_CONFIG_PARAM, profileId);
+                } else {
+                    LOG.info("Profile Id was not provided. The instance wasn't started using TeamCity Kube integration.");
+                    return;
+                }
 
                 final String instanceName = env.get(KubeContainerEnvironment.INSTANCE_NAME);
-                updateAgentNameIfNeeded(agentConfigurationEx, instanceName);
+                if (StringUtil.isNotEmpty(instanceName)) {
+                    updateAgentNameIfNeeded(agentConfigurationEx, instanceName);
+                }
 
                 for (Map.Entry<String, String> entry : env.entrySet()){
                     final String key = entry.getKey();
