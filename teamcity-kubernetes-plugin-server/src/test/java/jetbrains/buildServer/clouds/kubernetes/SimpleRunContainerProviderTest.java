@@ -3,10 +3,9 @@ package jetbrains.buildServer.clouds.kubernetes;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodTemplate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.clouds.CloudClientParameters;
@@ -25,9 +24,7 @@ import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.serverSide.impl.ServerSettingsImpl;
 import jetbrains.buildServer.serverSide.impl.executors.SimpleExecutorServices;
-import jetbrains.buildServer.serverSide.impl.executors.TeamCityExecutorServicesImpl;
 import jetbrains.buildServer.util.EventDispatcher;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -45,6 +42,8 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   private ServerPaths myServerPaths;
   private ExecutorServices myExecutorServices;
   private EventDispatcher<BuildServerListener> myEventDispatcher;
+  private KubeDataCacheImpl myCache;
+  private BuildAgentPodTemplateProvidersImpl myPodTemplateProviders;
 
   @BeforeMethod
   public void setUp() throws Exception {
@@ -62,6 +61,9 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     myEventDispatcher = EventDispatcher.create(BuildServerListener.class);
     myNameGenerator = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
     myContainerProvider = new SimpleRunContainerProvider(myServerSettings, myNameGenerator);
+    myCache = new KubeDataCacheImpl();
+    myPodTemplateProviders = new BuildAgentPodTemplateProvidersImpl(myServerSettings, (name, kubeClientParams) -> null, myNameGenerator);
+
   }
 
   public void check_generated_name(){
@@ -103,6 +105,56 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     );
   }
 
+  public void store_idxes_on_shutdown(){
+    final Map<String, String> imageParameters = createMap(CloudImageParameters.SOURCE_ID_FIELD, "image1",
+                                              KubeParametersConstants.DOCKER_IMAGE, "jetbrains/teamcity-agent",
+                                              KubeParametersConstants.AGENT_NAME_PREFIX, "prefix");
+    final KubeCloudImage image = createImage(imageParameters);
+    final KubePodNameGenerator newGenerator1 = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
+
+    then(newGenerator1.generateNewVmName(image)).isEqualTo("prefix-1");
+    myEventDispatcher.getMulticaster().serverShutdown();
+    final KubePodNameGenerator newGenerator2 = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
+    then(newGenerator2.generateNewVmName(image)).isEqualTo("prefix-2");
+  }
+
+
+  public void dont_generate_on_shutdown() throws InterruptedException {
+    final Map<String, String> imageParameters = createMap(CloudImageParameters.SOURCE_ID_FIELD, "image1",
+                                                          KubeParametersConstants.DOCKER_IMAGE, "jetbrains/teamcity-agent",
+                                                          KubeParametersConstants.AGENT_NAME_PREFIX, "prefix");
+    final KubeCloudImage image = createImage(imageParameters);
+    final Thread[] thArray = new Thread[10];
+    final Set<String> generatedNames = ConcurrentHashMap.newKeySet();
+    for (int i=0; i<10; i++){
+      final Thread th = new Thread(() -> {
+        for (int j = 0; j < 50000; j++) {
+          try {
+            generatedNames.add(myNameGenerator.generateNewVmName(image));
+          } catch (Exception ex) {
+            break;
+          }
+        }
+
+      });
+      th.start();
+      thArray[i] = th;
+    }
+    final long cur = System.currentTimeMillis();
+    myEventDispatcher.getMulticaster().serverShutdown();
+    then(System.currentTimeMillis() - cur).isLessThan(500l);
+    for (int i=0; i<10; i++){
+      thArray[i].join();
+    }
+    final KubePodNameGenerator newGenerator1 = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
+    int generatedSize = generatedNames.size();
+    then(generatedSize).isLessThan(500000);
+    then(newGenerator1.generateNewVmName(image)).isEqualTo("prefix-" + (generatedSize+1));
+    System.out.println(generatedSize);
+
+
+
+  }
 
 
   private Container createContainer(Map<String, String> imageParameters){
@@ -112,13 +164,14 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
 
   private Pod createTemplate(Map<String, String> imageParameters){
     final CloudInstanceUserData instanceTag = createInstanceTag();
-    final BuildAgentPodTemplateProvidersImpl podTemplateProviders = new BuildAgentPodTemplateProvidersImpl(
-      myServerSettings, (name, kubeClientParams) -> null, myNameGenerator);
-    final KubeDataCacheImpl cache = new KubeDataCacheImpl();
     final CloudClientParameters parameters = new CloudClientParametersImpl(createMap(), createSet());
+    return myContainerProvider.getPodTemplate(instanceTag, createImage(imageParameters), new KubeCloudClientParametersImpl(parameters));
+  }
+
+  private KubeCloudImage createImage(Map<String, String> imageParameters){
     final CloudImageDataImpl imageData = new CloudImageDataImpl(imageParameters);
-    KubeCloudImage image = new KubeCloudImageImpl(new KubeCloudImageData(new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")), new FakeKubeApiConnector(), cache, podTemplateProviders);
-    return myContainerProvider.getPodTemplate(instanceTag, image, new KubeCloudClientParametersImpl(parameters));
+    return new KubeCloudImageImpl(new KubeCloudImageData(new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")), new FakeKubeApiConnector(), myCache,
+                                  myPodTemplateProviders);
   }
 
   private CloudInstanceUserData createInstanceTag() {
