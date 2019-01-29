@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
+import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
@@ -46,4 +47,6 @@ public interface KubeCloudImage extends CloudImage {
 
     @NotNull
     CloudInstance startNewInstance(@NotNull CloudInstanceUserData instanceUserData, @NotNull KubeCloudClientParametersImpl clientParams);
+
+    void setErrorInfo(CloudErrorInfo errorInfo);
 }
