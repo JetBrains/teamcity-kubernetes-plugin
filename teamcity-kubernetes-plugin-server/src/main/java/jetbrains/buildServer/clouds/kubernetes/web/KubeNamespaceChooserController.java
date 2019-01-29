@@ -24,7 +24,7 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 05.10.17.
  */
 public class KubeNamespaceChooserController extends BaseController {
-    private static final String URL = "kubeNaspaces.html";
+    private static final String URL = "kubeNamespaces.html";
 
     private final PluginDescriptor myPluginDescriptor;
     private KubeAuthStrategyProvider myAuthStrategyProvider;

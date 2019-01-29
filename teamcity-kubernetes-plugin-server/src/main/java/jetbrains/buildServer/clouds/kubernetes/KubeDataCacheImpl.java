@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
+import java.util.concurrent.ConcurrentMap;
 import jetbrains.buildServer.clouds.InstanceStatus;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KubeDataCacheImpl implements KubeDataCache {
     public static String CACHE_EXPIRATION_TIMEOUT_PROPERTY = "teamcity.kube.cache.expirationTimeout";
 
-    private final Map<String, CacheEntry<InstanceStatus>> myInstanceStatusCache = new ConcurrentHashMap<>();
-    private final Map<String, CacheEntry<Date>> myInstanceStartedTimeCache = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, CacheEntry<InstanceStatus>> myInstanceStatusCache = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, CacheEntry<Date>> myInstanceStartedTimeCache = new ConcurrentHashMap<>();
 
     @NotNull
     @Override
@@ -47,6 +48,12 @@ public class KubeDataCacheImpl implements KubeDataCache {
     @Override
     public void cleanInstanceStatus(@NotNull String instanceId) {
         myInstanceStatusCache.remove(instanceId);
+    }
+
+    @Override
+    public void invalidate() {
+        myInstanceStatusCache.clear();
+        myInstanceStartedTimeCache.clear();
     }
 
     private class CacheEntry<T> {

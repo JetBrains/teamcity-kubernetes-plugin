@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import com.intellij.openapi.diagnostic.Logger;
+import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.serverSide.executors.ExecutorServices;
@@ -36,11 +37,23 @@ public class KubeBackgroundUpdaterImpl implements KubeBackgroundUpdater {
 
     private void populateInstances() {
         long populateInstancesStartTime = System.currentTimeMillis();
-        for(KubeCloudClient client : myRegisteredClients){
-            for(CloudImage image : client.getImages()){
-                ((KubeCloudImage)image).populateInstances();
+        try {
+            for (KubeCloudClient client : myRegisteredClients) {
+                for (CloudImage image : client.getImages()) {
+                    final KubeCloudImage kubeImage = (KubeCloudImage)image;
+                    try {
+                        kubeImage.populateInstances();
+                        kubeImage.setErrorInfo(null);
+                    } catch (Exception ex){
+                        final String errorMessage = String.format("An error occurred while populating instances for %s(profile=%s)", kubeImage.getName(), client.getProfileId());
+                        LOG.warnAndDebugDetails(errorMessage, ex);
+                        kubeImage.setErrorInfo(new CloudErrorInfo(ex.getMessage(), ex.toString(), ex));
+                    }
+                }
             }
+            LOG.debug("Populate instances task finished in " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - populateInstancesStartTime) + " seconds");
+        } catch (Exception ex) {
+            LOG.warnAndDebugDetails("An error occurred while populating kube instances", ex);
         }
-        LOG.debug("Populate ECS instances task finished in " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - populateInstancesStartTime) + " seconds");
     }
 }

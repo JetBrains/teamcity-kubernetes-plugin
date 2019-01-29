@@ -2,6 +2,7 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.concurrent.ConcurrentMap;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
@@ -29,7 +30,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     private final KubeDataCache myCache;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
 
-    private Map<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
     private CloudErrorInfo myCurrentError;
 
     KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
@@ -99,6 +100,11 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         }
         populateInstances();
         return newInstance;
+    }
+
+    @Override
+    public void setErrorInfo(@Nullable final CloudErrorInfo errorInfo) {
+        myCurrentError = errorInfo;
     }
 
     @Nullable
@@ -177,11 +183,11 @@ public class KubeCloudImageImpl implements KubeCloudImage {
               KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, myImageData.getProfileId()
                                                                  ));
             myIdToInstanceMap.clear();
+            myCache.invalidate();
             for (Pod pod : pods){
                 KubeCloudInstance cloudInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, pod, myApiConnector), myCache);
                 String instanceId = cloudInstance.getInstanceId();
                 myIdToInstanceMap.put(instanceId, cloudInstance);
-                myCache.cleanInstanceStatus(instanceId);
             }
             myCurrentError = null;
         } catch (KubernetesClientException ex){

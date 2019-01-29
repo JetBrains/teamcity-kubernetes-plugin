@@ -141,4 +141,8 @@ public class KubeCloudClient implements CloudClientEx {
 
         return cloudImage.getAgentName(instanceName);
     }
+
+    public String getProfileId() {
+        return myCloudProfileId;
+    }
 }
