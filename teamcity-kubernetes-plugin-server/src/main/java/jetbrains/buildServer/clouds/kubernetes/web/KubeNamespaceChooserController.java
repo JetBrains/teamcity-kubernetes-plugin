@@ -79,7 +79,7 @@ public class KubeNamespaceChooserController extends BaseController {
 
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("kubeNamespaces.jsp"));
         try {
-            KubeApiConnectorImpl apiConnector = KubeApiConnectorImpl.create(apiConnection, myAuthStrategyProvider.get(authStrategy));
+          KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl(apiConnection, myAuthStrategyProvider.get(authStrategy));
             modelAndView.getModelMap().put("namespaces", apiConnector.listNamespaces());
             modelAndView.getModelMap().put("error","");
         } catch (Exception ex){
