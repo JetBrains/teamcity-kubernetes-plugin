@@ -15,6 +15,7 @@ import jetbrains.buildServer.clouds.kubernetes.auth.OIDCAuthStrategy
 import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
 import org.jmock.Mock
+import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import java.util.concurrent.atomic.AtomicBoolean
@@ -23,13 +24,17 @@ import java.util.concurrent.atomic.AtomicReference
 @Test
 class KubeApiConnectorImplTest : BaseTestCase() {
 
-    lateinit var apiConnection: KubeApiConnection
-    lateinit var customParameters: MutableMap<String, String>
+    private lateinit var apiConnection: KubeApiConnection
+    private lateinit var customParameters: MutableMap<String, String>
 
     @BeforeMethod
     override fun setUp() {
         super.setUp()
         customParameters = HashMap<String, String>()
+        customParameters[KubeParametersConstants.OIDC_CLIENT_ID] = "clientId"
+        customParameters[KubeParametersConstants.OIDC_CLIENT_SECRET] = "secret"
+        customParameters[KubeParametersConstants.OIDC_ISSUER_URL] = "issuer"
+        customParameters[KubeParametersConstants.OIDC_REFRESH_TOKEN] = "refreshToken"
         apiConnection = object : KubeApiConnection {
             override fun getNamespace() = "test-namespace"
 
@@ -54,10 +59,6 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         val timeService = MockTimeService()
         val strategy = FakeAuthStrategy(timeService)
         var clientsCreated = 0
-        customParameters[KubeParametersConstants.OIDC_CLIENT_ID] = "clientId"
-        customParameters[KubeParametersConstants.OIDC_CLIENT_SECRET] = "secret"
-        customParameters[KubeParametersConstants.OIDC_ISSUER_URL] = "issuer"
-        customParameters[KubeParametersConstants.OIDC_REFRESH_TOKEN] = "refreshToken"
         val kubeApiConnector = object: KubeApiConnectorImpl(apiConnection, strategy){
             override fun createClient(config: Config): KubernetesClient {
                 clientsCreated++
@@ -86,5 +87,11 @@ class KubeApiConnectorImplTest : BaseTestCase() {
             retrieveCnt++
             return Pair.create("Token-$retrieveCnt", 100)
         }
+    }
+
+    @AfterMethod
+    override fun tearDown() {
+        OIDCAuthStrategy.invalidateAll()
+        super.tearDown()
     }
 }

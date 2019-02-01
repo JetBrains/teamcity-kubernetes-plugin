@@ -11,6 +11,7 @@ import java.net.*;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import jetbrains.buildServer.Used;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.util.FileUtil;
@@ -117,13 +118,13 @@ public class OIDCAuthStrategy implements KubeAuthStrategy {
         final JsonElement tokenRequestElement = parser.parse(tokenData);
         final JsonObject tokenRequestObj = tokenRequestElement.getAsJsonObject();
         final String idToken = tokenRequestObj.get("id_token").getAsString();
-        final long expireMs;
+        final long expireSec;
         if(tokenRequestObj.has("expires_in")) {
-          expireMs = tokenRequestObj.get("expires_in").getAsLong();
+          expireSec = tokenRequestObj.get("expires_in").getAsLong();
         } else {
-          expireMs = 365*24*86400l*1000l; //one year
+          expireSec = 365*24*86400l; //one year
         }
-        return Pair.create(idToken, expireMs);
+        return Pair.create(idToken, expireSec);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -202,5 +203,11 @@ public class OIDCAuthStrategy implements KubeAuthStrategy {
       }
       return new DataHolder(clientId, clientSecret, issuerUrl, refreshToken);
     }
+  }
+
+  @Used("Tests")
+  @Deprecated
+  public static void invalidateAll(){
+    CACHED_TOKENS.clear();
   }
 }
