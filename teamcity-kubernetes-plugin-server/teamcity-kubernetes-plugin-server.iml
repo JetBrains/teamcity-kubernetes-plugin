@@ -33,5 +33,6 @@
     <orderEntry type="library" scope="TEST" name="kotlin" level="project" />
     <orderEntry type="library" name="kubernetes-lib" level="project" />
     <orderEntry type="library" name="jackson" level="project" />
+    <orderEntry type="module" module-name="common-test-core" />
   </component>
 </module>
