@@ -34,7 +34,7 @@ public class TokenAuthStrategy implements KubeAuthStrategy {
     @NotNull
     @Override
     public ConfigBuilder apply(@NotNull ConfigBuilder clientConfig, @NotNull KubeApiConnection connection) {
-        String token = connection.getCustomParameter(AUTH_TOKEN);
+        String token = connection.getCustomParameter(SECURE_PREFIX + AUTH_TOKEN);
         if(StringUtil.isEmpty(token)) {
             throw new KubeCloudException("Auth token is empty for connection to " + connection.getApiServerUrl());
         }

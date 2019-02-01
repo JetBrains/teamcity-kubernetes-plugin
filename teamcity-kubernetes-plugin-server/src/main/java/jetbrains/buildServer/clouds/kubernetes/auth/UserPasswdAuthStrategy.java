@@ -36,7 +36,7 @@ public class UserPasswdAuthStrategy implements KubeAuthStrategy {
     @Override
     public ConfigBuilder apply(@NotNull ConfigBuilder clientConfig, @NotNull KubeApiConnection connection) {
         String username = connection.getCustomParameter(USERNAME);
-        String password = connection.getCustomParameter(PASSWORD);
+        String password = connection.getCustomParameter(SECURE_PREFIX+PASSWORD);
         return clientConfig.withUsername(username).withPassword(password);
     }
 }

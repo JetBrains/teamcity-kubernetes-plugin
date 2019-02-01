@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface KubeAuthStrategy {
 
+    String SECURE_PREFIX = "secure:";
+
     @NotNull String getId();
 
     @NotNull String getDisplayName();

@@ -5,6 +5,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.client.*;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.util.CollectionsUtil;
@@ -25,22 +27,27 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @NotNull
     private final KubeApiConnection myConnectionSettings;
-    private final KubernetesClient myKubernetesClient;
+    private KubernetesClient myKubernetesClient;
     private final KubeAuthStrategy myAuthStrategy;
 
-    private KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull Config config, @NotNull KubeAuthStrategy authStrategy) {
+    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
         myConnectionSettings = connectionSettings;
-        myKubernetesClient = new DefaultKubernetesClient(config);
         myAuthStrategy = authStrategy;
+        myKubernetesClient = recreateClient();
     }
 
     @NotNull
-    public static KubeApiConnectorImpl create(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) throws KubeCloudException {
+    protected KubernetesClient recreateClient(){
+        return new DefaultKubernetesClient(createConfig(myConnectionSettings, myAuthStrategy));
+    }
+
+
+    private static Config createConfig(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy){
         ConfigBuilder configBuilder = new ConfigBuilder()
-                .withMasterUrl(connectionSettings.getApiServerUrl())
-                .withNamespace(connectionSettings.getNamespace())
-                .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
-                .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
+          .withMasterUrl(connectionSettings.getApiServerUrl())
+          .withNamespace(connectionSettings.getNamespace())
+          .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
+          .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
         final String caCertData = connectionSettings.getCACertData();
         if(StringUtil.isEmptyOrSpaces(caCertData)){
             configBuilder.withTrustCerts(true);
@@ -48,17 +55,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
             configBuilder.withCaCertData(Base64.encodeBase64String(caCertData.getBytes()));
         }
         configBuilder = authStrategy.apply(configBuilder, connectionSettings);
-        if ("user-passwd".equals(connectionSettings.getCustomParameter("authStrategy")) &&
-          StringUtil.isNotEmpty(connectionSettings.getCustomParameter("username"))){
-            configBuilder
-              .withUsername(connectionSettings.getCustomParameter("username"))
-              .withPassword(connectionSettings.getCustomParameter("secure:password"));
-        }
-        if ("token".equals(connectionSettings.getCustomParameter("authStrategy")) &&
-          StringUtil.isNotEmpty(connectionSettings.getCustomParameter("secure:authToken"))){
-            configBuilder.withOauthToken(connectionSettings.getCustomParameter("secure:authToken"));
-        }
-        return new KubeApiConnectorImpl(connectionSettings, configBuilder.build(), authStrategy);
+        return configBuilder.build();
     }
 
     @NotNull
@@ -87,54 +84,89 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @NotNull
     @Override
     public Pod createPod(@NotNull Pod podTemplate) {
-        return myKubernetesClient.pods().create(podTemplate);
+        return withKubernetesClient(kubernetesClient -> {
+            return kubernetesClient.pods().create(podTemplate);
+        });
     }
 
     @Override
     public boolean deletePod(@NotNull Pod pod, long gracePeriod) {
-        return myKubernetesClient.pods().withName(pod.getMetadata().getName()).withGracePeriod(0).delete();
+        return withKubernetesClient(kubernetesClient -> {
+            return kubernetesClient.pods().withName(pod.getMetadata().getName()).withGracePeriod(0).delete();
+        });
     }
 
     @NotNull
     @Override
     public Collection<Pod> listPods(@NotNull Map<String, String> labels) {
-        return myKubernetesClient.pods().withLabels(labels).list().getItems();
+        return withKubernetesClient(kubernetesClient -> {
+            return kubernetesClient.pods().withLabels(labels).list().getItems();
+        });
     }
 
     @NotNull
     @Override
     public PodPhase getPodPhase(@NotNull String podName) {
-        final Pod podNow = myKubernetesClient.pods().withName(podName).get();
-        return podNow == null ? PodPhase.Unknown : PodPhase.valueOf(podNow.getStatus().getPhase());
+        return withKubernetesClient(kubernetesClient -> {
+            final Pod podNow = kubernetesClient.pods().withName(podName).get();
+            return podNow == null ? PodPhase.Unknown : PodPhase.valueOf(podNow.getStatus().getPhase());
+        });
     }
 
     @Nullable
     @Override
     public Deployment getDeployment(@NotNull String deploymentName) {
-        return myKubernetesClient.extensions().deployments().withName(deploymentName).get();
+        return withKubernetesClient(kubernetesClient -> {
+            return kubernetesClient.extensions().deployments().withName(deploymentName).get();
+        });
     }
 
     @Nullable
     @Override
     public PodStatus getPodStatus(@NotNull String podName) {
-        final Pod podNow = myKubernetesClient.pods().withName(podName).get();
-        return podNow == null ? null : podNow.getStatus();
+        return withKubernetesClient(kubernetesClient -> {
+            final Pod podNow = kubernetesClient.pods().withName(podName).get();
+            return podNow == null ? null : podNow.getStatus();
+        });
     }
 
     @NotNull
     @Override
     public Collection<String> listNamespaces() {
-        return CollectionsUtil.convertCollection(myKubernetesClient.namespaces().list().getItems(), namespace -> namespace.getMetadata().getName());
+        return withKubernetesClient(kubernetesClient -> {
+            return CollectionsUtil.convertCollection(kubernetesClient.namespaces().list().getItems(), namespace -> namespace.getMetadata().getName());
+        });
     }
 
     @NotNull
     @Override
     public Collection<String> listDeployments() {
-        return CollectionsUtil.convertCollection(myKubernetesClient.extensions().deployments().list().getItems(), namespace -> namespace.getMetadata().getName());
+        return withKubernetesClient(kubernetesClient -> {
+            return CollectionsUtil.convertCollection(kubernetesClient.extensions().deployments().list().getItems(), namespace -> namespace.getMetadata().getName());
+        });
     }
 
     @Override
     public void invalidate() {
         myAuthStrategy.invalidate(myConnectionSettings);
+    }
+
+    private <T> T withKubernetesClient(Function<KubernetesClient, T> function){
+        return withKubernetesClient(false, function);
+    }
+
+    private <T> T withKubernetesClient(boolean retrying, Function<KubernetesClient, T> function){
+        try {
+            return function.apply(myKubernetesClient);
+        } catch (KubernetesClientException kce){
+            if (!retrying && kce.getCode()==401){
+                if (testConnection().isNeedRefresh()){
+                    invalidate();
+                    myKubernetesClient = recreateClient();
+                }
+                return withKubernetesClient(true, function);
+            }
+            throw kce;
+        }
     }
 }
