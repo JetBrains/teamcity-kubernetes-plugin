@@ -5,9 +5,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.client.*;
-import java.util.concurrent.Callable;
 import java.util.function.Function;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
@@ -33,16 +31,16 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
         myConnectionSettings = connectionSettings;
         myAuthStrategy = authStrategy;
-        myKubernetesClient = recreateClient();
+        myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
     }
 
     @NotNull
-    protected KubernetesClient recreateClient(){
-        return new DefaultKubernetesClient(createConfig(myConnectionSettings, myAuthStrategy));
+    protected KubernetesClient createClient(@NotNull final Config config){
+        return new DefaultKubernetesClient(config);
     }
 
 
-    private static Config createConfig(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy){
+    protected Config createConfig(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy){
         ConfigBuilder configBuilder = new ConfigBuilder()
           .withMasterUrl(connectionSettings.getApiServerUrl())
           .withNamespace(connectionSettings.getNamespace())
@@ -162,7 +160,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
             if (!retrying && kce.getCode()==401){
                 if (testConnection().isNeedRefresh()){
                     invalidate();
-                    myKubernetesClient = recreateClient();
+                    myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
                 }
                 return withKubernetesClient(true, function);
             }

@@ -75,14 +75,24 @@ public class OIDCAuthStrategy implements KubeAuthStrategy {
   @Override
   public void invalidate(final KubeApiConnection connection) {
     final DataHolder dataHolder = DataHolder.createFromConnection(connection);
-    invalidateToken(dataHolder.myClientId, dataHolder.myIssuerUrl, false);
+    invalidateToken(dataHolder.myClientId, dataHolder.myIssuerUrl, true);
   }
 
-  private  String createToken(final DataHolder dataHolder){
+  private String createToken(final DataHolder dataHolder){
     final String currentToken = getOrExpiry(dataHolder.myClientId, dataHolder.myIssuerUrl);
     if (currentToken != null)
       return currentToken;
 
+    final Pair<String, Long> newTokenPair = retrieveNewToken(dataHolder);
+    if (newTokenPair == null)
+      return null;
+
+    cache(dataHolder.myClientId, dataHolder.myIssuerUrl, newTokenPair.first, newTokenPair.second);
+    return newTokenPair.getFirst();
+  }
+
+  @Nullable
+  protected Pair<String, Long> retrieveNewToken(@NotNull final DataHolder dataHolder) {
     InputStream stream = null;
     try {
       URL providerConfigurationURL = new URI(dataHolder.myIssuerUrl).resolve("/.well-known/openid-configuration").toURL();
@@ -107,14 +117,13 @@ public class OIDCAuthStrategy implements KubeAuthStrategy {
         final JsonElement tokenRequestElement = parser.parse(tokenData);
         final JsonObject tokenRequestObj = tokenRequestElement.getAsJsonObject();
         final String idToken = tokenRequestObj.get("id_token").getAsString();
-        final long expire;
+        final long expireMs;
         if(tokenRequestObj.has("expires_in")) {
-          expire = tokenRequestObj.get("expires_in").getAsLong();
+          expireMs = tokenRequestObj.get("expires_in").getAsLong();
         } else {
-          expire = 365*24*86400l*1000l; //one year
+          expireMs = 365*24*86400l*1000l; //one year
         }
-        cache(dataHolder.myClientId, dataHolder.myIssuerUrl, idToken, expire);
-        return idToken;
+        return Pair.create(idToken, expireMs);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -133,7 +142,7 @@ public class OIDCAuthStrategy implements KubeAuthStrategy {
 
     final long expireTime = token.getSecond();
     if (myTimeService.now() >= expireTime){
-      invalidateToken(clientId, issuerUrl, true);
+      invalidateToken(clientId, issuerUrl, false);
     } else {
       return token.getFirst();
     }
@@ -141,11 +150,11 @@ public class OIDCAuthStrategy implements KubeAuthStrategy {
     return null;
   }
 
-  private void invalidateToken(final String clientId, final String issuerUrl, boolean checkForTime){
+  private void invalidateToken(@NotNull final String clientId, @NotNull final String issuerUrl, boolean forceInvalidate){
     final Pair<String, String> key = Pair.create(clientId, issuerUrl);
     synchronized (CACHED_TOKENS){
       final Pair<String, Long> token2 = CACHED_TOKENS.get(key);
-      if (checkForTime || (token2 != null && myTimeService.now() >= token2.getSecond())){
+      if (forceInvalidate || (token2 != null && myTimeService.now() >= token2.getSecond())){
         CACHED_TOKENS.remove(key);
       }
     }
@@ -158,7 +167,7 @@ public class OIDCAuthStrategy implements KubeAuthStrategy {
     }
   }
 
-  private static class DataHolder {
+  protected static class DataHolder {
     private final String myClientId;
     private final String myClientSecret;
     private final String myIssuerUrl;
