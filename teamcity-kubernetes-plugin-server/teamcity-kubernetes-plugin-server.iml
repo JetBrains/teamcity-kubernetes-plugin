@@ -30,7 +30,7 @@
     <orderEntry type="module" module-name="web-openapi" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-common" />
     <orderEntry type="library" name="commons-codec" level="project" />
-    <orderEntry type="library" scope="TEST" name="kotlin" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="kotlin" level="project" />
     <orderEntry type="library" name="kubernetes-lib" level="project" />
     <orderEntry type="library" name="jackson" level="project" />
     <orderEntry type="module" module-name="common-test-core" />

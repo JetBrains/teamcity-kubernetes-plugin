@@ -1,25 +1,18 @@
 package jetbrains.buildServer.clouds.kubernetes.connector
 
 import com.intellij.openapi.util.Pair
-import io.fabric8.kubernetes.api.model.HasMetadata
 import io.fabric8.kubernetes.api.model.Pod
 import io.fabric8.kubernetes.api.model.Status
 import io.fabric8.kubernetes.client.*
-import io.fabric8.kubernetes.client.dsl.NamespaceVisitFromServerGetWatchDeleteRecreateWaitApplicable
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
-import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.OIDC_CLIENT_ID
-import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy
-import jetbrains.buildServer.clouds.kubernetes.auth.OIDCAuthStrategy
+import jetbrains.buildServer.clouds.kubernetes.auth.RefreshableStrategy
 import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
-import org.jmock.Mock
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 
 @Test
 class KubeApiConnectorImplTest : BaseTestCase() {
@@ -31,10 +24,7 @@ class KubeApiConnectorImplTest : BaseTestCase() {
     override fun setUp() {
         super.setUp()
         customParameters = HashMap<String, String>()
-        customParameters[KubeParametersConstants.OIDC_CLIENT_ID] = "clientId"
-        customParameters[KubeParametersConstants.OIDC_CLIENT_SECRET] = "secret"
-        customParameters[KubeParametersConstants.OIDC_ISSUER_URL] = "issuer"
-        customParameters[KubeParametersConstants.OIDC_REFRESH_TOKEN] = "refreshToken"
+        customParameters["DummyData"] = "DummyData"
         apiConnection = object : KubeApiConnection {
             override fun getNamespace() = "test-namespace"
 
@@ -80,10 +70,24 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         then(strategy.retrieveCnt).isEqualTo(2)
     }
 
-    internal class FakeAuthStrategy(timeService: TimeService) : OIDCAuthStrategy(timeService) {
+    internal class FakeAuthStrategy(timeService: TimeService) : RefreshableStrategy<DummyData>(timeService) {
+        override fun createKey(dataHolder: DummyData): Pair<String, String> {
+            return Pair.create(dataHolder.data, dataHolder.data)
+        }
+
+        override fun createData(connection: KubeApiConnection): DummyData {
+            return DummyData(connection.getCustomParameter("DummyData")!!)
+        }
+
+        override fun getId() = "dummy"
+
+        override fun getDisplayName() = "Dummy Display Name"
+
+        override fun getDescription() = "Dummy Description"
+
         var retrieveCnt = 0;
 
-        override fun retrieveNewToken(dataHolder: DataHolder): Pair<String, Long>? {
+        override fun retrieveNewToken(dataHolder: DummyData): Pair<String, Long>? {
             retrieveCnt++
             return Pair.create("Token-$retrieveCnt", 100)
         }
@@ -91,7 +95,10 @@ class KubeApiConnectorImplTest : BaseTestCase() {
 
     @AfterMethod
     override fun tearDown() {
-        OIDCAuthStrategy.invalidateAll()
+        RefreshableStrategy.invalidateAll()
         super.tearDown()
     }
+}
+
+data class DummyData(val data: String) {
 }

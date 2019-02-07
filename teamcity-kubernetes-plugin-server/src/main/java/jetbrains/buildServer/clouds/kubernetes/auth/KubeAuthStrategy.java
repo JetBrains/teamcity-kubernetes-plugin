@@ -24,7 +24,7 @@ public interface KubeAuthStrategy {
         return false;
     }
 
-    default void invalidate(final KubeApiConnection connection){
+    default void invalidate(@NotNull final KubeApiConnection connection){
 
     }
 }
