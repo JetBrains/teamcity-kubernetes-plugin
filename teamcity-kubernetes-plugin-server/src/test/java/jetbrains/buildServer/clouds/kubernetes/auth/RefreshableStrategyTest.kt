@@ -6,6 +6,7 @@ import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 @Test
-class OIDCAuthStrategyTest : BaseTestCase() {
+class RefreshableStrategyTest : BaseTestCase() {
     private lateinit var apiConnection: KubeApiConnection
     private lateinit var customParameters: MutableMap<String, String>
 
@@ -22,10 +23,7 @@ class OIDCAuthStrategyTest : BaseTestCase() {
     override public fun setUp(){
         super.setUp();
         customParameters = HashMap<String, String>()
-        customParameters[KubeParametersConstants.OIDC_CLIENT_ID] = "clientId"
-        customParameters[KubeParametersConstants.OIDC_CLIENT_SECRET] = "secret"
-        customParameters[KubeParametersConstants.OIDC_ISSUER_URL] = "issuer"
-        customParameters[KubeParametersConstants.OIDC_REFRESH_TOKEN] = "refreshToken"
+        customParameters["DummyData"] = "DummyData"
         apiConnection = object : KubeApiConnection {
             override fun getNamespace() = "test-namespace"
 
@@ -42,8 +40,8 @@ class OIDCAuthStrategyTest : BaseTestCase() {
     fun invalidate_by_time(){
         val timeService = MockTimeService()
         val tokenRef = AtomicReference<Pair<String, Long>>()
-        val strategy = object: OIDCAuthStrategy(timeService){
-            override fun retrieveNewToken(dataHolder: DataHolder) = tokenRef.get()
+        val strategy = object: DummyRefreshableStrategy(timeService){
+            override fun retrieveNewToken(dataHolder: DummyData) = tokenRef.get()
         }
         tokenRef.set(Pair("Token1", 100))
         then(strategy.apply(ConfigBuilder(), apiConnection).oauthToken).isEqualTo("Token1")
@@ -56,8 +54,8 @@ class OIDCAuthStrategyTest : BaseTestCase() {
     fun force_invalidate(){
         val timeService = MockTimeService()
         val tokenRef = AtomicReference<Pair<String, Long>>()
-        val strategy = object: OIDCAuthStrategy(timeService){
-            override fun retrieveNewToken(dataHolder: DataHolder) = tokenRef.get()
+        val strategy = object: DummyRefreshableStrategy(timeService){
+            override fun retrieveNewToken(dataHolder: DummyData) = tokenRef.get()
         }
         tokenRef.set(Pair("Token1", 100))
         then(strategy.apply(ConfigBuilder(), apiConnection).oauthToken).isEqualTo("Token1")
@@ -70,7 +68,28 @@ class OIDCAuthStrategyTest : BaseTestCase() {
 
     @AfterMethod
     override fun tearDown() {
-        OIDCAuthStrategy.invalidateAll()
+        RefreshableStrategy.invalidateAll()
         super.tearDown()
     }
+}
+
+abstract class DummyRefreshableStrategy(myTimeService: TimeService) : RefreshableStrategy<DummyData>(myTimeService) {
+
+    override fun createKey(dataHolder: DummyData) = Pair.create(dataHolder.data, dataHolder.data)
+
+    override fun createData(connection: KubeApiConnection):DummyData {
+        val data = connection.getCustomParameter("DummyData") ?: throw RuntimeException()
+        return DummyData(data)
+    }
+
+    override fun getId() = "dummy"
+
+    override fun getDisplayName() = "Dummy"
+
+    override fun getDescription() = "Dummy description"
+}
+
+
+data class DummyData(val data : String){
+
 }

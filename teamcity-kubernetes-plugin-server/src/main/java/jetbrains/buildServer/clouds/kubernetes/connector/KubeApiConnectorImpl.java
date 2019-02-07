@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes.connector;
 
+import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
@@ -20,6 +21,8 @@ import java.util.Map;
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeApiConnectorImpl implements KubeApiConnector {
+    private static final Logger LOG = Logger.getInstance(KubeApiConnectorImpl.class.getName());
+
     private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
     private static final int DEFAULT_REQUEST_TIMEOUT_MS = 15 * 1000;
 
@@ -157,6 +160,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         try {
             return function.apply(myKubernetesClient);
         } catch (KubernetesClientException kce){
+            LOG.warnAndDebugDetails("An error occurred", kce);
             if (!retrying && kce.getCode()==401){
                 if (testConnection().isNeedRefresh()){
                     invalidate();
