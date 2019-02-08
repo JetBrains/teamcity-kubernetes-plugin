@@ -83,7 +83,7 @@ class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCDat
     override fun getDescription() = "Authenticate with Open ID provider"
 }
 
-data class OIDCData(val myIssuerUrl: String,
-                    val myClientId: String,
+data class OIDCData(val myClientId: String,
                     val myClientSecret: String,
+                    val myIssuerUrl: String,
                     val myRefreshToken: String)
