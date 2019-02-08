@@ -108,6 +108,18 @@
       <version>${kotlin.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-sts</artifactId>
+      <version>1.11.475</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-eks</artifactId>
+      <version>1.11.475</version>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>

@@ -34,5 +34,6 @@
     <orderEntry type="library" name="kubernetes-lib" level="project" />
     <orderEntry type="library" name="jackson" level="project" />
     <orderEntry type="module" module-name="common-test-core" />
+    <orderEntry type="library" name="aws-sdk" level="project" />
   </component>
 </module>

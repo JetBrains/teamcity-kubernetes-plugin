@@ -312,6 +312,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _toggleAuth: function () {
+        debugger;
         var selectedStrategyId = this.$authStrategySelector.val();
         $j('.auth-ui').toggleClass('hidden', true);
         if(selectedStrategyId) {
