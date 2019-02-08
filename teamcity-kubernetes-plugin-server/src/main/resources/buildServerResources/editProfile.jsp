@@ -134,6 +134,27 @@
             <span id="error_secure:${cons.oidcRefreshToken}" class="error"></span>
         </td>
     </tr>
+
+    <tr class="hidden eks auth-ui">
+        <th><label for="${cons.eksAccessId}">Access ID: <l:star/></label></th>
+        <td><props:textProperty name="${cons.eksAccessId}" className="longField"/>
+            <span id="error_${cons.eksAccessId}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden eks auth-ui">
+        <th><label for="secure:${cons.eksSecretKey}">Secret Key: <l:star/></label></th>
+        <td>
+            <props:passwordProperty name="secure:${cons.eksSecretKey}" className="longField"/>
+            <span id="error_secure:${cons.eksSecretKey}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden eks auth-ui">
+        <th><label for="${cons.eksClusterName}">Cluster Name: <l:star/></label></th>
+        <td><props:textProperty name="${cons.eksClusterName}" className="longField"/>
+            <span id="error_${cons.eksClusterName}" class="error"></span>
+        </td>
+    </tr>
+
     <tr>
         <th class="noBorder"></th>
         <td class="noBorder">

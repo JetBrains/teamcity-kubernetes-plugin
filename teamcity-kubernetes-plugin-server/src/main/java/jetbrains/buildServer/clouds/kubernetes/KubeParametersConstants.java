@@ -31,6 +31,12 @@ public class KubeParametersConstants {
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
     public static final String AGENT_NAME_PREFIX = "agentNamePrefix";
 
+    public static final String EKS_ACCESS_ID = "eksAccessId";
+    public static final String EKS_SECRET_KEY = "eksSecretKey";
+    public static final String EKS_REGION = "eksRegion";
+    public static final String EKS_CLUSTER_NAME = "eksClusterName";
+
+
     public String getApiServerUrl() {
         return API_SERVER_URL;
     }
@@ -121,5 +127,21 @@ public class KubeParametersConstants {
 
     public String getAgentNamePrefix() {
         return AGENT_NAME_PREFIX;
+    }
+
+    public String getEksAccessId() {
+        return EKS_ACCESS_ID;
+    }
+
+    public String getEksSecretKey() {
+        return EKS_SECRET_KEY;
+    }
+
+    public String getEksRegion() {
+        return EKS_REGION;
+    }
+
+    public String getEksClusterName() {
+        return EKS_CLUSTER_NAME;
     }
 }
