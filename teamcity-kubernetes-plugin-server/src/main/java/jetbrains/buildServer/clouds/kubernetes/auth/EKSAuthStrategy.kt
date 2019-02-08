@@ -62,7 +62,6 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
             val presignerFacade = PresignerFacade(presignerParams)
             val url = presignerFacade.presign(callerIdentityRequestDefaultRequest, expirationDate)
             val encodedUrl = Base64.getUrlEncoder().withoutPadding().encodeToString(url.toString().toByteArray())
-            println("$url")
             return "k8s-aws-v1.$encodedUrl"
         } catch (e: URISyntaxException) {
             e.printStackTrace()
@@ -74,12 +73,9 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
     override fun createData(connection: KubeApiConnection): EKSData {
         val accessId = connection.getCustomParameter(KubeParametersConstants.EKS_ACCESS_ID) ?: throw KubeCloudException("Access ID is empty for connection to " + connection.apiServerUrl)
         val secretKey = connection.getCustomParameter(KubeParametersConstants.EKS_SECRET_KEY) ?: throw KubeCloudException("Secret key is empty for connection to " + connection.apiServerUrl)
-//        val region = connection.getCustomParameter(KubeParametersConstants.EKS_REGION) ?: throw KubeCloudException("Region is empty for connection to " + connection.apiServerUrl)
         val clusterName = connection.getCustomParameter(KubeParametersConstants.EKS_CLUSTER_NAME) ?: throw KubeCloudException("Cluster name is empty for connection to " + connection.apiServerUrl)
 
-        return EKSData(accessId, secretKey,
-//                region,
-                clusterName)
+        return EKSData(accessId, secretKey, clusterName)
     }
 
     override fun getId() = "eks"
@@ -91,5 +87,4 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
 
 data class EKSData(val accessId : String,
                    val secretKey: String,
-//                   val region   : String,
                    val clusterName: String)
