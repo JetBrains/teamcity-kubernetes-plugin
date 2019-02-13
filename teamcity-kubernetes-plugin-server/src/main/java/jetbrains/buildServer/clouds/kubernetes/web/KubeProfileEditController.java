@@ -131,7 +131,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
             final String authStrategyName = props.get(KubeParametersConstants.AUTH_STRATEGY);
             try {
                 final KubeAuthStrategy strategy = myAuthStrategyProvider.get(authStrategyName);
-                KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl(connectionSettings, strategy);
+                KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", connectionSettings, strategy);
                 KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
                 if(!connectionCheckResult.isSuccess()){
                     if (strategy.isRefreshable() && connectionCheckResult.isNeedRefresh()){
