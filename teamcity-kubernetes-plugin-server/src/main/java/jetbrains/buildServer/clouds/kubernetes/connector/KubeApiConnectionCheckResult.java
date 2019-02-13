@@ -33,4 +33,12 @@ public class KubeApiConnectionCheckResult {
     public boolean isNeedRefresh() {
         return myNeedRefresh;
     }
+
+    @Override
+    public String toString() {
+        if (myNeedRefresh)
+            return "Need refresh: " + myMessage;
+
+        return myMessage;
+    }
 }

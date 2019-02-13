@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.fabric8.kubernetes.client.*;
+import java.util.Date;
 import java.util.function.Function;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.util.CollectionsUtil;
@@ -26,12 +27,14 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
     private static final int DEFAULT_REQUEST_TIMEOUT_MS = 15 * 1000;
 
+    private String myProfileId;
     @NotNull
     private final KubeApiConnection myConnectionSettings;
-    private KubernetesClient myKubernetesClient;
+    private volatile KubernetesClient myKubernetesClient;
     private final KubeAuthStrategy myAuthStrategy;
 
-    public KubeApiConnectorImpl(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
+    public KubeApiConnectorImpl(@NotNull String profileId,  @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
+        myProfileId = profileId;
         myConnectionSettings = connectionSettings;
         myAuthStrategy = authStrategy;
         myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
@@ -39,6 +42,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @NotNull
     protected KubernetesClient createClient(@NotNull final Config config){
+        LOG.info("Creating new client with config" + getConfigDescription(config));
         return new DefaultKubernetesClient(config);
     }
 
@@ -160,9 +164,14 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         try {
             return function.apply(myKubernetesClient);
         } catch (KubernetesClientException kce){
-            LOG.warnAndDebugDetails("An error occurred", kce);
+            final String operation = getOperation(kce);
+            LOG.warnAndDebugDetails(String.format("An error occurred at %s, ProfileId: %s, Code: %d, Status: %s", operation, myProfileId, kce.getCode(), kce.getStatus()),
+                                    KubernetesClientException.launderThrowable(kce));
             if (!retrying && kce.getCode()==401){
-                if (testConnection().isNeedRefresh()){
+                final KubeApiConnectionCheckResult result = testConnection();
+                LOG.info(String.format("Test connection for %s: %s", myProfileId, result));
+                if (result.isNeedRefresh()){
+                    LOG.info("Will now invalidate and recreate client for " + myProfileId);
                     invalidate();
                     myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
                 }
@@ -170,5 +179,31 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
             }
             throw kce;
         }
+    }
+
+    @Nullable
+    private String getOperation(@NotNull KubernetesClientException kce){
+        final StackTraceElement[] stackTrace = kce.getStackTrace();
+        for (int i=0; i<stackTrace.length; i++){
+            if (stackTrace[i].getClassName().contains("jetbrains.buildServer")){
+                return stackTrace[i].toString();
+            }
+        }
+        return null;
+    }
+
+    private static String getConfigDescription(Config config){
+        if (config.getOauthToken() != null) {
+            String token = config.getOauthToken();
+            String tokenMask;
+            if (token.length() <= 16) {
+                tokenMask = "Updated on  " + new Date();
+            } else {
+                tokenMask = String.format("%s...%s", token.substring(0, 4), token.substring(token.length() - 4));
+            }
+            return " with OAuthToken: " + tokenMask;
+        }
+        else
+            return "";
     }
 }

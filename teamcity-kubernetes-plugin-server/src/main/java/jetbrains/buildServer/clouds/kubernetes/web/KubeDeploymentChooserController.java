@@ -79,7 +79,7 @@ public class KubeDeploymentChooserController extends BaseController {
 
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("kubeDeployments.jsp"));
         try {
-          KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl(apiConnection, myAuthStrategyProvider.get(authStrategy));
+          KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", apiConnection, myAuthStrategyProvider.get(authStrategy));
             modelAndView.getModelMap().put("deployments", apiConnector.listDeployments());
             modelAndView.getModelMap().put("error","");
         } catch (Exception ex){
