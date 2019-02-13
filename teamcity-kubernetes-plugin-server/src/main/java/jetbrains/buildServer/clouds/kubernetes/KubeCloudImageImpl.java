@@ -152,7 +152,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
             case DeploymentBuildAgentPodTemplateProvider.ID:
                 return "Deployment: " + getSourceDeploymentName();
             default:
-                return "UNKNOWN";
+                return "Custom template: " + getAgentNamePrefix();
         }
     }
 
