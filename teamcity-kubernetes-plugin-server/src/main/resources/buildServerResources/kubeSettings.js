@@ -312,7 +312,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _toggleAuth: function () {
-        debugger;
         var selectedStrategyId = this.$authStrategySelector.val();
         $j('.auth-ui').toggleClass('hidden', true);
         if(selectedStrategyId) {
@@ -516,12 +515,22 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     addImage: function () {
         var newImageId = this.generateNewImageId(),
             newImage = this._image;
-        newImage['source-id'] = newImageId;
+        newImage['source-id'] = this.setupSourceId(newImage, newImageId);
         this._renderImageRow(newImage, newImageId);
         this.imagesData[newImageId] = newImage;
         this._imagesDataLength += 1;
         this.saveImagesData();
         this._toggleImagesTable();
+    },
+
+    setupSourceId: function(image, defaultImageId){
+        debugger;
+        var namePrefix = $j.trim(image.agentNamePrefix);
+        if (namePrefix != ''){
+            image['source-id'] = namePrefix;
+        } else {
+            image['source-id'] = defaultImageId;
+        }
     },
 
     generateNewImageId: function () {
@@ -532,7 +541,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     editImage: function (id) {
-        this._image['source-id'] = id;
+        this.setupSourceId(this._image);
         this.imagesData[id] = this._image;
         this.saveImagesData();
         this.$imagesTable.find(this.selectors.imagesTableRow).remove();
