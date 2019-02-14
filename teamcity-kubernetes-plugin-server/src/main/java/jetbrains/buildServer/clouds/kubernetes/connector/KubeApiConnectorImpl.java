@@ -75,9 +75,8 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                       String.format("Error connecting to %s: invalid namespace %s", myConnectionSettings.getApiServerUrl(), StringUtil.isEmptyOrSpaces(currentNamespaceName) ? "Default" : currentNamespaceName),
                     false);
         } catch (KubernetesClientException e) {
-            boolean needRefresh = e.getStatus().getCode() == 401 && e.getStatus().getMessage().contains("expired");
             return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getCause() == null ? e.getMessage() : e.getCause().getMessage()),
-                                                      needRefresh);
+                                                      e.getStatus().getCode() == 401);
         } catch (Exception e) {
             return KubeApiConnectionCheckResult.error(
               String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getMessage()),
