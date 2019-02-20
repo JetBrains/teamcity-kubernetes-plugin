@@ -24,7 +24,7 @@
             <configuration>
               <artifactId>cloud-server</artifactId>
               <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
+              <version>2018.1</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-lib-path}/cloud-server.jar</file>
@@ -40,7 +40,7 @@
             <configuration>
               <artifactId>cloud-server-api</artifactId>
               <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
+              <version>2018.1</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-lib-path}/cloud-server-api.jar</file>
@@ -56,7 +56,7 @@
             <configuration>
               <artifactId>server</artifactId>
               <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
+              <version>2018.1</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-lib-path}/server.jar</file>
@@ -72,7 +72,7 @@
             <configuration>
               <artifactId>web</artifactId>
               <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
+              <version>2018.1</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-lib-path}/web.jar</file>
@@ -88,7 +88,7 @@
             <configuration>
               <artifactId>common-impl</artifactId>
               <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
+              <version>2018.1</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-lib-path}/common-impl.jar</file>
@@ -104,7 +104,7 @@
             <configuration>
               <artifactId>tests-integration</artifactId>
               <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
+              <version>2018.1</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-devpackage-path}/tests/tests-integration.jar</file>
@@ -120,7 +120,7 @@
             <configuration>
               <artifactId>agent</artifactId>
               <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
+              <version>2018.1</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-agent-lib-path}/agent.jar</file>
