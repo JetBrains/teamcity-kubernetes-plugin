@@ -142,7 +142,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     }
     final long cur = System.currentTimeMillis();
     myEventDispatcher.getMulticaster().serverShutdown();
-    then(System.currentTimeMillis() - cur).isLessThan(500l);
+    then(System.currentTimeMillis() - cur).isLessThan(1500l);
     for (int i=0; i<10; i++){
       thArray[i].join();
     }
