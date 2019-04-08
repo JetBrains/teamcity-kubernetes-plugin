@@ -515,7 +515,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     addImage: function () {
         var newImageId = this.generateNewImageId(),
             newImage = this._image;
-        newImage['source-id'] = this.setupSourceId(newImage, newImageId);
+        this.setupSourceId(newImage, newImageId);
         this._renderImageRow(newImage, newImageId);
         this.imagesData[newImageId] = newImage;
         this._imagesDataLength += 1;
