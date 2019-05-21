@@ -56,7 +56,7 @@ Please feel free to post feedback in the repository [issues](https://github.com/
 
 ## Contributing guidelines
 
-Follow general instructions to [build TeamCity plugins using Maven](https://www.jetbrains.com/help/teamcity/?Developing+Plugins+Using+Maven).
+Follow general instructions to [build TeamCity plugins using Maven](https://plugins.jetbrains.com/docs/teamcity/developing-plugins-using-maven.html).
 Plugin uses [TeamCity SDK Maven plugin](https://github.com/JetBrains/teamcity-sdk-maven-plugin)
 
 ``` bash
