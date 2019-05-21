@@ -2,7 +2,7 @@
 [![official JetBrains project](http://jb.gg/badges/official.svg)](https://plugins.jetbrains.com/plugin/9818-kubernetes-cloud-support)
 [![plugin status](https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:TeamCityPluginsByJetBrains_TeamCityKubernetesPlugin_Build)/statusIcon.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TeamCityPluginsByJetBrains_TeamCityKubernetesPlugin_Build20181x&guest=1)
 
-Run [TeamCity cloud agents](https://confluence.jetbrains.com/display/TCD10/TeamCity+Integration+with+Cloud+Solutions) in a [Kubernetes](https://kubernetes.io/) cluster. 
+Run [TeamCity cloud agents](https://www.jetbrains.com/help/teamcity/?TeamCity+Integration+with+Cloud+Solutions) in a [Kubernetes](https://kubernetes.io/) cluster. 
 
 Support [Helm](https://docs.helm.sh/) build steps.
 
@@ -18,7 +18,7 @@ You can [download the plugin](https://teamcity.jetbrains.com/guestAuth/app/rest/
 
 ### Cloud agents
 
-Configure Kubernetes [Cloud Profile](https://confluence.jetbrains.com/display/TCD10/Agent+Cloud+Profile#AgentCloudProfile-ConfiguringCloudProfile) for your project in the Server Administration UI.
+Configure Kubernetes [Cloud Profile](https://www.jetbrains.com/help/teamcity/?Agent+Cloud+Profile#AgentCloudProfile-ConfiguringCloudProfile) for your project in the Server Administration UI.
 
 The plugin supports Kubernetes cluster images to start new pods with a TeamCity build agent running in one of the containers. The plugin supports the [official TeamCity Build Agent Docker image](https://hub.docker.com/r/jetbrains/teamcity-agent) out of the box. You can use your own image as well.
 
@@ -56,7 +56,7 @@ Please feel free to post feedback in the repository [issues](https://github.com/
 
 ## Contributing guidelines
 
-Follow general instructions to [build TeamCity plugins using Maven](https://confluence.jetbrains.com/display/TCD10/Developing+Plugins+Using+Maven).
+Follow general instructions to [build TeamCity plugins using Maven](https://www.jetbrains.com/help/teamcity/?Developing+Plugins+Using+Maven).
 Plugin uses [TeamCity SDK Maven plugin](https://github.com/JetBrains/teamcity-sdk-maven-plugin)
 
 ``` bash
