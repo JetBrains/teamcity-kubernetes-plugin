@@ -52,7 +52,7 @@ Apache 2.0
 
 ## Feedback
 
-Please feel free to post feedback in the repository [issues](https://github.com/JetBrains/teamcity-kubernetes-plugin/issues).
+Please feel free to post feedback in the repository [issues](https://youtrack.jetbrains.com/issues/TW).
 
 ## Contributing guidelines
 
