@@ -22,11 +22,9 @@ public class UpgradeArgumentsProvider implements HelmCommandArgumentsProvider {
     @NotNull
     @Override
     public List<String> getArguments(@NotNull Map<String, String> runnerParameters) {
-        List<String> result = new LinkedList<String>();
-        result.add(HELM_UPGRADE_COMMAND);
-        result.add(StringUtil.emptyIfNull(runnerParameters.get(HELM_UPGRADE_COMMAND_NAME + RELEASE_NAME)));
-        result.add(StringUtil.emptyIfNull(runnerParameters.get(HELM_UPGRADE_COMMAND_NAME + CHART)));
-        result.add(StringUtil.emptyIfNull(runnerParameters.get(HELM_UPGRADE_COMMAND_NAME + ADDITIONAL_FLAGS)));
-        return result;
+        String release = runnerParameters.get(HELM_UPGRADE_COMMAND_NAME + RELEASE_NAME);
+        String chart = runnerParameters.get(HELM_UPGRADE_COMMAND_NAME + CHART);
+        String additionalFlags = runnerParameters.get(HELM_UPGRADE_COMMAND_NAME + ADDITIONAL_FLAGS);
+        return StringUtil.splitCommandArgumentsAndUnquote(String.format("%s %s %s %s", HELM_UPGRADE_COMMAND, StringUtil.emptyIfNull(release), StringUtil.emptyIfNull(chart), StringUtil.emptyIfNull(additionalFlags)));
     }
 }
