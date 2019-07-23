@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import java.util.*;
+import java.util.regex.Pattern;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudClientParameters;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage;
@@ -12,6 +13,7 @@ import jetbrains.buildServer.util.CollectionsUtil;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractPodTemplateProvider implements BuildAgentPodTemplateProvider {
+  private static final Pattern ENV_VAR_NAME = Pattern.compile("([A-Z]+[_])*[A-Z]+");
 
   protected Pod patchedPodTemplateSpec(@NotNull PodTemplateSpec podTemplateSpec,
                                        @NotNull String instanceName,
@@ -54,7 +56,11 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
     cloudInstanceUserData.getCustomAgentConfigurationParameters().forEach((k,v)->{
       if (!envDataMap.containsKey(k) && k.startsWith(KubeContainerEnvironment.TEAMCITY_KUBERNETES_PREFIX)){
-        envDataMap.put(k, v);
+        if (ENV_VAR_NAME.matcher(k).matches()) {
+          envDataMap.put(k, v);
+        } else {
+          // Do noting
+        }
       }
     });
 
