@@ -72,9 +72,8 @@ public class DeploymentBuildAgentPodTemplateProvider extends AbstractPodTemplate
                                   instanceName,
                                   kubeClientParams.getNamespace(),
                                   myServerSettings.getServerUUID(),
-                                  cloudInstanceUserData.getProfileId(),
                                   kubeCloudImage.getId(),
-                                  cloudInstanceUserData.getServerAddress()
+                                  cloudInstanceUserData
     );
     }
 }

@@ -48,23 +48,26 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
     @NotNull
     @Override
     public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters kubeClientParams) {
-        String customPodTemplateSpecContent = kubeCloudImage.getCustomPodTemplateSpec();
-        if (StringUtil.isEmpty(customPodTemplateSpecContent)) {
+        final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
+
+        String spec = kubeCloudImage.getCustomPodTemplateSpec();
+        System.out.println(spec);
+        spec = spec.replaceAll("%instance\\.id%", instanceName);
+
+        if (StringUtil.isEmpty(spec)) {
             throw new KubeCloudException("Custom pod template spec is not specified for image " + kubeCloudImage.getId());
         }
 
         final PodTemplateSpec podTemplateSpec = Serialization.unmarshal(
-          new ByteArrayInputStream(customPodTemplateSpecContent.getBytes()),
+          new ByteArrayInputStream(spec.getBytes()),
           PodTemplateSpec.class
         );
 
         return patchedPodTemplateSpec(podTemplateSpec,
-                                      myPodNameGenerator.generateNewVmName(kubeCloudImage),
+                                      instanceName,
                                       kubeClientParams.getNamespace(),
                                       myServerSettings.getServerUUID(),
-                                      cloudInstanceUserData.getProfileId(),
                                       kubeCloudImage.getId(),
-                                      cloudInstanceUserData.getServerAddress()
-        );
+                                      cloudInstanceUserData);
     }
 }

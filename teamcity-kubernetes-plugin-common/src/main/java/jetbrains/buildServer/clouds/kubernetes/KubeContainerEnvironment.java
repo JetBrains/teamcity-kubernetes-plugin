@@ -4,7 +4,7 @@ package jetbrains.buildServer.clouds.kubernetes;
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
  */
 public class KubeContainerEnvironment {
-    public static final String TEAMCITY_KUBERNETES_PREFIX = "TEAMCITY_KUBERNETES_";
+    public static final String TEAMCITY_KUBERNETES_PREFIX = "TC_K8S_";
     public static final String TEAMCITY_KUBERNETES_PROVIDED_PREFIX = "TC_K8S_PROVIDED_";
 
     public static final String SERVER_URL = TEAMCITY_KUBERNETES_PREFIX + "SERVER_URL";
