@@ -1,4 +1,4 @@
-<%@ page import="jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants" %>
+<%@ page import="static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ include file="/include.jsp" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
@@ -11,9 +11,20 @@
   </td>
 </tr>
 <tr>
-  <td colspan="2">
+  <th>
+    Docker image name:
+  </th>
+  <td>
+    <props:textProperty name="<%=RUN_IN_KUBE_DOCKER_IMAGE%>" className="longField"/>
+  </td>
+</tr>
+<tr>
+  <th>
+    Kubernetes Source:
+  </th>
+  <td>
     <div style="float:left">
-      <props:selectProperty name="<%=KubeParametersConstants.RUN_IN_KUBE_PARAM%>">
+      <props:selectProperty name="<%=RUN_IN_KUBE_AGENT_SOURCE%>">
         <props:option value="">No Image Selected</props:option>
         <c:forEach var="imgPair" items="${buildFeature.showProfilesAndImages(buildForm.project)}">
           <props:option value="${imgPair.first}"><c:out value="${imgPair.second}"/></props:option>
