@@ -3,14 +3,31 @@ package jetbrains.buildServer.clouds.kubernetes.buildFeature
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.RUN_IN_KUBE_FEATURE
 import jetbrains.buildServer.clouds.server.CloudManager
-import jetbrains.buildServer.serverSide.BuildFeature
-import jetbrains.buildServer.serverSide.SProject
+import jetbrains.buildServer.serverSide.*
+import jetbrains.buildServer.util.EventDispatcher
 import jetbrains.buildServer.web.openapi.PluginDescriptor
+import java.util.*
 
-class RunInKubeFeature (descriptor: PluginDescriptor, private val cloudManager: CloudManager)
-    : BuildFeature() {
+class RunInKubeFeature (descriptor: PluginDescriptor,
+                        private val cloudManager: CloudManager,
+                        dispatcher: EventDispatcher<BuildServerListener>
+                        ) : BuildFeature() {
     companion object {
         val FEATURE_PATH = "runInKubeFeature.jsp"
+    }
+
+    init{
+        dispatcher.addListener(object : BuildServerAdapter(){
+            override fun buildTypeAddedToQueue(queuedBuild: SQueuedBuild) {
+                val buildEx = queuedBuild as QueuedBuildEx
+                buildEx.buildType.getBuildFeaturesOfType(RUN_IN_KUBE_FEATURE).firstOrNull()?.apply {
+                    // buildEx.buildPromotion.customParameters return new HashMap, so we can just our param in it
+                    val customParameters = buildEx.buildPromotion.customParameters
+                    this.parameters.forEach { k, v ->  customParameters[k]=v}
+                    buildEx.buildPromotion.customParameters = customParameters
+                }
+            }
+        })
     }
 
     private val myEditUrl = descriptor.getPluginResourcesPath(FEATURE_PATH)
@@ -41,7 +58,7 @@ class RunInKubeFeature (descriptor: PluginDescriptor, private val cloudManager: 
     override fun isMultipleFeaturesPerBuildTypeAllowed() = false
 
     override fun describeParameters(params: MutableMap<String, String>): String {
-        val imgParam = params[KubeParametersConstants.RUN_IN_KUBE_PARAM] ?: return "Not used"
+        val imgParam = params[KubeParametersConstants.RUN_IN_KUBE_AGENT_SOURCE] ?: return "Not used"
         val split = imgParam.split(":")
         if (split.size < 3){
             return "Not used"
@@ -57,5 +74,9 @@ class RunInKubeFeature (descriptor: PluginDescriptor, private val cloudManager: 
         }
 
         return "<Unknown Cloud Image>"
+    }
+
+    override fun getDefaultParameters(): MutableMap<String, String> {
+        return Collections.singletonMap(KubeParametersConstants.RUN_IN_KUBE_DOCKER_IMAGE, "jetbrains/teamcity-agent")
     }
 }

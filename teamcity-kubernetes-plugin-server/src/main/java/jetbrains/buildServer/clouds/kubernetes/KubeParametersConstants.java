@@ -37,7 +37,8 @@ public class KubeParametersConstants {
     public static final String EKS_CLUSTER_NAME = "eksClusterName";
 
     public static final String RUN_IN_KUBE_FEATURE = "RunInKubernetes";
-    public static final String RUN_IN_KUBE_PARAM = "runInKube";
+    public static final String RUN_IN_KUBE_AGENT_SOURCE = "run-in-kube-source";
+    public static final String RUN_IN_KUBE_DOCKER_IMAGE = "run-in-kube-image";
 
 
     public String getApiServerUrl() {
@@ -149,6 +150,6 @@ public class KubeParametersConstants {
     }
 
     public String getRunInKubeParam(){
-        return RUN_IN_KUBE_PARAM;
+        return RUN_IN_KUBE_AGENT_SOURCE;
     }
 }
