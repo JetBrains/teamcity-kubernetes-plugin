@@ -23,7 +23,8 @@ class RunInKubeFeature (descriptor: PluginDescriptor,
                 buildEx.buildType.getBuildFeaturesOfType(RUN_IN_KUBE_FEATURE).firstOrNull()?.apply {
                     // buildEx.buildPromotion.customParameters return new HashMap, so we can just our param in it
                     val customParameters = buildEx.buildPromotion.customParameters
-                    this.parameters.forEach { k, v ->  customParameters[k]=v}
+                    customParameters.putIfAbsent(RUN_IN_KUBE_FEATURE, "true")
+                    this.parameters.forEach { k, v ->  customParameters.putIfAbsent(k, v)}
                     buildEx.buildPromotion.customParameters = customParameters
                 }
             }
