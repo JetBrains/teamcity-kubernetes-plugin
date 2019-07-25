@@ -1,12 +1,17 @@
 package jetbrains.buildServer.clouds.kubernetes.buildFeature
 
+import jetbrains.buildServer.agent.Constants
+import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.RUN_IN_KUBE_FEATURE
 import jetbrains.buildServer.clouds.server.CloudManager
+import jetbrains.buildServer.requirements.Requirement
+import jetbrains.buildServer.requirements.RequirementType
 import jetbrains.buildServer.serverSide.*
 import jetbrains.buildServer.util.EventDispatcher
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
+import kotlin.collections.ArrayList
 
 class RunInKubeFeature (descriptor: PluginDescriptor,
                         private val cloudManager: CloudManager,
@@ -79,5 +84,20 @@ class RunInKubeFeature (descriptor: PluginDescriptor,
 
     override fun getDefaultParameters(): MutableMap<String, String> {
         return Collections.singletonMap(KubeParametersConstants.RUN_IN_KUBE_DOCKER_IMAGE, "jetbrains/teamcity-agent")
+    }
+
+    override fun getRequirements(params: MutableMap<String, String>?): MutableCollection<Requirement> {
+        val imgParam = params?.get(KubeParametersConstants.RUN_IN_KUBE_AGENT_SOURCE) ?: return arrayListOf()
+        val split = imgParam.split(":")
+        if (split.size != 3)
+            return arrayListOf()
+
+        return arrayListOf(Requirement(
+                Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID,
+                split[1],
+                RequirementType.EQUALS), Requirement(
+                Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_ID,
+                split[2],
+                RequirementType.EQUALS))
     }
 }
