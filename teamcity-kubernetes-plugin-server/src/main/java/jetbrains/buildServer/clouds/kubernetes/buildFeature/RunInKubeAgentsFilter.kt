@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.kubernetes.buildFeature
 
 import jetbrains.buildServer.agent.Constants
+import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.serverSide.QueuedBuildEx
 import jetbrains.buildServer.serverSide.SBuildAgent
@@ -18,7 +19,7 @@ class RunInKubeAgentsFilter : StartingBuildAgentsFilter {
         val result = AgentsFilterResult()
         val suitableAgent = ArrayList<SBuildAgent>()
         context.agentsForStartingBuild.forEach {
-            val buildId = it.buildParameters[Constants.ENV_PREFIX + KubeParametersConstants.RUN_IN_KUBE_ENV]
+            val buildId = it.buildParameters[Constants.ENV_PREFIX + KubeContainerEnvironment.BUILD_ID]
             if (featureVal == "true") {
                 if (buildId == build.buildPromotionInfo.id.toString()) {
                     suitableAgent.add(it)
