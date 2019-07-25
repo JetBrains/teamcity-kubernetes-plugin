@@ -4,13 +4,15 @@ import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import java.util.*;
 import java.util.regex.Pattern;
+import jetbrains.buildServer.clouds.CloudConstants;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudClientParameters;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage;
-import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment;
-import jetbrains.buildServer.clouds.kubernetes.KubeTeamCityLabels;
+import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
+
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.*;
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
 
 public abstract class AbstractPodTemplateProvider implements BuildAgentPodTemplateProvider {
   private static final Pattern ENV_VAR_NAME = Pattern.compile("([A-Z]+[_])*[A-Z]+");
@@ -46,16 +48,17 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
     }
 
     for (Pair<String, String> env : Arrays.asList(
-      new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
-      new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudInstanceUserData.getProfileId()),
-      new Pair<>(KubeContainerEnvironment.IMAGE_ID, imageId),
-      new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))
+      new Pair<>(SERVER_UUID, serverUUID),
+      new Pair<>(PROFILE_ID, cloudInstanceUserData.getProfileId()),
+      new Pair<>(IMAGE_ID, imageId),
+      new Pair<>(INSTANCE_NAME, instanceName))
     ) {
       envDataMap.put(env.first, env.second);
     }
 
-    cloudInstanceUserData.getCustomAgentConfigurationParameters().forEach((k,v)->{
-      if (!envDataMap.containsKey(k) && k.startsWith(KubeContainerEnvironment.TEAMCITY_KUBERNETES_PREFIX)){
+    final Map<String, String> customParams = cloudInstanceUserData.getCustomAgentConfigurationParameters();
+    customParams.forEach((k, v)->{
+      if (!envDataMap.containsKey(k) && k.startsWith(TEAMCITY_KUBERNETES_PREFIX)){
         if (ENV_VAR_NAME.matcher(k).matches()) {
           envDataMap.put(k, v);
         } else {
@@ -64,11 +67,19 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
       }
     });
 
-    if (!envDataMap.containsKey(KubeContainerEnvironment.SERVER_URL)) {
-      envDataMap.put(KubeContainerEnvironment.SERVER_URL, cloudInstanceUserData.getServerAddress());
+    // check for run in Kubernetes:
+    if ("true".equals(customParams.get(RUN_IN_KUBE_FEATURE))){
+      final String buildId = customParams.get(CloudConstants.BUILD_ID);
+      if (StringUtil.isNotEmpty(buildId)){
+        envDataMap.put(KubeContainerEnvironment.BUILD_ID, buildId);
+      }
     }
-    if (!envDataMap.containsKey(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL)) {
-      envDataMap.put(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, cloudInstanceUserData.getServerAddress());
+
+    if (!envDataMap.containsKey(SERVER_URL)) {
+      envDataMap.put(SERVER_URL, cloudInstanceUserData.getServerAddress());
+    }
+    if (!envDataMap.containsKey(OFFICIAL_IMAGE_SERVER_URL)) {
+      envDataMap.put(OFFICIAL_IMAGE_SERVER_URL, cloudInstanceUserData.getServerAddress());
     }
 
     final List<EnvVar> patchedEnv = new ArrayList<>();
@@ -98,10 +109,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
   @NotNull
   @Override
-  public Pod getPodTemplate(@NotNull final CloudInstanceUserData cloudInstanceUserData,
+  public abstract Pod getPodTemplate(@NotNull final CloudInstanceUserData cloudInstanceUserData,
                             @NotNull final KubeCloudImage kubeCloudImage,
-                            @NotNull final KubeCloudClientParameters clientParameters) {
-    throw new UnsupportedOperationException("AbstractPodTemplateProvider.getPodTemplate");
-    //return null;
-  }
+                            @NotNull final KubeCloudClientParameters clientParameters);
 }
