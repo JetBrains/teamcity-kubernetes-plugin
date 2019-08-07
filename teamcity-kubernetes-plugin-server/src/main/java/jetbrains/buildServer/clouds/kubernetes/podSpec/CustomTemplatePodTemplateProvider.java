@@ -76,7 +76,7 @@ public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateP
 
         PodSpec spec = podTemplateSpec.getSpec();
         for (Container container : spec.getContainers()){
-            container.setName(instanceName);
+            container.setName(container.getName() + "-" + instanceName);
 
             Map<String, String> patchedEnvData = new HashMap<>();
             for (EnvVar env : container.getEnv()){
