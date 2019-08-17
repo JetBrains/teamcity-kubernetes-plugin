@@ -52,9 +52,15 @@ public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateP
         if(StringUtil.isEmpty(customPodTemplateSpecContent))
             throw new KubeCloudException("Custom pod template spec is not specified for image " + kubeCloudImage.getId());
 
+        final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
+
+        // replace parameters
+        if (customPodTemplateSpecContent.contains("%instance.id%")){
+            customPodTemplateSpecContent =  customPodTemplateSpecContent.replace("%instance.id%", instanceName);
+        }
+
         PodTemplateSpec podTemplateSpec = Serialization.unmarshal(new ByteArrayInputStream(customPodTemplateSpecContent.getBytes()), PodTemplateSpec.class);
 
-        final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
 
         final String serverAddress = cloudInstanceUserData.getServerAddress();
 
