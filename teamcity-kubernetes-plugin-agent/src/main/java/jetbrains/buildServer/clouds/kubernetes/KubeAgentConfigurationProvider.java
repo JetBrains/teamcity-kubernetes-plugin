@@ -51,7 +51,7 @@ public class KubeAgentConfigurationProvider {
 
                 final String instanceName = env.get(KubeContainerEnvironment.INSTANCE_NAME);
                 if (StringUtil.isNotEmpty(instanceName)) {
-                    updateAgentNameIfNeeded(agentConfigurationEx, instanceName);
+                    agentConfigurationEx.setName(instanceName);
                 }
 
                 for (Map.Entry<String, String> entry : env.entrySet()){
@@ -66,20 +66,4 @@ public class KubeAgentConfigurationProvider {
         });
     }
 
-
-    public void updateAgentNameIfNeeded(@NotNull BuildAgentConfigurationEx conf,
-                                        @Nullable String containerName){
-        final File file = new File(conf.getAgentConfDirectory(), "k8s-"+containerName);
-        if (file.exists()) {
-            LOG.info(String.format("Marker file '%s' exists. Agent name will not be updated", file.getName()));
-            return;
-        }
-        LOG.info(String.format("Marker file '%s' doesn't exist. Agent name will be updated", file.getName()));
-        conf.setName(containerName);
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            LOG.warnAndDebugDetails("Unable to create a marker file " + file.getName(), e);
-        }
-    }
 }
