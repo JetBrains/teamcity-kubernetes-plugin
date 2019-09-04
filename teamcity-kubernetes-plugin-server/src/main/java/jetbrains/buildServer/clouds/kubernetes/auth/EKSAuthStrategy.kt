@@ -36,20 +36,53 @@ import java.net.URISyntaxException
 import java.util.*
 
 class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>(myTimeService) {
+    var credentialsProvider: AWSCredentialsProvider? = null
 
     override fun retrieveNewToken(dataHolder: EKSData): Pair<String, Long>? {
-        val credentialsProvider = AWSStaticCredentialsProvider(BasicAWSCredentials(dataHolder.accessId, dataHolder.secretKey))
+        val credentials = getAwsCredentialProvider(dataHolder)
         val tokenService : AWSSecurityTokenServiceClient = AWSSecurityTokenServiceClientBuilder
                 .standard()
                 .withRegion(Regions.EU_WEST_1)
-                .withCredentials(credentialsProvider)
+                .withCredentials(credentials)
                 .build() as AWSSecurityTokenServiceClient
 
-        val token = generateToken(dataHolder.clusterName, Date(), tokenService, credentialsProvider, "https", "sts.amazonaws.com")
+        val token = generateToken(dataHolder.clusterName, Date(), tokenService, credentials, "https", "sts.amazonaws.com")
         return Pair(token, 60*12) // expire time = 12 minutes
     }
 
-    override fun createKey(dataHolder: EKSData) = Pair.create(dataHolder.accessId, dataHolder.clusterName)
+    override fun createKey(dataHolder: EKSData): Pair<String, String> {
+        if (dataHolder.useInstanceProfile) {
+            return Pair.create("instance-profile", dataHolder.clusterName)
+        } else {
+            return Pair.create(dataHolder.accessId, dataHolder.clusterName)
+        }
+    }
+
+    private fun getAwsCredentialProvider(dataHolder: EKSData): AWSCredentialsProvider {
+        // Only initialize the credential provider once. Static creds never change and the AssumeRole handles refreshing credentials itself
+        if (credentialsProvider == null) return credentialsProvider!!
+
+        var baseCreds = if (dataHolder.useInstanceProfile) {
+            InstanceProfileCredentialsProvider.getInstance()
+        } else {
+            AWSStaticCredentialsProvider(BasicAWSCredentials(dataHolder.accessId, dataHolder.secretKey))
+        }
+
+        credentialsProvider = if (!dataHolder.iamRoleArn.isNullOrEmpty()) {
+            val stsClient = AWSSecurityTokenServiceClientBuilder
+                    .standard()
+                    .withRegion(Regions.EU_WEST_1)
+                    .withCredentials(baseCreds)
+                    .build() as AWSSecurityTokenServiceClient
+            STSAssumeRoleSessionCredentialsProvider.Builder(dataHolder.iamRoleArn, "teamcity-kubernetes-plugin-session")
+                    .withStsClient(stsClient)
+                    .withRoleSessionDurationSeconds(60 * 12)
+                    .build() as STSAssumeRoleSessionCredentialsProvider
+        } else {
+            baseCreds
+        }
+        return credentialsProvider!!
+    }
 
     @Throws(URISyntaxException::class)
     private fun generateToken(clusterName: String,
@@ -87,11 +120,17 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
     }
 
     override fun createData(connection: KubeApiConnection): EKSData {
-        val accessId = connection.getCustomParameter(KubeParametersConstants.EKS_ACCESS_ID) ?: throw KubeCloudException("Access ID is empty for connection to " + connection.apiServerUrl)
-        val secretKey = connection.getCustomParameter(KubeParametersConstants.EKS_SECRET_KEY) ?: throw KubeCloudException("Secret key is empty for connection to " + connection.apiServerUrl)
+        val useInstanceProfile = (connection.getCustomParameter(KubeParametersConstants.EKS_USE_INSTANCE_PROFILE) ?: "false").toBoolean()
+        var accessId: String? = null
+        var secretKey: String? = null
+        if (!useInstanceProfile) {
+            accessId = connection.getCustomParameter(KubeParametersConstants.EKS_ACCESS_ID) ?: throw KubeCloudException("Access ID is empty for connection to " + connection.apiServerUrl)
+            secretKey = connection.getCustomParameter(KubeParametersConstants.EKS_SECRET_KEY) ?: throw KubeCloudException("Secret key is empty for connection to " + connection.apiServerUrl)
+        }
+        val iamRoleArn: String? = connection.getCustomParameter(KubeParametersConstants.EKS_IAM_ROLE_ARN)
         val clusterName = connection.getCustomParameter(KubeParametersConstants.EKS_CLUSTER_NAME) ?: throw KubeCloudException("Cluster name is empty for connection to " + connection.apiServerUrl)
 
-        return EKSData(accessId, secretKey, clusterName)
+        return EKSData(useInstanceProfile, accessId, secretKey, iamRoleArn, clusterName)
     }
 
     override fun getId() = "eks"
@@ -101,6 +140,8 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
     override fun getDescription() = "Amazon EKS"
 }
 
-data class EKSData(val accessId : String,
-                   val secretKey: String,
+data class EKSData(val useInstanceProfile: Boolean,
+                   val accessId : String?,
+                   val secretKey: String?,
+                   val iamRoleArn: String?,
                    val clusterName: String)
