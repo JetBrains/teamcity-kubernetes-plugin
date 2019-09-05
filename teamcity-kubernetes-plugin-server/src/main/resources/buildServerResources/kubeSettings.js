@@ -344,19 +344,25 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _toggleEKSCredentials: function () {
-        var checked = this.$eksUseInstanceProfile.is(":checked");
-        $j('.eks.aws-credential').toggleClass('hidden', checked);
+        var selectedStrategyId = this.$authStrategySelector.val();
+        if (selectedStrategyId == "eks") {
+            var checked = this.$eksUseInstanceProfile.is(":checked");
+            $j('.eks.aws-credential').toggleClass('hidden', checked);
 
-        //workaround for TW-51797
-        BS.MultilineProperties.updateVisible();
+            //workaround for TW-51797
+            BS.MultilineProperties.updateVisible();
+        }
     },
 
     _toggleEKSIAM: function () {
-        var checked = this.$eksAssumeIAMRole.is(":checked");
-        $j('.eks.aws-iam').toggleClass('hidden', !checked);
+        var selectedStrategyId = this.$authStrategySelector.val();
+        if (selectedStrategyId == "eks") {
+            var checked = this.$eksAssumeIAMRole.is(":checked");
+            $j('.eks.aws-iam').toggleClass('hidden', !checked);
 
-        //workaround for TW-51797
-        BS.MultilineProperties.updateVisible();
+            //workaround for TW-51797
+            BS.MultilineProperties.updateVisible();
+        }
     },
 
     _togglePodSpecMode: function () {
