@@ -60,7 +60,7 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
 
     private fun getAwsCredentialProvider(dataHolder: EKSData): AWSCredentialsProvider {
         // Only initialize the credential provider once. Static creds never change and the AssumeRole handles refreshing credentials itself
-        if (credentialsProvider == null) return credentialsProvider!!
+        if (credentialsProvider != null) return credentialsProvider!!
 
         var baseCreds = if (dataHolder.useInstanceProfile) {
             InstanceProfileCredentialsProvider.getInstance()
