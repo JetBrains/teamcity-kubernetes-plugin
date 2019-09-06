@@ -47,7 +47,7 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
                 .build() as AWSSecurityTokenServiceClient
 
         val token = generateToken(dataHolder.clusterName, Date(), tokenService, credentials, "https", "sts.amazonaws.com")
-        return Pair(token, 60*12) // expire time = 12 minutes
+        return Pair(token, 60*15) // expire time = 15 minutes
     }
 
     override fun createKey(dataHolder: EKSData): Pair<String, String> {
@@ -76,7 +76,7 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
                     .build() as AWSSecurityTokenServiceClient
             STSAssumeRoleSessionCredentialsProvider.Builder(dataHolder.iamRoleArn, "teamcity-kubernetes-plugin-session")
                     .withStsClient(stsClient)
-                    .withRoleSessionDurationSeconds(60 * 12)
+                    .withRoleSessionDurationSeconds(60 * 15)
                     .build() as STSAssumeRoleSessionCredentialsProvider
         } else {
             baseCreds
