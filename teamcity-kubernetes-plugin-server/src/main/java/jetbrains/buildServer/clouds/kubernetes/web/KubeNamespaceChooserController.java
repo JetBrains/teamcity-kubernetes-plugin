@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes.web;
 
+import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Map;
 
+import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
 
 /**
@@ -53,7 +55,7 @@ public class KubeNamespaceChooserController extends BaseController {
             @NotNull
             @Override
             public String getApiServerUrl() {
-                return props.get(API_SERVER_URL);
+                return props.get(KubeParametersConstants.API_SERVER_URL);
             }
 
             @NotNull
@@ -66,13 +68,13 @@ public class KubeNamespaceChooserController extends BaseController {
             @Nullable
             @Override
             public String getCustomParameter(@NotNull String parameterName) {
-                return props.get(parameterName);
+                return props.containsKey(parameterName) ? props.get(parameterName) : props.get(SECURE_PROPERTY_PREFIX + parameterName);
             }
 
             @Nullable
             @Override
             public String getCACertData() {
-                return props.get(CA_CERT_DATA);
+                return props.get(SECURE_PROPERTY_PREFIX + CA_CERT_DATA);
             }
         };
         String authStrategy = props.get(AUTH_STRATEGY);
