@@ -51,7 +51,10 @@ public class KubeAgentConfigurationProvider {
 
                 final String instanceName = env.get(KubeContainerEnvironment.INSTANCE_NAME);
                 if (StringUtil.isNotEmpty(instanceName)) {
+                    LOG.info("Setting instance name to " + instanceName);
                     agentConfigurationEx.setName(instanceName);
+                } else {
+                    LOG.warn("Couldn't find 'env." + KubeContainerEnvironment.INSTANCE_NAME + "' property" );
                 }
 
                 for (Map.Entry<String, String> entry : env.entrySet()){

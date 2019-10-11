@@ -1,0 +1,45 @@
+# TODO Deployment
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: teamcity-agent
+    agent-id: %instance.id%
+spec:
+  serviceAccount: teamcity-build-agent
+  tolerations:
+    - key: "node.kubernetes.io/unreachable"
+      operator: "Exists"
+      effect: "NoExecute"
+      tolerationSeconds: 6000
+  volumes:
+    - name: agent-data
+      hostPath:
+        path: /data/agents/%instance.id%/
+  initContainers:
+    - name: init-agent
+      imagePullPolicy: IfNotPresent
+      image: jetbrains/teamcity-agent
+      command:
+        - /bin/bash
+        - -c
+        - 'cd /usr/bin && curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl && chmod +x ./kubectl && cp -r /opt/buildagent/* /opt/buildagent-copy/'
+      volumeMounts:
+        - mountPath: /opt/buildagent-copy/
+          name: agent-data
+  containers:
+    - name: teamcity-agent
+      image: %agent.image%
+      lifecycle:
+        preStop:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - 'rm -rf /opt/buildagent/*'
+      volumeMounts:
+        - mountPath: /opt/buildagent/
+          name: agent-data
+      env:
+        - name: RUN_AS_BUILDAGENT
+          value: "true"

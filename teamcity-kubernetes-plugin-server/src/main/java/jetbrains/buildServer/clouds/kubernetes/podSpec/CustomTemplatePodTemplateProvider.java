@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
  */
-public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateProvider {
+public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvider {
     private final ServerSettings myServerSettings;
     private KubePodNameGenerator myPodNameGenerator;
 
@@ -48,71 +48,26 @@ public class CustomTemplatePodTemplateProvider implements BuildAgentPodTemplateP
     @NotNull
     @Override
     public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters kubeClientParams) {
-        String customPodTemplateSpecContent = kubeCloudImage.getCustomPodTemplateSpec();
-        if(StringUtil.isEmpty(customPodTemplateSpecContent))
-            throw new KubeCloudException("Custom pod template spec is not specified for image " + kubeCloudImage.getId());
-
         final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
 
-        // replace parameters
-        if (customPodTemplateSpecContent.contains("%instance.id%")){
-            customPodTemplateSpecContent =  customPodTemplateSpecContent.replace("%instance.id%", instanceName);
+        String spec = kubeCloudImage.getCustomPodTemplateSpec();
+        System.out.println(spec);
+        spec = spec.replaceAll("%instance\\.id%", instanceName);
+
+        if (StringUtil.isEmpty(spec)) {
+            throw new KubeCloudException("Custom pod template spec is not specified for image " + kubeCloudImage.getId());
         }
 
-        PodTemplateSpec podTemplateSpec = Serialization.unmarshal(new ByteArrayInputStream(customPodTemplateSpecContent.getBytes()), PodTemplateSpec.class);
+        final PodTemplateSpec podTemplateSpec = Serialization.unmarshal(
+          new ByteArrayInputStream(spec.getBytes()),
+          PodTemplateSpec.class
+        );
 
-
-        final String serverAddress = cloudInstanceUserData.getServerAddress();
-
-        ObjectMeta metadata = podTemplateSpec.getMetadata();
-        metadata.setName(instanceName);
-        metadata.setNamespace(kubeClientParams.getNamespace());
-
-        String serverUUID = myServerSettings.getServerUUID();
-        String cloudProfileId = cloudInstanceUserData.getProfileId();
-
-        Map<String, String> patchedLabels = new HashMap<>();
-        patchedLabels.putAll(metadata.getLabels());
-        patchedLabels.putAll(CollectionsUtil.asMap(
-                KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
-                KubeTeamCityLabels.TEAMCITY_SERVER_UUID, serverUUID,
-                KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudProfileId,
-                KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, kubeCloudImage.getId()));
-        metadata.setLabels(patchedLabels);
-
-        PodSpec spec = podTemplateSpec.getSpec();
-        for (Container container : spec.getContainers()){
-            container.setName(instanceName);
-
-            Map<String, String> patchedEnvData = new HashMap<>();
-            for (EnvVar env : container.getEnv()){
-                patchedEnvData.put(env.getName(), env.getValue());
-            }
-
-            for (Pair<String, String> env : Arrays.asList(
-                    new Pair<>(KubeContainerEnvironment.SERVER_UUID, serverUUID),
-                    new Pair<>(KubeContainerEnvironment.PROFILE_ID, cloudProfileId),
-                    new Pair<>(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId()),
-                    new Pair<>(KubeContainerEnvironment.INSTANCE_NAME, instanceName))){
-                patchedEnvData.put(env.first, env.second);
-            }
-
-            if(!patchedEnvData.containsKey(KubeContainerEnvironment.SERVER_URL)){
-                patchedEnvData.put(KubeContainerEnvironment.SERVER_URL, serverAddress);
-            }
-            if(!patchedEnvData.containsKey(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL)){
-                patchedEnvData.put(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress);
-            }
-
-            List<EnvVar> patchedEnv = new ArrayList<>();
-            for (String envName : patchedEnvData.keySet()){
-                patchedEnv.add(new EnvVar(envName, patchedEnvData.get(envName), null));
-            }
-            container.setEnv(patchedEnv);
-        }
-        return new PodBuilder()
-                .withMetadata(metadata)
-                .withSpec(spec)
-                .build();
+        return patchedPodTemplateSpec(podTemplateSpec,
+                                      instanceName,
+                                      kubeClientParams.getNamespace(),
+                                      myServerSettings.getServerUUID(),
+                                      kubeCloudImage.getId(),
+                                      cloudInstanceUserData);
     }
 }

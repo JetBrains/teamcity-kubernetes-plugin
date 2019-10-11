@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
 import java.util.Collections;
+import jetbrains.buildServer.clouds.CloudConstants;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
@@ -65,7 +66,8 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
                          new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
                          new EnvVar(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId(), null),
                          new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
-                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
+                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null),
+                         new EnvVar(KubeContainerEnvironment.BUILD_ID, cloudInstanceUserData.getCustomAgentConfigurationParameters().get(CloudConstants.BUILD_ID), null));
 
         String dockerCommand = kubeCloudImage.getDockerCommand();
         if(!StringUtil.isEmpty(dockerCommand)) containerBuilder = containerBuilder.withCommand(dockerCommand);

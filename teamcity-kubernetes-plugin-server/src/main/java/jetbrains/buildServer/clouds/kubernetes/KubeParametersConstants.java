@@ -36,6 +36,11 @@ public class KubeParametersConstants {
     public static final String EKS_REGION = "eksRegion";
     public static final String EKS_CLUSTER_NAME = "eksClusterName";
 
+    public static final String RUN_IN_KUBE_FEATURE = "RunInKubernetes";
+    public static final String RUN_IN_KUBE_AGENT_SOURCE = "run-in-kube-source";
+    public static final String RUN_IN_KUBE_DOCKER_IMAGE = "run-in-kube-image";
+    public static final String RUN_IN_KUBE_ENV = "RUN_IN_KUBERNETES";
+
 
     public String getApiServerUrl() {
         return API_SERVER_URL;
@@ -143,5 +148,9 @@ public class KubeParametersConstants {
 
     public String getEksClusterName() {
         return EKS_CLUSTER_NAME;
+    }
+
+    public String getRunInKubeParam(){
+        return RUN_IN_KUBE_AGENT_SOURCE;
     }
 }
