@@ -96,7 +96,7 @@ class RunInKubeFeature (descriptor: PluginDescriptor,
                 Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID,
                 split[1],
                 RequirementType.EQUALS), Requirement(
-                Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_ID,
+                Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_NAME,
                 split[2],
                 RequirementType.EQUALS))
     }

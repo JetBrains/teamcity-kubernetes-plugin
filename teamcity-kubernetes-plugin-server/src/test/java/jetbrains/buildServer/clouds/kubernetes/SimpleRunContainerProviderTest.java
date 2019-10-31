@@ -5,7 +5,6 @@ import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.clouds.CloudClientParameters;
@@ -99,7 +98,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
       new EnvVar(KubeContainerEnvironment.SERVER_URL, "server address", null),
       new EnvVar(KubeContainerEnvironment.SERVER_UUID, "SERVER-UUID", null),
       new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, "server address", null),
-      new EnvVar(KubeContainerEnvironment.IMAGE_ID, "image1", null),
+      new EnvVar(KubeContainerEnvironment.IMAGE_NAME, "image1", null),
       new EnvVar(KubeContainerEnvironment.PROFILE_ID, "profile id", null),
       new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, "prefix-1", null)
     );

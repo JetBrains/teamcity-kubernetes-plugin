@@ -33,7 +33,10 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
       container -> container.setEnv(patchEnvVars(instanceName, serverUUID, imageId, cloudInstanceUserData, container.getEnv()))
     );
 
-    return new PodBuilder().withMetadata(metadata).withSpec(spec).build();
+    final Pod pod = new PodBuilder().build();
+    pod.setMetadata(metadata);
+    pod.setSpec(spec);
+    return pod;
   }
 
   @NotNull
@@ -50,7 +53,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
     for (Pair<String, String> env : Arrays.asList(
       new Pair<>(SERVER_UUID, serverUUID),
       new Pair<>(PROFILE_ID, cloudInstanceUserData.getProfileId()),
-      new Pair<>(IMAGE_ID, imageId),
+      new Pair<>(IMAGE_NAME, imageId),
       new Pair<>(INSTANCE_NAME, instanceName))
     ) {
       envDataMap.put(env.first, env.second);

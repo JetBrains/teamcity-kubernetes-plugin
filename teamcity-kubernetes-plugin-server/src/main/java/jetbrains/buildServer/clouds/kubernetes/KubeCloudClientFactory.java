@@ -84,10 +84,10 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @Override
     public boolean canBeAgentOfType(@NotNull AgentDescription agentDescription) {
         final Map<String, String> map = agentDescription.getAvailableParameters();
-        return  map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.SERVER_UUID) &&
-                map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID) &&
-                map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_ID) &&
-                map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.INSTANCE_NAME);
+        return map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.SERVER_UUID) &&
+               map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID) &&
+               map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.IMAGE_NAME) &&
+               map.containsKey(Constants.ENV_PREFIX + KubeContainerEnvironment.INSTANCE_NAME);
     }
 
     @NotNull

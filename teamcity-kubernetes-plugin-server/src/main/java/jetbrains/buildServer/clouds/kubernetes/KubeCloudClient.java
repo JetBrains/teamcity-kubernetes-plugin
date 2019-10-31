@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.IMAGE_ID;
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.IMAGE_NAME;
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.INSTANCE_NAME;
 
 /**
@@ -87,7 +87,7 @@ public class KubeCloudClient implements CloudClientEx {
                 !myCloudProfileId.equals(agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID)))
             return null;
 
-        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_ID);
+        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_NAME);
         final String instanceName = agentParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
         if (imageId != null) {
             final KubeCloudImage cloudImage = myImageIdToImageMap.get(imageId);
@@ -130,7 +130,7 @@ public class KubeCloudClient implements CloudClientEx {
     @Override
     public String generateAgentName(@NotNull AgentDescription agentDescription) {
         final Map<String, String> agentParameters = agentDescription.getAvailableParameters();
-        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_ID);
+        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_NAME);
         final String instanceName = agentParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
         if (!StringUtil.isNotEmpty(imageId) || !StringUtil.isNotEmpty(instanceName))
             return null;

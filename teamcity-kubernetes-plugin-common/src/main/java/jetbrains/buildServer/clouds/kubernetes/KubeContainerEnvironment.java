@@ -9,7 +9,7 @@ public class KubeContainerEnvironment {
 
     public static final String SERVER_URL = TEAMCITY_KUBERNETES_PREFIX + "SERVER_URL";
     public static final String SERVER_UUID = TEAMCITY_KUBERNETES_PREFIX + "SERVER_UUID";
-    public static final String IMAGE_ID = TEAMCITY_KUBERNETES_PREFIX + "IMAGE_NAME";
+    public static final String IMAGE_NAME = TEAMCITY_KUBERNETES_PREFIX + "IMAGE_NAME";
     public static final String PROFILE_ID = TEAMCITY_KUBERNETES_PREFIX + "CLOUD_PROFILE_ID";
     public static final String INSTANCE_NAME = TEAMCITY_KUBERNETES_PREFIX + "INSTANCE_NAME";
     public static final String BUILD_ID = TEAMCITY_KUBERNETES_PREFIX + "BUILD_ID";

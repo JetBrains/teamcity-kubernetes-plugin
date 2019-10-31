@@ -64,10 +64,9 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
                 .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
                          new EnvVar(KubeContainerEnvironment.SERVER_UUID, serverUUID, null),
                          new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
-                         new EnvVar(KubeContainerEnvironment.IMAGE_ID, kubeCloudImage.getId(), null),
+                         new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getId(), null),
                          new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
-                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null),
-                         new EnvVar(KubeContainerEnvironment.BUILD_ID, cloudInstanceUserData.getCustomAgentConfigurationParameters().get(CloudConstants.BUILD_ID), null));
+                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
 
         String dockerCommand = kubeCloudImage.getDockerCommand();
         if(!StringUtil.isEmpty(dockerCommand)) containerBuilder = containerBuilder.withCommand(dockerCommand);
