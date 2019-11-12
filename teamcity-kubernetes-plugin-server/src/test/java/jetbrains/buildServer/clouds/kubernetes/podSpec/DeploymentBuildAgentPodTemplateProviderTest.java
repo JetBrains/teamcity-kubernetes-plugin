@@ -1,4 +1,4 @@
-package jetbrains.buildServer.clouds.kubernetes;
+package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
+import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.auth.UnauthorizedAccessStrategy;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
@@ -58,7 +59,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         final ServerPaths serverPaths = new ServerPaths(tempFiles.createTempDir());
         final EventDispatcher<BuildServerListener> eventDispatcher = EventDispatcher.create(BuildServerListener.class);
         myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(
-          serverSettings, myDeploymentContentProvider, new KubePodNameGenerator(serverPaths, executorServices, eventDispatcher));
+          serverSettings, myDeploymentContentProvider, new KubePodNameGeneratorImpl(serverPaths, executorServices, eventDispatcher));
     }
 
     @AfterMethod

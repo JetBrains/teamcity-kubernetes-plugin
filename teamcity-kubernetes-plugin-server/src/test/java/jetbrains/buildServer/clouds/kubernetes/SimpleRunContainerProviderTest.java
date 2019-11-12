@@ -58,7 +58,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     myServerPaths = new ServerPaths(tempFiles.createTempDir());
     myExecutorServices = new SimpleExecutorServices();
     myEventDispatcher = EventDispatcher.create(BuildServerListener.class);
-    myNameGenerator = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
+    myNameGenerator = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
     myContainerProvider = new SimpleRunContainerProvider(myServerSettings, myNameGenerator);
     myCache = new KubeDataCacheImpl();
     myPodTemplateProviders = new BuildAgentPodTemplateProvidersImpl(myServerSettings, (name, kubeClientParams) -> null, myNameGenerator);
@@ -109,11 +109,11 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
                                               KubeParametersConstants.DOCKER_IMAGE, "jetbrains/teamcity-agent",
                                               KubeParametersConstants.AGENT_NAME_PREFIX, "prefix");
     final KubeCloudImage image = createImage(imageParameters);
-    final KubePodNameGenerator newGenerator1 = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
+    final KubePodNameGenerator newGenerator1 = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
 
     then(newGenerator1.generateNewVmName(image)).isEqualTo("prefix-1");
     myEventDispatcher.getMulticaster().serverShutdown();
-    final KubePodNameGenerator newGenerator2 = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
+    final KubePodNameGenerator newGenerator2 = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
     then(newGenerator2.generateNewVmName(image)).isEqualTo("prefix-2");
   }
 
@@ -145,7 +145,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     for (int i=0; i<10; i++){
       thArray[i].join();
     }
-    final KubePodNameGenerator newGenerator1 = new KubePodNameGenerator(myServerPaths, myExecutorServices, myEventDispatcher);
+    final KubePodNameGenerator newGenerator1 = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
     int generatedSize = generatedNames.size();
     then(generatedSize).isLessThan(500000);
     then(newGenerator1.generateNewVmName(image)).isEqualTo("prefix-" + (generatedSize+1));

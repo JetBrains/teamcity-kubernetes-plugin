@@ -4,6 +4,7 @@ import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import java.io.File;
+import jetbrains.buildServer.Used;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.serverSide.ServerSettings;
@@ -51,10 +52,19 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
         final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
 
         String spec = kubeCloudImage.getCustomPodTemplateSpec();
+        return getPodTemplateInternal(cloudInstanceUserData, kubeCloudImage.getId(), kubeClientParams.getNamespace(), instanceName, spec);
+    }
+
+    @Used("tests")
+    /* package local for tests */ Pod getPodTemplateInternal(@NotNull final CloudInstanceUserData cloudInstanceUserData,
+                                      @NotNull final String imageId,
+                                      @NotNull final String namespace,
+                                      final String instanceName,
+                                      String spec) {
         spec = spec.replaceAll("%instance\\.id%", instanceName);
 
         if (StringUtil.isEmpty(spec)) {
-            throw new KubeCloudException("Custom pod template spec is not specified for image " + kubeCloudImage.getId());
+            throw new KubeCloudException("Custom pod template spec is not specified for image " + imageId);
         }
 
         final PodTemplateSpec podTemplateSpec = Serialization.unmarshal(
@@ -64,9 +74,9 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
 
         return patchedPodTemplateSpec(podTemplateSpec,
                                       instanceName,
-                                      kubeClientParams.getNamespace(),
+                                      namespace,
                                       myServerSettings.getServerUUID(),
-                                      kubeCloudImage.getId(),
+                                      imageId,
                                       cloudInstanceUserData);
     }
 }
