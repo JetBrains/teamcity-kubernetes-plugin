@@ -51,7 +51,6 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
         final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
 
         String spec = kubeCloudImage.getCustomPodTemplateSpec();
-        System.out.println(spec);
         spec = spec.replaceAll("%instance\\.id%", instanceName);
 
         if (StringUtil.isEmpty(spec)) {

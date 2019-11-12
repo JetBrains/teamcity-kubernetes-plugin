@@ -72,10 +72,12 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
     // check for run in Kubernetes:
     if ("true".equals(customParams.get(RUN_IN_KUBE_FEATURE))){
+      /*
       final String buildId = customParams.get(CloudConstants.BUILD_ID);
       if (StringUtil.isNotEmpty(buildId)){
         envDataMap.put(KubeContainerEnvironment.BUILD_ID, buildId);
       }
+      */
     }
 
     if (!envDataMap.containsKey(SERVER_URL)) {
@@ -101,7 +103,9 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
     metadata.setNamespace(namespace);
 
     Map<String, String> patchedLabels = new HashMap<>();
-    patchedLabels.putAll(metadata.getLabels());
+    if (metadata.getLabels() != null) {
+      patchedLabels.putAll(metadata.getLabels());
+    }
     patchedLabels.putAll(CollectionsUtil.asMap(
       KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
       KubeTeamCityLabels.TEAMCITY_SERVER_UUID, serverUUID,
