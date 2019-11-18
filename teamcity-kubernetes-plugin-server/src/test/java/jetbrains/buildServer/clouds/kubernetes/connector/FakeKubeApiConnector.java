@@ -36,12 +36,6 @@ public class FakeKubeApiConnector implements KubeApiConnector {
     return null;
   }
 
-  @NotNull
-  @Override
-  public PodPhase getPodPhase(@NotNull final String podName) {
-    return null;
-  }
-
   @Nullable
   @Override
   public Deployment getDeployment(@NotNull final String deploymentName) {

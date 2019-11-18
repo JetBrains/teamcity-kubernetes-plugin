@@ -35,7 +35,9 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
 
     private final KubeCloudImage myKubeCloudImage;
     private final KubeApiConnector myApiConnector;
-    private final Pod myPod;
+    private volatile Pod myPod;
+    private volatile InstanceStatus myInstanceStatus;
+    private volatile Date myStartDate;
 
     private CloudErrorInfo myCurrentError;
     private Date myCreationTime;
@@ -81,7 +83,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public Date getStartedTime() {
-        final PodStatus podStatus = myApiConnector.getPodStatus(myPod.getMetadata().getName());
+        final PodStatus podStatus = myPod.getStatus();
         if(podStatus == null) return myCreationTime;
         try {
             final List<PodCondition> podConditions = podStatus.getConditions();
@@ -107,13 +109,13 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public InstanceStatus getStatus() {
-        return InstanceStatusUtils.mapPodPhase(myApiConnector.getPodPhase(myPod.getMetadata().getName()));
+        return  InstanceStatusUtils.mapPodPhase(myPod.getStatus());
     }
 
     @Nullable
     @Override
     public CloudErrorInfo getErrorInfo() {
-        return myCurrentError;
+        return InstanceStatusUtils.getErrorMessage(myPod.getStatus());
     }
 
     @Override
@@ -136,5 +138,9 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
             myCurrentError = new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex);
         }
         myKubeCloudImage.populateInstances();
+    }
+
+    public void updateState(@NotNull Pod actualPod){
+        myPod = actualPod;
     }
 }

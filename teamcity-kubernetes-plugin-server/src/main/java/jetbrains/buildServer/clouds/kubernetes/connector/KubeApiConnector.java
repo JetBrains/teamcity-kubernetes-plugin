@@ -26,9 +26,6 @@ public interface KubeApiConnector {
     @NotNull
     Collection<Pod> listPods(@NotNull Map<String, String> labels);
 
-    @NotNull
-    PodPhase getPodPhase(@NotNull String podName);
-
     @Nullable
     Deployment getDeployment(@NotNull String deploymentName);
 

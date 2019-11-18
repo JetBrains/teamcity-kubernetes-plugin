@@ -1,8 +1,11 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
+import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
@@ -17,14 +20,13 @@ import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
  */
 public class KubeCloudImageImpl implements KubeCloudImage {
+    private static final Logger LOG = Logger.getInstance(KubeCloudImageImpl.class.getName());
     private final KubeApiConnector myApiConnector;
     private final KubeCloudImageData myImageData;
     private final KubeDataCache myCache;
@@ -93,7 +95,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
             final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceUserData, this, clientParams);
             final Pod newPod = myApiConnector.createPod(podTemplate);
             myCurrentError = null;
-            newInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, newPod, myApiConnector), myCache);
+            newInstance = new KubeCloudInstanceImpl(this, newPod, myApiConnector);
         } catch (KubeCloudException | KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
             throw ex;
@@ -174,7 +176,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myCurrentError;
     }
 
-    //TODO: syncronize access to myIdToInstanceMap
+    //TODO: synchronize access to myIdToInstanceMap
     //TODO: filter pods more carefully using all setted labels
     public void populateInstances(){
         try{
@@ -182,12 +184,50 @@ public class KubeCloudImageImpl implements KubeCloudImage {
               KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId(),
               KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, myImageData.getProfileId()
                                                                  ));
-            myIdToInstanceMap.clear();
-            myCache.invalidate();
+            final Set<String> keys = new HashSet<>(myIdToInstanceMap.keySet());
+            final List<Pod> newPods = new ArrayList<>();
             for (Pod pod : pods){
-                KubeCloudInstance cloudInstance = new CachingKubeCloudInstance(new KubeCloudInstanceImpl(this, pod, myApiConnector), myCache);
-                String instanceId = cloudInstance.getInstanceId();
-                myIdToInstanceMap.put(instanceId, cloudInstance);
+                if (pod.getMetadata() == null){
+                    LOG.debug("Found pod without metadata...");
+                    continue;
+                }
+                final String podName = pod.getMetadata().getName();
+                if (keys.remove(podName)){
+                    LOG.debug(String.format("Found known pod '%s'", podName));
+                    final KubeCloudInstance instance = myIdToInstanceMap.get(podName);
+                    if (instance == null){
+                        LOG.warn(String.format("Instance '%s' was removed?!", podName));
+                        continue;
+                    }
+                    instance.updateState(pod);
+                } else {
+                    LOG.debug(String.format("Found new pod '%s'", podName));
+                    newPods.add(pod);
+                }
+            }
+            if (keys.size() > 0) {
+                LOG.info(String.format("The following %s %s deleted: %s",
+                                       StringUtil.withPlural(keys.size(), "pod"),
+                                       keys.size() == 1? "was" : "were",
+                                       String.join(", ", keys))
+                );
+                keys.forEach(myIdToInstanceMap::remove);
+            }
+            if (newPods.size() > 0){
+                final List<String> podNames = newPods.stream().map(pod -> pod.getMetadata().getName()).collect(Collectors.toList());
+                LOG.info(String.format(
+                  "Found %d new %s: %s",
+                  newPods.size(),
+                  StringUtil.pluralize("pod", newPods.size()),
+                  String.join(", ", podNames)
+                ));
+                newPods.forEach(pod->{
+                    final String podName = pod.getMetadata().getName();
+                    final KubeCloudInstance putInstance = myIdToInstanceMap.putIfAbsent(podName, new KubeCloudInstanceImpl(this, pod, myApiConnector));
+                    if (putInstance != null){
+                        myIdToInstanceMap.get(podName).updateState(pod);
+                    }
+                });
             }
             myCurrentError = null;
         } catch (KubernetesClientException ex){

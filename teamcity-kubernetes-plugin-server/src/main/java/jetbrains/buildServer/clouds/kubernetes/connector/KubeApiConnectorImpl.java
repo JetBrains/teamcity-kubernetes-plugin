@@ -108,15 +108,6 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         });
     }
 
-    @NotNull
-    @Override
-    public PodPhase getPodPhase(@NotNull String podName) {
-        return withKubernetesClient(kubernetesClient -> {
-            final Pod podNow = kubernetesClient.pods().withName(podName).get();
-            return podNow == null ? PodPhase.Unknown : PodPhase.valueOf(podNow.getStatus().getPhase());
-        });
-    }
-
     @Nullable
     @Override
     public Deployment getDeployment(@NotNull String deploymentName) {
