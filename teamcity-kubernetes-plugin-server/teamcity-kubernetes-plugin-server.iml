@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
+  <component name="AutoImportedSourceRoots">
+    <option name="directories">
+      <list>
+        <option value="src/main/java" />
+        <option value="src/main/resources" />
+        <option value="src/test/java" />
+      </list>
+    </option>
+  </component>
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
       <configuration>
@@ -37,5 +46,6 @@
     <orderEntry type="library" name="aws-sdk-eks" level="project" />
     <orderEntry type="library" name="aws-sdk-common" level="project" />
     <orderEntry type="library" name="aws-sdk-sources" level="project" />
+    <orderEntry type="library" name="io.fabric8:kubernetes-client:4.7.0" level="project" />
   </component>
 </module>

@@ -2,7 +2,7 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
 import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import java.io.File;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;

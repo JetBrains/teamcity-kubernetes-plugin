@@ -1,6 +1,6 @@
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudClientParameters;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;

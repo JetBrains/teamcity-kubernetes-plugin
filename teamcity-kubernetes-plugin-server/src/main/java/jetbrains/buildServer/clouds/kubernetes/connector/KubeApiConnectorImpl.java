@@ -4,7 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.*;
 import java.util.Date;
 import java.util.function.Function;
@@ -111,9 +111,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Nullable
     @Override
     public Deployment getDeployment(@NotNull String deploymentName) {
-        return withKubernetesClient(kubernetesClient -> {
-            return kubernetesClient.extensions().deployments().withName(deploymentName).get();
-        });
+        return withKubernetesClient(kubernetesClient -> kubernetesClient.apps().deployments().withName(deploymentName).get());
     }
 
     @Nullable

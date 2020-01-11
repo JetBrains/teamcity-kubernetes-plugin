@@ -2,7 +2,7 @@ package jetbrains.buildServer.clouds.kubernetes.connector;
 
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import java.util.Collection;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;

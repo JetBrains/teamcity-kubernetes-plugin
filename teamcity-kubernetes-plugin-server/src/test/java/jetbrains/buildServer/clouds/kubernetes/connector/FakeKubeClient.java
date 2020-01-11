@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.kubernetes.client.dsl.base.BaseOperation;
+import io.fabric8.kubernetes.client.dsl.base.OperationContext;
 
 public class FakeKubeClient extends DefaultKubernetesClient {
 
@@ -30,7 +31,8 @@ public class FakeKubeClient extends DefaultKubernetesClient {
   private static class MyOperation extends BaseOperation{
 
     protected MyOperation() {
-      super(null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+      super(new OperationContext(null, null, null, null, null, null, null, false, null, null, null, null, null, null,
+              null, null, false, 10000, null));
     }
   }
 }
