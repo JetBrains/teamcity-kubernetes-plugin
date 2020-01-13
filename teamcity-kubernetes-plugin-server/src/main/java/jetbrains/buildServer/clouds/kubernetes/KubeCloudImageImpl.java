@@ -206,8 +206,8 @@ public class KubeCloudImageImpl implements KubeCloudImage {
                 }
             }
             if (keys.size() > 0) {
-                LOG.info(String.format("The following %s %s deleted: %s",
-                                       StringUtil.withPlural(keys.size(), "pod"),
+                LOG.info(String.format("The following %d %s %s deleted: %s",
+                                       keys.size(), StringUtil.pluralize( "pod",keys.size()),
                                        keys.size() == 1? "was" : "were",
                                        String.join(", ", keys))
                 );
