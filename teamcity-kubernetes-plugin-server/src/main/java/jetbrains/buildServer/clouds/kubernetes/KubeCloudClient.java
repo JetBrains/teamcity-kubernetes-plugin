@@ -119,11 +119,11 @@ public class KubeCloudClient implements CloudClientEx {
             return false;
         }
         int profileInstanceLimit = myKubeClientParams.getInstanceLimit();
-        if(profileInstanceLimit > 0 && myImageIdToImageMap.values().stream().mapToInt(KubeCloudImage::getRunningInstanceCount).sum() >= profileInstanceLimit)
+        if(profileInstanceLimit >= 0 && myImageIdToImageMap.values().stream().mapToInt(KubeCloudImage::getRunningInstanceCount).sum() >= profileInstanceLimit)
             return false;
 
         int imageLimit = kubeCloudImage.getInstanceLimit();
-        return imageLimit <= 0 || kubeCloudImage.getRunningInstanceCount() < imageLimit;
+        return imageLimit < 0 || kubeCloudImage.getRunningInstanceCount() < imageLimit;
     }
 
     @Nullable
