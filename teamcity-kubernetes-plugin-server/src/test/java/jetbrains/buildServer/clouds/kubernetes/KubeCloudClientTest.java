@@ -94,7 +94,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
         KubeCloudClient cloudClient = createClient(images);
-        assertTrue(cloudClient.canStartNewInstance(image));
+        assertFalse(cloudClient.canStartNewInstance(image));
     }
 
     @Test
