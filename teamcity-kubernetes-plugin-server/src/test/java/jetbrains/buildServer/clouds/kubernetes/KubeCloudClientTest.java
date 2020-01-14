@@ -98,6 +98,20 @@ public class KubeCloudClientTest extends BaseTestCase {
     }
 
     @Test
+    public void testCanStartNewInstance2() throws Exception {
+        KubeCloudImage image = m.mock(KubeCloudImage.class);
+        m.checking(new Expectations(){{
+            allowing(image).getName(); will(returnValue("image-1-name"));
+            allowing(image).getId(); will(returnValue("image-1-id"));
+            allowing(image).getRunningInstanceCount(); will(returnValue(1));
+            allowing(image).getInstanceLimit(); will(returnValue(5));
+        }});
+        List<KubeCloudImage> images = Collections.singletonList(image);
+        KubeCloudClient cloudClient = createClient(images);
+        assertTrue(cloudClient.canStartNewInstance(image));
+    }
+
+    @Test
     public void testCanStartNewInstance_ProfileLimit() throws Exception {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
@@ -109,6 +123,20 @@ public class KubeCloudClientTest extends BaseTestCase {
         CloudClientParameters cloudClientParameters = new MockCloudClientParameters(Collections.singletonMap(PROFILE_INSTANCE_LIMIT, "1"));
         KubeCloudClient cloudClient = createClient(images, cloudClientParameters);
         assertFalse(cloudClient.canStartNewInstance(image));
+    }
+
+    @Test
+    public void testCanStartNewInstance_ProfileLimit2() throws Exception {
+        KubeCloudImage image = m.mock(KubeCloudImage.class);
+        m.checking(new Expectations(){{
+            allowing(image).getId(); will(returnValue("image-1-id"));
+            allowing(image).getRunningInstanceCount(); will(returnValue(3));
+            allowing(image).getInstanceLimit(); will(returnValue(5));
+        }});
+        List<KubeCloudImage> images = Collections.singletonList(image);
+        CloudClientParameters cloudClientParameters = new MockCloudClientParameters(Collections.singletonMap(PROFILE_INSTANCE_LIMIT, "5"));
+        KubeCloudClient cloudClient = createClient(images, cloudClientParameters);
+        assertTrue(cloudClient.canStartNewInstance(image));
     }
 
     @Test
