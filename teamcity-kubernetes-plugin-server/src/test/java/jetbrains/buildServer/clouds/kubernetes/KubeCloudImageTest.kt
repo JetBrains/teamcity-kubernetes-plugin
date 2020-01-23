@@ -94,7 +94,7 @@ class KubeCloudImageTest : BaseTestCase() {
             }
         }
         return KubeCloudImageImpl(KubeCloudImageData(CloudImageParametersImpl(cloudImageData, PROJECT_ID, "image1")),
-                myApiConnector, KubeDataCacheImpl(), buildAgentPodTemplateProviders)
+                myApiConnector, buildAgentPodTemplateProviders)
     }
 
     private fun createInstanceTag(): CloudInstanceUserData {

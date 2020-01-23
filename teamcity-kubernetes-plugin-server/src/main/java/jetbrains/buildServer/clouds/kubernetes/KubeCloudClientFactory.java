@@ -46,7 +46,6 @@ public class KubeCloudClientFactory implements CloudClientFactory {
 
     private final PluginDescriptor myPluginDescriptor;
     private final ServerSettings myServerSettings;
-    private final KubeDataCache myCache;
     private final KubeAuthStrategyProvider myAuthStrategies;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
     private final KubeBackgroundUpdater myUpdater;
@@ -56,13 +55,11 @@ public class KubeCloudClientFactory implements CloudClientFactory {
                                   @NotNull final ServerSettings serverSettings,
                                   @NotNull final KubeAuthStrategyProvider authStrategies,
                                   @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
-                                  @NotNull final KubeDataCache cache,
                                   @NotNull final KubeBackgroundUpdater updater) {
         myPluginDescriptor = pluginDescriptor;
         myServerSettings = serverSettings;
         myAuthStrategies = authStrategies;
         myPodTemplateProviders = podTemplateProviders;
-        myCache = cache;
         myUpdater = updater;
         registrar.registerCloudFactory(this);
     }
@@ -113,7 +110,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
             final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
           final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudClientParameters.getProfileId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
-                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myCache, myPodTemplateProviders);
+                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myPodTemplateProviders);
                 kubeCloudImage.populateInstances();
                 return kubeCloudImage;
             });

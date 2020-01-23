@@ -21,7 +21,6 @@
        default-autowire="constructor">
     <bean class="jetbrains.buildServer.clouds.kubernetes.KubePodNameGeneratorImpl"/>
     <bean id="kubeCloudClientFactory" class="jetbrains.buildServer.clouds.kubernetes.KubeCloudClientFactory" />
-    <bean id="kubeDataCache" class="jetbrains.buildServer.clouds.kubernetes.KubeDataCacheImpl" />
     <bean id="kubeBackgroundUpdater" class="jetbrains.buildServer.clouds.kubernetes.KubeBackgroundUpdaterImpl" />
     <bean id="kubeAuthStrategyProvider" class="jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl" />
     <bean id="podTemplateProviders" class="jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvidersImpl" />

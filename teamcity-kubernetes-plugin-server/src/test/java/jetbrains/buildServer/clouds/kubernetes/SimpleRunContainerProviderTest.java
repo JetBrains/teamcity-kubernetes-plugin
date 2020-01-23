@@ -57,7 +57,6 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   private ServerPaths myServerPaths;
   private ExecutorServices myExecutorServices;
   private EventDispatcher<BuildServerListener> myEventDispatcher;
-  private KubeDataCacheImpl myCache;
   private BuildAgentPodTemplateProvidersImpl myPodTemplateProviders;
 
   @BeforeMethod
@@ -76,7 +75,6 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     myEventDispatcher = EventDispatcher.create(BuildServerListener.class);
     myNameGenerator = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
     myContainerProvider = new SimpleRunContainerProvider(myServerSettings, myNameGenerator);
-    myCache = new KubeDataCacheImpl();
     myPodTemplateProviders = new BuildAgentPodTemplateProvidersImpl(myServerSettings, (name, kubeClientParams) -> null, myNameGenerator);
 
   }
@@ -185,7 +183,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
 
   private KubeCloudImage createImage(Map<String, String> imageParameters){
     final CloudImageDataImpl imageData = new CloudImageDataImpl(imageParameters);
-    return new KubeCloudImageImpl(new KubeCloudImageData(new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")), new FakeKubeApiConnector(), myCache,
+    return new KubeCloudImageImpl(new KubeCloudImageData(new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")), new FakeKubeApiConnector(),
                                   myPodTemplateProviders);
   }
 

@@ -45,7 +45,6 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     private static final Logger LOG = Logger.getInstance(KubeCloudImageImpl.class.getName());
     private final KubeApiConnector myApiConnector;
     private final KubeCloudImageData myImageData;
-    private final KubeDataCache myCache;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
 
     private final ConcurrentMap<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
@@ -53,11 +52,9 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
                        @NotNull final KubeApiConnector apiConnector,
-                       @NotNull final KubeDataCache cache,
                        @NotNull final BuildAgentPodTemplateProviders podTemplateProviders) {
         myImageData = kubeCloudImageData;
         myApiConnector = apiConnector;
-        myCache = cache;
         myPodTemplateProviders = podTemplateProviders;
     }
 

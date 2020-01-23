@@ -41,7 +41,6 @@ public class KubeCloudClientTest extends BaseTestCase {
     private Mockery m;
     private KubeApiConnector myApi;
     private BuildAgentPodTemplateProviders myPodTemplateProviders;
-    private KubeDataCache myCache;
     private KubeBackgroundUpdater myUpdater = new KubeBackgroundUpdater() {
         @Override
         public void registerClient(@NotNull KubeCloudClient client) {
@@ -60,7 +59,6 @@ public class KubeCloudClientTest extends BaseTestCase {
         m = new Mockery();
         myApi = m.mock(KubeApiConnector.class);
         myPodTemplateProviders = m.mock(BuildAgentPodTemplateProviders.class);
-        myCache = new KubeDataCacheImpl();
     }
 
     @NotNull
