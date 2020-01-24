@@ -21,6 +21,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
@@ -46,16 +47,19 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     private final KubeApiConnector myApiConnector;
     private final KubeCloudImageData myImageData;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
+    private ExecutorService myExecutorService;
 
     private final ConcurrentMap<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
     private CloudErrorInfo myCurrentError;
 
     KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
                        @NotNull final KubeApiConnector apiConnector,
-                       @NotNull final BuildAgentPodTemplateProviders podTemplateProviders) {
+                       @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
+                       @NotNull final ExecutorService executorService) {
         myImageData = kubeCloudImageData;
         myApiConnector = apiConnector;
         myPodTemplateProviders = podTemplateProviders;
+        myExecutorService = executorService;
     }
 
     @NotNull
@@ -108,7 +112,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
             final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceUserData, this, clientParams);
             final Pod newPod = myApiConnector.createPod(podTemplate);
             myCurrentError = null;
-            newInstance = new KubeCloudInstanceImpl(this, newPod, myApiConnector);
+            newInstance = new KubeCloudInstanceImpl(this, newPod);
         } catch (KubeCloudException | KubernetesClientException ex){
             myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
             throw ex;
@@ -236,7 +240,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
                 ));
                 newPods.forEach(pod->{
                     final String podName = pod.getMetadata().getName();
-                    final KubeCloudInstance putInstance = myIdToInstanceMap.putIfAbsent(podName, new KubeCloudInstanceImpl(this, pod, myApiConnector));
+                    final KubeCloudInstance putInstance = myIdToInstanceMap.putIfAbsent(podName, new KubeCloudInstanceImpl(this, pod));
                     if (putInstance != null){
                         myIdToInstanceMap.get(podName).updateState(pod);
                     }

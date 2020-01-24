@@ -61,7 +61,7 @@ public class KubeCloudInstanceImplTest extends BaseTestCase {
         m.checking(new Expectations(){{
             allowing(myApi).getPodStatus(with("foo")); will(returnValue(pod.getStatus()));
         }});
-        KubeCloudInstanceImpl instance = new KubeCloudInstanceImpl(image, pod, myApi);
+        KubeCloudInstanceImpl instance = new KubeCloudInstanceImpl(image, pod);
         Date startedTime = instance.getStartedTime();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

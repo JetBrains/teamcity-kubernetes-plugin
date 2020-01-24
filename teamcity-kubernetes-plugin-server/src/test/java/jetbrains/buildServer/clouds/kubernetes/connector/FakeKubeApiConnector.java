@@ -42,7 +42,7 @@ public class FakeKubeApiConnector implements KubeApiConnector {
   }
 
   @Override
-  public boolean deletePod(@NotNull final Pod pod, final long gracePeriod) {
+  public boolean deletePod(@NotNull final String podName, final long gracePeriod) {
     return false;
   }
 

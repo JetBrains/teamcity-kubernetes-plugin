@@ -59,6 +59,10 @@ public class InstanceStatusUtils {
         return new CloudErrorInfo(String.format("%s:%s", reason, message));
     }
 
+    public static boolean isPodStatus(@NotNull InstanceStatus status){
+        return myPhasesMap.containsValue(status);
+    }
+
     static {
         myPhasesMap.put("Running", InstanceStatus.RUNNING);
         myPhasesMap.put("Pending", InstanceStatus.SCHEDULED_TO_START);

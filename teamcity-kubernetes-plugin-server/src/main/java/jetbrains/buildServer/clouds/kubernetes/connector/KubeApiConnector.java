@@ -37,7 +37,7 @@ public interface KubeApiConnector {
     @NotNull
     Pod createPod(@NotNull Pod podTemplate);
 
-    boolean deletePod(@NotNull Pod pod, long gracePeriod);
+    boolean deletePod(@NotNull String podName, long gracePeriod);
 
     @NotNull
     Collection<Pod> listPods(@NotNull Map<String, String> labels);

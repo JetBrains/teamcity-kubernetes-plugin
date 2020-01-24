@@ -19,14 +19,10 @@ package jetbrains.buildServer.clouds.kubernetes;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodCondition;
 import io.fabric8.kubernetes.api.model.PodStatus;
-import io.fabric8.kubernetes.client.KubernetesClientException;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
-import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.InstanceStatus;
-import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.PodConditionType;
 import jetbrains.buildServer.serverSide.AgentDescription;
-import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,25 +40,20 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.I
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
 public class KubeCloudInstanceImpl implements KubeCloudInstance {
-    private static final String TEAMCITY_KUBE_PODS_GRACE_PERIOD = "teamcity.kube.pods.gracePeriod";
 
     private SimpleDateFormat myPodTransitionTimeFormat;
     private SimpleDateFormat myPodStartTimeFormat;
 
     private final KubeCloudImage myKubeCloudImage;
-    private final KubeApiConnector myApiConnector;
     private volatile Pod myPod;
-    private volatile InstanceStatus myInstanceStatus;
+    private volatile InstanceStatus myInstanceStatus = InstanceStatus.SCHEDULED_TO_START;
     private volatile Date myStartDate;
 
     private CloudErrorInfo myCurrentError;
     private Date myCreationTime;
 
-    public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage,
-                                 @NotNull Pod pod,
-                                 @NotNull KubeApiConnector apiConnector) {
+    public KubeCloudInstanceImpl(@NotNull KubeCloudImage kubeCloudImage, @NotNull Pod pod) {
         myKubeCloudImage = kubeCloudImage;
-        myApiConnector = apiConnector;
         myPod = pod;
         final TimeZone utc = TimeZone.getTimeZone("UTC");
         myPodStartTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
@@ -92,8 +83,13 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
 
     @NotNull
     @Override
-    public CloudImage getImage() {
+    public KubeCloudImage getImage() {
         return myKubeCloudImage;
+    }
+
+    @Override
+    public void setStatus(final InstanceStatus status) {
+        myInstanceStatus = status;
     }
 
     @NotNull
@@ -125,7 +121,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @NotNull
     @Override
     public InstanceStatus getStatus() {
-        return  InstanceStatusUtils.mapPodPhase(myPod.getStatus());
+        return myInstanceStatus;
     }
 
     @Nullable
@@ -140,23 +136,19 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         return getName().equals(agentParams.get(INSTANCE_NAME));
     }
 
-    @Override
-    public void terminate() {
-        long gracePeriod = TeamCityProperties.getLong(TEAMCITY_KUBE_PODS_GRACE_PERIOD, 0);
-        try{
-            int failedDeleteAttempts = 0;
-            while (!myApiConnector.deletePod(myPod, gracePeriod)){
-                failedDeleteAttempts++;
-                if(failedDeleteAttempts == 10) throw new KubeCloudException("Failed to delete pod " + myPod);
-            }
-            myCurrentError = null;
-        } catch (KubernetesClientException ex){
-            myCurrentError = new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex);
-        }
-        myKubeCloudImage.populateInstances();
-    }
-
     public void updateState(@NotNull Pod actualPod){
         myPod = actualPod;
+        InstanceStatus podStatus = InstanceStatusUtils.mapPodPhase(actualPod.getStatus());
+        if (podStatus == InstanceStatus.STOPPED) {
+            myInstanceStatus = InstanceStatus.STOPPED;
+        } else if (InstanceStatusUtils.isPodStatus(myInstanceStatus)){
+            myInstanceStatus = podStatus;
+        }
     }
+
+    @Override
+    public void setError(@Nullable final CloudErrorInfo errorInfo) {
+        myCurrentError = errorInfo;
+    }
+
 }

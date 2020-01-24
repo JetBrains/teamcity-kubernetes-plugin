@@ -18,9 +18,13 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.concurrent.ExecutorService;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.serverSide.AgentDescription;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,24 +42,31 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.I
  * Created by ekoshkin (koshkinev@gmail.com) on 27.05.17.
  */
 public class KubeCloudClient implements CloudClientEx {
+    private static final String TEAMCITY_KUBE_PODS_GRACE_PERIOD = "teamcity.kube.pods.gracePeriod";
     private final static Logger LOG = Logger.getInstance(KubeCloudClient.class.getName());
 
+    private final KubeApiConnector myApiConnector;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParametersImpl myKubeClientParams;
     private final KubeBackgroundUpdater myUpdater;
+    private final ExecutorService myExecutorService;
 
     @Nullable private final String myServerUuid;
     private final String myCloudProfileId;
 
-    public KubeCloudClient(@Nullable String serverUuid,
+    public KubeCloudClient(@NotNull KubeApiConnector apiConnector,
+                           @Nullable String serverUuid,
                            @NotNull String cloudProfileId,
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParametersImpl kubeClientParams,
-                           @NotNull KubeBackgroundUpdater updater) {
+                           @NotNull KubeBackgroundUpdater updater,
+                           @Nullable ExecutorService executorService) {
+        myApiConnector = apiConnector;
         myServerUuid = serverUuid;
         myCloudProfileId = cloudProfileId;
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getId));
         myKubeClientParams = kubeClientParams;
+        myExecutorService = executorService;
         myUpdater = updater;
         myUpdater.registerClient(this);
     }
@@ -84,8 +95,24 @@ public class KubeCloudClient implements CloudClientEx {
 
     @Override
     public void terminateInstance(@NotNull CloudInstance cloudInstance) {
-        KubeCloudInstance kubeCloudInstance = (KubeCloudInstance) cloudInstance;
-        kubeCloudInstance.terminate();
+        final KubeCloudInstance kubeCloudInstance = (KubeCloudInstance) cloudInstance;
+        kubeCloudInstance.setStatus(InstanceStatus.SCHEDULED_TO_STOP);
+        myExecutorService.submit(() -> {
+            long gracePeriod = TeamCityProperties.getLong(TEAMCITY_KUBE_PODS_GRACE_PERIOD, 0);
+            try{
+                int failedDeleteAttempts = 0;
+                while (!myApiConnector.deletePod(kubeCloudInstance.getName(), gracePeriod)){
+                    failedDeleteAttempts++;
+                    if(failedDeleteAttempts == 10) throw new KubeCloudException("Failed to delete pod " + kubeCloudInstance.getName());
+                }
+                kubeCloudInstance.setError(null);
+            } catch (KubernetesClientException ex){
+                kubeCloudInstance.setError(new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex));
+            } finally {
+                kubeCloudInstance.setStatus(InstanceStatus.STOPPING);
+            }
+            kubeCloudInstance.getImage().populateInstances();
+        });
     }
 
     @Nullable

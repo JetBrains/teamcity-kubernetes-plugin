@@ -104,24 +104,18 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @NotNull
     @Override
     public Pod createPod(@NotNull Pod podTemplate) {
-        return withKubernetesClient(kubernetesClient -> {
-            return kubernetesClient.pods().create(podTemplate);
-        });
+        return withKubernetesClient(kubernetesClient -> kubernetesClient.pods().create(podTemplate));
     }
 
     @Override
-    public boolean deletePod(@NotNull Pod pod, long gracePeriod) {
-        return withKubernetesClient(kubernetesClient -> {
-            return kubernetesClient.pods().withName(pod.getMetadata().getName()).delete();
-        });
+    public boolean deletePod(@NotNull String podName, long gracePeriod) {
+        return withKubernetesClient(kubernetesClient -> kubernetesClient.pods().withName(podName).delete());
     }
 
     @NotNull
     @Override
     public Collection<Pod> listPods(@NotNull Map<String, String> labels) {
-        return withKubernetesClient(kubernetesClient -> {
-            return kubernetesClient.pods().withLabels(labels).list().getItems();
-        });
+        return withKubernetesClient(kubernetesClient -> kubernetesClient.pods().withLabels(labels).list().getItems());
     }
 
     @Nullable

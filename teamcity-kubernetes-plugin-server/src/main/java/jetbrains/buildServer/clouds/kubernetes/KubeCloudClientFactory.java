@@ -17,6 +17,8 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
@@ -108,18 +110,21 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
         try {
             final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
-          final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudClientParameters.getProfileId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
+            final ExecutorService executorService = new ScheduledThreadPoolExecutor(2);
+            final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudClientParameters.getProfileId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
-                KubeCloudImageImpl kubeCloudImage = new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myPodTemplateProviders);
+                final KubeCloudImageImpl kubeCloudImage =
+                    new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myPodTemplateProviders, executorService);
                 kubeCloudImage.populateInstances();
                 return kubeCloudImage;
             });
             return new KubeCloudClient(
-                    myServerSettings.getServerUUID(),
-                    cloudState.getProfileId(),
-                    images,
-                    kubeClientParams,
-                    myUpdater);
+              apiConnector, myServerSettings.getServerUUID(),
+              cloudState.getProfileId(),
+              images,
+              kubeClientParams,
+              myUpdater,
+              executorService);
         } catch (Throwable ex){
             if(ex instanceof KubernetesClientException){
                 final Throwable cause = ex.getCause();
