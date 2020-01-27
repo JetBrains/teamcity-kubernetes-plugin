@@ -22,7 +22,7 @@
     <version>@Version@</version>
     <description>Allows running TeamCity agents in a Kubernetes cluster</description>
     <vendor>
-      <name>JetBrains, s.r.o.</name>
+      <name>JetBrains</name>
       <url>http://www.jetbrains.com</url>
     </vendor>
   </info>
