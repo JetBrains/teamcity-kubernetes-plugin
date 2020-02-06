@@ -28,11 +28,9 @@ import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProv
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders
 import jetbrains.buildServer.clouds.server.impl.profile.CloudImageDataImpl
 import jetbrains.buildServer.clouds.server.impl.profile.CloudImageParametersImpl
-import jetbrains.buildServer.util.executors.ExecutorsFactory
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
-import java.util.concurrent.Executors
 
 @Test
 class KubeCloudImageTest : BaseTestCase() {
@@ -96,7 +94,7 @@ class KubeCloudImageTest : BaseTestCase() {
             }
         }
         return KubeCloudImageImpl(KubeCloudImageData(CloudImageParametersImpl(cloudImageData, PROJECT_ID, "image1")),
-                myApiConnector, buildAgentPodTemplateProviders, ExecutorsFactory.newFixedScheduledExecutor("", 1))
+                myApiConnector)
     }
 
     private fun createInstanceTag(): CloudInstanceUserData {

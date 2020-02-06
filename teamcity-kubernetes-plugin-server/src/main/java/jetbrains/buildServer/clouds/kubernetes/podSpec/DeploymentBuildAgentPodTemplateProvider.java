@@ -41,11 +41,9 @@ public class DeploymentBuildAgentPodTemplateProvider extends AbstractPodTemplate
   private KubePodNameGenerator myPodNameGenerator;
 
   public DeploymentBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings,
-                                                 @NotNull DeploymentContentProvider deploymentContentProvider,
-                                                 @NotNull final KubePodNameGenerator podNameGenerator) {
+                                                 @NotNull DeploymentContentProvider deploymentContentProvider) {
     myServerSettings = serverSettings;
     myDeploymentContentProvider = deploymentContentProvider;
-    myPodNameGenerator = podNameGenerator;
   }
 
   @NotNull
@@ -67,8 +65,9 @@ public class DeploymentBuildAgentPodTemplateProvider extends AbstractPodTemplate
   }
 
   @NotNull
-    @Override
-  public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData,
+  @Override
+  public Pod getPodTemplate(@NotNull String instanceName,
+                            @NotNull CloudInstanceUserData cloudInstanceUserData,
                             @NotNull KubeCloudImage kubeCloudImage,
                             @NotNull KubeCloudClientParameters kubeClientParams) {
     String sourceDeploymentName = kubeCloudImage.getSourceDeploymentName();
@@ -81,8 +80,8 @@ public class DeploymentBuildAgentPodTemplateProvider extends AbstractPodTemplate
       throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);
     }
 
-    final String agentNameProvided = cloudInstanceUserData.getAgentName();
-    final String instanceName = StringUtil.isEmpty(agentNameProvided) ? sourceDeploymentName + "-" + UUID.randomUUID().toString() : agentNameProvided;
+    //final String agentNameProvided = cloudInstanceUserData.getAgentName();
+    //final String instanceName = StringUtil.isEmpty(agentNameProvided) ? sourceDeploymentName + "-" + UUID.randomUUID().toString() : agentNameProvided;
 
     return patchedPodTemplateSpec(sourceDeployment.getSpec().getTemplate(),
                                   instanceName,

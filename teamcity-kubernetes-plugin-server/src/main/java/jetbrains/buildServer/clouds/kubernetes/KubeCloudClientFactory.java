@@ -50,6 +50,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     private final ServerSettings myServerSettings;
     private final KubeAuthStrategyProvider myAuthStrategies;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
+    @NotNull private final KubePodNameGenerator myKubePodNameGenerator;
     private final KubeBackgroundUpdater myUpdater;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
@@ -57,11 +58,13 @@ public class KubeCloudClientFactory implements CloudClientFactory {
                                   @NotNull final ServerSettings serverSettings,
                                   @NotNull final KubeAuthStrategyProvider authStrategies,
                                   @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
+                                  @NotNull final KubePodNameGenerator kubePodNameGenerator,
                                   @NotNull final KubeBackgroundUpdater updater) {
         myPluginDescriptor = pluginDescriptor;
         myServerSettings = serverSettings;
         myAuthStrategies = authStrategies;
         myPodTemplateProviders = podTemplateProviders;
+        myKubePodNameGenerator = kubePodNameGenerator;
         myUpdater = updater;
         registrar.registerCloudFactory(this);
     }
@@ -114,7 +117,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
             final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudClientParameters.getProfileId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
                 final KubeCloudImageImpl kubeCloudImage =
-                    new KubeCloudImageImpl(kubeCloudImageData, apiConnector, myPodTemplateProviders, executorService);
+                    new KubeCloudImageImpl(kubeCloudImageData, apiConnector);
                 kubeCloudImage.populateInstances();
                 return kubeCloudImage;
             });
@@ -124,7 +127,10 @@ public class KubeCloudClientFactory implements CloudClientFactory {
               images,
               kubeClientParams,
               myUpdater,
-              executorService);
+              myPodTemplateProviders,
+              executorService,
+              myKubePodNameGenerator
+              );
         } catch (Throwable ex){
             if(ex instanceof KubernetesClientException){
                 final Throwable cause = ex.getCause();

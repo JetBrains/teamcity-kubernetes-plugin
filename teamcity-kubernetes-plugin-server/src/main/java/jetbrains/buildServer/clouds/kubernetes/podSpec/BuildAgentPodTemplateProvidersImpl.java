@@ -33,11 +33,10 @@ public class BuildAgentPodTemplateProvidersImpl implements BuildAgentPodTemplate
     private final Map<String, BuildAgentPodTemplateProvider> myIdToProviderMap = new HashMap<>();
 
     public BuildAgentPodTemplateProvidersImpl(@NotNull ServerSettings serverSettings,
-                                              @NotNull DeploymentContentProvider deploymentContentProvider,
-                                              @NotNull KubePodNameGenerator podNameGenerator) {
-        registerProvider(new SimpleRunContainerProvider(serverSettings, podNameGenerator));
-        registerProvider(new DeploymentBuildAgentPodTemplateProvider(serverSettings, deploymentContentProvider, podNameGenerator));
-        registerProvider(new CustomTemplatePodTemplateProvider(serverSettings, podNameGenerator));
+                                              @NotNull DeploymentContentProvider deploymentContentProvider) {
+        registerProvider(new SimpleRunContainerProvider(serverSettings));
+        registerProvider(new DeploymentBuildAgentPodTemplateProvider(serverSettings, deploymentContentProvider));
+        registerProvider(new CustomTemplatePodTemplateProvider(serverSettings));
     }
 
     @NotNull

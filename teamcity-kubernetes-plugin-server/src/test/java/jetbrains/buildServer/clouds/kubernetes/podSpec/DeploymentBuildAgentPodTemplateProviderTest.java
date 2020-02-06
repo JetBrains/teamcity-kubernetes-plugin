@@ -56,6 +56,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
     private BuildAgentPodTemplateProvider myPodTemplateProvider;
     private UnauthorizedAccessStrategy myAuthStrategy = new UnauthorizedAccessStrategy();
     private DeploymentContentProvider myDeploymentContentProvider;
+    private KubePodNameGenerator myNameGenerator;
 
     @BeforeMethod
     @Override
@@ -75,8 +76,8 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         TempFiles tempFiles = new TempFiles();
         final ServerPaths serverPaths = new ServerPaths(tempFiles.createTempDir());
         final EventDispatcher<BuildServerListener> eventDispatcher = EventDispatcher.create(BuildServerListener.class);
-        myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(
-          serverSettings, myDeploymentContentProvider, new KubePodNameGeneratorImpl(serverPaths, executorServices, eventDispatcher));
+        myNameGenerator = new KubePodNameGeneratorImpl(serverPaths, executorServices, eventDispatcher);
+        myPodTemplateProvider = new DeploymentBuildAgentPodTemplateProvider(serverSettings, myDeploymentContentProvider);
     }
 
     @AfterMethod
@@ -94,7 +95,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(null));
         }});
-        assertExceptionThrown(() -> myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams), KubeCloudException.class);
+        assertExceptionThrown(() -> myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, clientParams), KubeCloudException.class);
     }
 
     public void testGetPodTemplate() throws Exception {
@@ -129,7 +130,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
-        Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
+        Pod podTemplate = myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, clientParams);
         assertNotNull(podTemplate);
         assertNotNull(podTemplate.getMetadata());
         assertNotNull(podTemplate.getSpec());
@@ -166,7 +167,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
-        Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
+        Pod podTemplate = myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, clientParams);
         for(Container container : podTemplate.getSpec().getContainers()){
             assertNotSame(container.getName(), "agent name");
         }
@@ -208,7 +209,7 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
 
-        Pod podTemplate = myPodTemplateProvider.getPodTemplate(instanceTag, image, clientParams);
+        Pod podTemplate = myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, clientParams);
 
         assertNotEmpty(podTemplate.getSpec().getAdditionalProperties().keySet());
     }

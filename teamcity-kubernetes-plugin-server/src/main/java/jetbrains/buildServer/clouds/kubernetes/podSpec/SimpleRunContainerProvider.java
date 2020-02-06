@@ -38,11 +38,9 @@ import org.jetbrains.annotations.Nullable;
 public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider {
     public static final String ID = "simple";
     private final ServerSettings myServerSettings;
-    private final KubePodNameGenerator myPodNameGenerator;
 
-    public SimpleRunContainerProvider(@NotNull ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
+    public SimpleRunContainerProvider(@NotNull ServerSettings serverSettings) {
         myServerSettings = serverSettings;
-        myPodNameGenerator = podNameGenerator;
     }
 
     @NotNull
@@ -65,8 +63,10 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
 
     @NotNull
     @Override
-    public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters clientParameters) {
-        final String agentName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
+    public Pod getPodTemplate(@NotNull String instanceName,
+                              @NotNull CloudInstanceUserData cloudInstanceUserData,
+                              @NotNull KubeCloudImage kubeCloudImage,
+                              @NotNull KubeCloudClientParameters clientParameters) {
 
         ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
         String serverAddress = cloudInstanceUserData.getServerAddress();
@@ -74,7 +74,7 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
         String cloudProfileId = cloudInstanceUserData.getProfileId();
 
         ContainerBuilder containerBuilder = new ContainerBuilder()
-                .withName(agentName)
+                .withName(instanceName)
                 .withImage(kubeCloudImage.getDockerImage())
                 .withImagePullPolicy(imagePullPolicy == null ? ImagePullPolicy.IfNotPresent.getName() : imagePullPolicy.getName())
                 .withEnv(new EnvVar(KubeContainerEnvironment.SERVER_URL, serverAddress, null),
@@ -82,7 +82,7 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
                          new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, serverAddress, null),
                          new EnvVar(KubeContainerEnvironment.IMAGE_NAME, kubeCloudImage.getId(), null),
                          new EnvVar(KubeContainerEnvironment.PROFILE_ID, cloudProfileId, null),
-                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, agentName, null));
+                         new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, instanceName, null));
 
         String dockerCommand = kubeCloudImage.getDockerCommand();
         if(!StringUtil.isEmpty(dockerCommand)) containerBuilder = containerBuilder.withCommand(dockerCommand);
@@ -91,7 +91,7 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
 
         return new PodBuilder()
                 .withNewMetadata()
-                .withName(agentName)
+                .withName(instanceName)
                 .withNamespace(clientParameters.getNamespace())
                 .withLabels(CollectionsUtil.asMap(
                         KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",

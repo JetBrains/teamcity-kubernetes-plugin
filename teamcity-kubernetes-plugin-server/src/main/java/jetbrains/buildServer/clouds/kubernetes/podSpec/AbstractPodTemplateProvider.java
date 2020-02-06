@@ -132,7 +132,8 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
   @NotNull
   @Override
-  public abstract Pod getPodTemplate(@NotNull final CloudInstanceUserData cloudInstanceUserData,
-                            @NotNull final KubeCloudImage kubeCloudImage,
-                            @NotNull final KubeCloudClientParameters clientParameters);
+  public abstract Pod getPodTemplate(@NotNull String kubeInstanceName,
+                                    @NotNull final CloudInstanceUserData cloudInstanceUserData,
+                                    @NotNull final KubeCloudImage kubeCloudImage,
+                                    @NotNull final KubeCloudClientParameters clientParameters);
 }

@@ -46,20 +46,14 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     private static final Logger LOG = Logger.getInstance(KubeCloudImageImpl.class.getName());
     private final KubeApiConnector myApiConnector;
     private final KubeCloudImageData myImageData;
-    private final BuildAgentPodTemplateProviders myPodTemplateProviders;
-    private ExecutorService myExecutorService;
 
     private final ConcurrentMap<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
     private CloudErrorInfo myCurrentError;
 
     KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
-                       @NotNull final KubeApiConnector apiConnector,
-                       @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
-                       @NotNull final ExecutorService executorService) {
+                       @NotNull final KubeApiConnector apiConnector) {
         myImageData = kubeCloudImageData;
         myApiConnector = apiConnector;
-        myPodTemplateProviders = podTemplateProviders;
-        myExecutorService = executorService;
     }
 
     @NotNull
@@ -103,23 +97,6 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myImageData.getAgentNamePrefix();
     }
 
-    @NotNull
-    @Override
-    public CloudInstance startNewInstance(@NotNull CloudInstanceUserData instanceUserData, @NotNull KubeCloudClientParametersImpl clientParams) {
-        final KubeCloudInstance newInstance;
-        BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(getPodSpecMode());
-        try {
-            final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceUserData, this, clientParams);
-            final Pod newPod = myApiConnector.createPod(podTemplate);
-            myCurrentError = null;
-            newInstance = new KubeCloudInstanceImpl(this, newPod);
-        } catch (KubeCloudException | KubernetesClientException ex){
-            myCurrentError = new CloudErrorInfo("Failed to start pod", ex.getMessage(), ex);
-            throw ex;
-        }
-        populateInstances();
-        return newInstance;
-    }
 
     @Override
     public void setErrorInfo(@Nullable final CloudErrorInfo errorInfo) {

@@ -37,11 +37,9 @@ import java.util.*;
  */
 public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvider {
     private final ServerSettings myServerSettings;
-    private KubePodNameGenerator myPodNameGenerator;
 
-    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings, final KubePodNameGenerator podNameGenerator) {
+    public CustomTemplatePodTemplateProvider(ServerSettings serverSettings) {
         myServerSettings = serverSettings;
-        myPodNameGenerator = podNameGenerator;
     }
 
     @NotNull
@@ -64,11 +62,13 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
 
     @NotNull
     @Override
-    public Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters kubeClientParams) {
-        final String instanceName = myPodNameGenerator.generateNewVmName(kubeCloudImage);
+    public Pod getPodTemplate(@NotNull String kubeInstanceName,
+                              @NotNull CloudInstanceUserData cloudInstanceUserData,
+                              @NotNull KubeCloudImage kubeCloudImage,
+                              @NotNull KubeCloudClientParameters kubeClientParams) {
 
         String spec = kubeCloudImage.getCustomPodTemplateSpec();
-        return getPodTemplateInternal(cloudInstanceUserData, kubeCloudImage.getId(), kubeClientParams.getNamespace(), instanceName, spec);
+        return getPodTemplateInternal(cloudInstanceUserData, kubeCloudImage.getId(), kubeClientParams.getNamespace(), kubeInstanceName, spec);
     }
 
     @Used("tests")

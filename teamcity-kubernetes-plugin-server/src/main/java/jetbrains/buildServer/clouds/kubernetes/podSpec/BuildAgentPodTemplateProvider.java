@@ -37,5 +37,8 @@ public interface BuildAgentPodTemplateProvider {
     @Nullable String getDescription();
 
     @NotNull
-    Pod getPodTemplate(@NotNull CloudInstanceUserData cloudInstanceUserData, @NotNull KubeCloudImage kubeCloudImage, @NotNull KubeCloudClientParameters clientParameters);
+    Pod getPodTemplate(@NotNull String instanceName,
+                       @NotNull CloudInstanceUserData cloudInstanceUserData,
+                       @NotNull KubeCloudImage kubeCloudImage,
+                       @NotNull KubeCloudClientParameters clientParameters);
 }

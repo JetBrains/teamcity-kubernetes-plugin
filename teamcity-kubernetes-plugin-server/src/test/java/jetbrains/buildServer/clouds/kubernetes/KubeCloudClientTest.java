@@ -73,7 +73,8 @@ public class KubeCloudClientTest extends BaseTestCase {
 
     @NotNull
     private KubeCloudClient createClient(String serverUuid, String profileId, List<KubeCloudImage> images, CloudClientParameters cloudClientParameters) {
-        return new KubeCloudClient(myApi, serverUuid, profileId, images, new KubeCloudClientParametersImpl(cloudClientParameters), myUpdater, null);
+        return new KubeCloudClient(myApi, serverUuid, profileId, images, new KubeCloudClientParametersImpl(cloudClientParameters), myUpdater,
+                                   myPodTemplateProviders, null, image -> String.format("%s-123", image.getId()));
     }
 
     @AfterMethod

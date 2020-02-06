@@ -18,11 +18,14 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.concurrent.ExecutorService;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.StringUtil;
@@ -49,6 +52,8 @@ public class KubeCloudClient implements CloudClientEx {
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParametersImpl myKubeClientParams;
     private final KubeBackgroundUpdater myUpdater;
+    private KubePodNameGenerator myNameGenerator;
+    private BuildAgentPodTemplateProviders myPodTemplateProviders;
     private final ExecutorService myExecutorService;
 
     @Nullable private final String myServerUuid;
@@ -60,14 +65,18 @@ public class KubeCloudClient implements CloudClientEx {
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParametersImpl kubeClientParams,
                            @NotNull KubeBackgroundUpdater updater,
-                           @Nullable ExecutorService executorService) {
+                           final BuildAgentPodTemplateProviders podTemplateProviders,
+                           @Nullable ExecutorService executorService,
+                           @NotNull KubePodNameGenerator nameGenerator) {
         myApiConnector = apiConnector;
         myServerUuid = serverUuid;
         myCloudProfileId = cloudProfileId;
         myImageIdToImageMap = new ConcurrentHashMap<>(Maps.uniqueIndex(images, CloudImage::getId));
         myKubeClientParams = kubeClientParams;
+        myPodTemplateProviders = podTemplateProviders;
         myExecutorService = executorService;
         myUpdater = updater;
+        myNameGenerator = nameGenerator;
         myUpdater.registerClient(this);
     }
 
@@ -85,7 +94,19 @@ public class KubeCloudClient implements CloudClientEx {
     @NotNull
     @Override
     public CloudInstance startNewInstance(@NotNull CloudImage cloudImage, @NotNull CloudInstanceUserData cloudInstanceUserData) throws QuotaException {
-        return ((KubeCloudImage) cloudImage).startNewInstance(cloudInstanceUserData, myKubeClientParams);
+        final KubeCloudImage kubeCloudImage = (KubeCloudImage)cloudImage;
+        BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
+        final String instanceName = myNameGenerator.generateNewVmName(kubeCloudImage);
+        final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceName, cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
+        myExecutorService.submit(() -> {
+            try {
+                final Pod newPod = myApiConnector.createPod(podTemplate);
+                return new KubeCloudInstanceImpl(kubeCloudImage, newPod);
+            } catch (KubeCloudException | KubernetesClientException ex){
+                throw ex;
+            }
+        });
+        return new StartingKubeCloudInstance(kubeCloudImage, instanceName);
     }
 
     @Override

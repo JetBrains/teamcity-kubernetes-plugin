@@ -74,8 +74,8 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     myExecutorServices = new SimpleExecutorServices();
     myEventDispatcher = EventDispatcher.create(BuildServerListener.class);
     myNameGenerator = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
-    myContainerProvider = new SimpleRunContainerProvider(myServerSettings, myNameGenerator);
-    myPodTemplateProviders = new BuildAgentPodTemplateProvidersImpl(myServerSettings, (name, kubeClientParams) -> null, myNameGenerator);
+    myContainerProvider = new SimpleRunContainerProvider(myServerSettings);
+    myPodTemplateProviders = new BuildAgentPodTemplateProvidersImpl(myServerSettings, (name, kubeClientParams) -> null);
 
   }
 
@@ -178,13 +178,15 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   private Pod createTemplate(Map<String, String> imageParameters){
     final CloudInstanceUserData instanceTag = createInstanceTag();
     final CloudClientParameters parameters = new CloudClientParametersImpl(createMap(), createSet());
-    return myContainerProvider.getPodTemplate(instanceTag, createImage(imageParameters), new KubeCloudClientParametersImpl(parameters));
+    KubeCloudImage image = createImage(imageParameters);
+    String newPodName = myNameGenerator.generateNewVmName(image);
+    return myContainerProvider.getPodTemplate(newPodName, instanceTag, image, new KubeCloudClientParametersImpl(parameters));
   }
 
   private KubeCloudImage createImage(Map<String, String> imageParameters){
     final CloudImageDataImpl imageData = new CloudImageDataImpl(imageParameters);
-    return new KubeCloudImageImpl(new KubeCloudImageData(new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")), new FakeKubeApiConnector(),
-                                  myPodTemplateProviders, null);
+    return new KubeCloudImageImpl(new KubeCloudImageData(new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")), new FakeKubeApiConnector()
+    );
   }
 
   private CloudInstanceUserData createInstanceTag() {

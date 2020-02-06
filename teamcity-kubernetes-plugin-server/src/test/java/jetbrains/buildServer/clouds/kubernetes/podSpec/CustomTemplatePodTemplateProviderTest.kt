@@ -52,7 +52,7 @@ class CustomTemplatePodTemplateProviderTest : BaseTestCase() {
                 "  containers:\n" +
                 "  - name: teamcity-agent\n" +
                 "    image: jetbrains/teamcity-agent"
-        val provider = CustomTemplatePodTemplateProvider(myServerSettings) { "${it.id}-123" }
+        val provider = CustomTemplatePodTemplateProvider(myServerSettings) // { "${it.id}-123" }
         val userData = CloudInstanceUserData("", "", "http://127.0.0.1:9999", null, "kube-321",
                 "Test Profile", emptyMap())
         val kubeTemplSpec = provider.getPodTemplateInternal(userData, "kube-img", "namespacccess", "instance-name", noLabelsYaml)
