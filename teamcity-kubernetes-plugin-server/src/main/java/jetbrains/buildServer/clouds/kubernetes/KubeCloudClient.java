@@ -18,7 +18,9 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.concurrent.ExecutorService;
 import jetbrains.buildServer.agent.Constants;
@@ -98,15 +100,17 @@ public class KubeCloudClient implements CloudClientEx {
         BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
         final String instanceName = myNameGenerator.generateNewVmName(kubeCloudImage);
         final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceName, cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
+        KubeCloudInstance instance = new KubeCloudInstanceImpl(kubeCloudImage, podTemplate);
+        kubeCloudImage.addStartedInstance(instance);
         myExecutorService.submit(() -> {
             try {
                 final Pod newPod = myApiConnector.createPod(podTemplate);
-                return new KubeCloudInstanceImpl(kubeCloudImage, newPod);
+                instance.updateState(newPod);
             } catch (KubeCloudException | KubernetesClientException ex){
                 throw ex;
             }
         });
-        return new StartingKubeCloudInstance(kubeCloudImage, instanceName);
+        return instance;
     }
 
     @Override

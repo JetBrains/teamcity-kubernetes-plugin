@@ -41,7 +41,10 @@ public class InstanceStatusUtils {
     }
 
     @Nullable
-    public static CloudErrorInfo getErrorMessage(@NotNull PodStatus podStatus){
+    public static CloudErrorInfo getErrorMessage(@Nullable PodStatus podStatus){
+        if (podStatus == null)
+            return null;
+
         if (!podStatus.getPhase().equalsIgnoreCase("Failed")){
             return null;
         }

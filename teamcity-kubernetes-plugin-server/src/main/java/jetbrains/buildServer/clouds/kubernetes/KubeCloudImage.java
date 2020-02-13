@@ -18,8 +18,6 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
-import jetbrains.buildServer.clouds.CloudInstance;
-import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +39,8 @@ public interface KubeCloudImage extends CloudImage {
     String getDockerCommand();
 
     void populateInstances();
+
+    void addStartedInstance(final KubeCloudInstance instance);
 
     @NotNull
     String getPodSpecMode();

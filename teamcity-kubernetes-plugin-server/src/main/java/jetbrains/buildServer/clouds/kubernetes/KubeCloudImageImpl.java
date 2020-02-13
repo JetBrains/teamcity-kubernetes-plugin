@@ -21,15 +21,11 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
-import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
@@ -170,6 +166,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myCurrentError;
     }
 
+    @Override
+    public void addStartedInstance(final KubeCloudInstance instance) {
+        // don't do anything if present - it's already there
+        myIdToInstanceMap.putIfAbsent(instance.getInstanceId(), instance);
+    }
+
     //TODO: synchronize access to myIdToInstanceMap
     //TODO: filter pods more carefully using all setted labels
     public void populateInstances(){
@@ -217,10 +219,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
                 ));
                 newPods.forEach(pod->{
                     final String podName = pod.getMetadata().getName();
-                    final KubeCloudInstance putInstance = myIdToInstanceMap.putIfAbsent(podName, new KubeCloudInstanceImpl(this, pod));
-                    if (putInstance != null){
-                        myIdToInstanceMap.get(podName).updateState(pod);
-                    }
+                    myIdToInstanceMap.putIfAbsent(podName, new KubeCloudInstanceImpl(this, pod));
                 });
             }
             myCurrentError = null;

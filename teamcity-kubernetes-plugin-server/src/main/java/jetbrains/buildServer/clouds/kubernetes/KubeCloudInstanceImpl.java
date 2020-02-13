@@ -45,6 +45,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     private SimpleDateFormat myPodStartTimeFormat;
 
     private final KubeCloudImage myKubeCloudImage;
+    @Nullable
     private volatile Pod myPod;
     private volatile InstanceStatus myInstanceStatus = InstanceStatus.SCHEDULED_TO_START;
     private volatile Date myStartDate;
@@ -115,6 +116,8 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @Nullable
     @Override
     public String getNetworkIdentity() {
+        if (myPod.getStatus() == null)
+            return null;
         return myPod.getStatus().getPodIP();
     }
 
