@@ -93,6 +93,8 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         m.checking(new Expectations(){{
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
+            allowing(image).getAgentNamePrefix(); will(returnValue("agent-name-prefix"));
+            allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(null));
         }});
         assertExceptionThrown(() -> myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, clientParams), KubeCloudException.class);
@@ -127,6 +129,8 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).getId(); will(returnValue("my image id"));
             allowing(image).getName(); will(returnValue("my image name"));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
+            allowing(image).getAgentNamePrefix(); will(returnValue("agent-name-prefix"));
+            allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
@@ -163,6 +167,8 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(clientParams).getNamespace(); will(returnValue("custom namespace"));
             allowing(image).getId(); will(returnValue("my image id"));
             allowing(image).getName(); will(returnValue("my image name"));
+            allowing(image).getAgentNamePrefix(); will(returnValue("agent-name-prefix"));
+            allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
@@ -204,6 +210,8 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(clientParams).getNamespace(); will(returnValue("custom namespace"));
             allowing(image).getId(); will(returnValue("my image id"));
             allowing(image).getName(); will(returnValue("my image name"));
+            allowing(image).getAgentNamePrefix(); will(returnValue("agent-name-prefix"));
+            allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
             allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
