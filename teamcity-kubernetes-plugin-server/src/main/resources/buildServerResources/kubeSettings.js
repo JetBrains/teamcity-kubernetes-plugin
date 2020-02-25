@@ -372,6 +372,13 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 }
             }.bind(this),
 
+            agentNamePrefix: function(){
+                if (this._image['podTemplateMode'] === 'custom-pod-template' && !this._image['agentNamePrefix']) {
+                    this.addOptionError('required', 'agentNamePrefix');
+                    isValid = false;
+                }
+            }.bind(this),
+
             imageInstanceLimit: function () {
                 var imageInstanceLimit = this._image['imageInstanceLimit'];
                 if (imageInstanceLimit && (!$j.isNumeric(imageInstanceLimit) || imageInstanceLimit < 0 )) {
@@ -531,7 +538,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     addImage: function () {
         var newImageId = this.generateNewImageId(),
             newImage = this._image;
-        this.setupSourceId(newImage, newImageId);
+        this.setupSourceId(newImage);
         this._renderImageRow(newImage, newImageId);
         this.imagesData[newImageId] = newImage;
         this._imagesDataLength += 1;
@@ -539,13 +546,17 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this._toggleImagesTable();
     },
 
-    setupSourceId: function(image, defaultImageId){
-        debugger;
+    setupSourceId: function(image){
         var namePrefix = $j.trim(image.agentNamePrefix);
-        if (namePrefix != ''){
+        if (namePrefix !== ''){
             image['source-id'] = namePrefix;
         } else {
-            image['source-id'] = defaultImageId;
+            var mode = $j('#podTemplateMode').val();
+            if (mode === 'deployment-base'){
+                image['source-id'] = $j('#sourceDeployment').val();
+            } else if (mode === 'simple'){
+                image['source-id'] = $j('#dockerImage').val();
+            }
         }
     },
 
