@@ -53,7 +53,7 @@ public class KubeCloudImageData {
     }
 
     public String getId() {
-        return myRawImageData.getId();
+        return KubeUtils.escapeForKube(myRawImageData.getId());
     }
 
     public Integer getAgentPoolId() {

@@ -130,7 +130,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @Nullable
     @Override
     public CloudErrorInfo getErrorInfo() {
-        return InstanceStatusUtils.getErrorMessage(myPod.getStatus());
+        return KubeUtils.getErrorMessage(myPod.getStatus());
     }
 
     @Override
@@ -141,10 +141,10 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
 
     public void updateState(@NotNull Pod actualPod){
         myPod = actualPod;
-        InstanceStatus podStatus = InstanceStatusUtils.mapPodPhase(actualPod.getStatus());
+        InstanceStatus podStatus = KubeUtils.mapPodPhase(actualPod.getStatus());
         if (podStatus == InstanceStatus.STOPPED) {
             myInstanceStatus = InstanceStatus.STOPPED;
-        } else if (InstanceStatusUtils.isPodStatus(myInstanceStatus)){
+        } else if (KubeUtils.isPodStatus(myInstanceStatus)){
             myInstanceStatus = podStatus;
         }
     }

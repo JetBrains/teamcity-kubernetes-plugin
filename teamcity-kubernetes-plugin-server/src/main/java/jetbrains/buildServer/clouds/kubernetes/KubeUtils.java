@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 13.06.17.
  */
-public class InstanceStatusUtils {
+public class KubeUtils {
 
     private static final Map<String, InstanceStatus> myPhasesMap = new HashMap<>();
 
@@ -64,6 +64,14 @@ public class InstanceStatusUtils {
 
     public static boolean isPodStatus(@NotNull InstanceStatus status){
         return myPhasesMap.containsValue(status);
+    }
+
+    @Nullable
+    public static String escapeForKube(@Nullable String value){
+        if (value == null){
+            return null;
+        }
+        return value.replaceAll("[^A-Za-z0-9\\-]", "-");
     }
 
     static {
