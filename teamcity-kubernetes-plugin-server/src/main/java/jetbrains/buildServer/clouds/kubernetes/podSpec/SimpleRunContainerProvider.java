@@ -16,10 +16,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
-import io.fabric8.kubernetes.api.model.ContainerBuilder;
-import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodBuilder;
+import io.fabric8.kubernetes.api.model.*;
 import java.util.Collections;
 import jetbrains.buildServer.clouds.CloudConstants;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
@@ -104,5 +101,11 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
                 .withRestartPolicy(KubeApiConnector.NEVER_RESTART_POLICY)
                 .endSpec()
                 .build();
+    }
+
+    @Nullable
+    @Override
+    public PersistentVolumeClaim getPVC(@NotNull final String instanceName, @NotNull final KubeCloudImage kubeCloudImage) {
+        return null;
     }
 }

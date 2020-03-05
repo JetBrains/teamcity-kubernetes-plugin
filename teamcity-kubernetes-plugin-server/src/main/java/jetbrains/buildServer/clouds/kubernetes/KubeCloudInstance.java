@@ -36,4 +36,7 @@ public interface KubeCloudInstance extends CloudInstance {
     void updateState(Pod pod);
 
     void setError(@Nullable CloudErrorInfo errorInfo);
+
+    @Nullable
+    String getPVCName();
 }

@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes;
 
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
@@ -46,7 +47,10 @@ public interface KubeCloudImage extends CloudImage {
     String getPodSpecMode();
 
     @Nullable
-    String getCustomPodTemplateSpec();
+    String getPodTemplate();
+
+    @Nullable
+    String getPVCTemplate();
 
     @Nullable
     String getSourceDeploymentName();

@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes.connector;
 
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -37,6 +38,8 @@ public interface KubeApiConnector {
     @NotNull
     Pod createPod(@NotNull Pod podTemplate);
 
+    PersistentVolumeClaim createPVC(@NotNull PersistentVolumeClaim pvc);
+
     boolean deletePod(@NotNull String podName, long gracePeriod);
 
     @NotNull
@@ -53,6 +56,8 @@ public interface KubeApiConnector {
 
     @NotNull
     Collection<String> listDeployments();
+
+    boolean deletePVC(@NotNull String name);
 
     void invalidate();
 }

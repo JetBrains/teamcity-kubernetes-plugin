@@ -18,6 +18,7 @@ package jetbrains.buildServer.clouds.kubernetes.connector;
 
 import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.Namespace;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -108,6 +109,11 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     }
 
     @Override
+    public PersistentVolumeClaim createPVC(@NotNull final PersistentVolumeClaim pvc) {
+        return withKubernetesClient(kubernetesClient -> kubernetesClient.persistentVolumeClaims().create(pvc));
+    }
+
+    @Override
     public boolean deletePod(@NotNull String podName, long gracePeriod) {
         return withKubernetesClient(kubernetesClient -> kubernetesClient.pods().withName(podName).delete());
     }
@@ -145,8 +151,12 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Override
     public Collection<String> listDeployments() {
         return withKubernetesClient(kubernetesClient -> {
-            return CollectionsUtil.convertCollection(kubernetesClient.extensions().deployments().list().getItems(), namespace -> namespace.getMetadata().getName());
+            return CollectionsUtil.convertCollection(kubernetesClient.apps().deployments().list().getItems(), namespace -> namespace.getMetadata().getName());
         });
+    }
+
+    public boolean deletePVC(@NotNull String name){
+        return withKubernetesClient(kubernetesClient -> kubernetesClient.persistentVolumeClaims().withName(name).delete());
     }
 
     @Override

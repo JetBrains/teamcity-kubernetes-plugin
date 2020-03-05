@@ -154,4 +154,12 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         myCurrentError = errorInfo;
     }
 
+    @Override
+    @Nullable
+    public String getPVCName() {
+        if (myPod.getMetadata() == null ||  myPod.getMetadata().getLabels() == null)
+            return null;
+        return myPod.getMetadata().getLabels().get(KubeTeamCityLabels.POD_PVC_NAME);
+    }
+
 }

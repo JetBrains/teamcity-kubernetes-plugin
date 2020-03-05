@@ -18,9 +18,8 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.concurrent.ExecutorService;
 import jetbrains.buildServer.agent.Constants;
@@ -100,10 +99,17 @@ public class KubeCloudClient implements CloudClientEx {
         BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
         final String instanceName = myNameGenerator.generateNewVmName(kubeCloudImage);
         final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceName, cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
+        final PersistentVolumeClaim pvc = podTemplateProvider.getPVC(instanceName, kubeCloudImage);
+        if (pvc != null){
+            KubeTeamCityLabels.addCustomLabel(podTemplate, KubeTeamCityLabels.POD_PVC_NAME, pvc.getMetadata().getName());
+        }
         KubeCloudInstance instance = new KubeCloudInstanceImpl(kubeCloudImage, podTemplate);
         kubeCloudImage.addStartedInstance(instance);
         myExecutorService.submit(() -> {
             try {
+                if (pvc !=null){
+                    myApiConnector.createPVC(pvc);
+                }
                 final Pod newPod = myApiConnector.createPod(podTemplate);
                 instance.updateState(newPod);
             } catch (KubeCloudException | KubernetesClientException ex){
@@ -124,17 +130,24 @@ public class KubeCloudClient implements CloudClientEx {
         kubeCloudInstance.setStatus(InstanceStatus.SCHEDULED_TO_STOP);
         myExecutorService.submit(() -> {
             long gracePeriod = TeamCityProperties.getLong(TEAMCITY_KUBE_PODS_GRACE_PERIOD, 0);
+            kubeCloudInstance.setStatus(InstanceStatus.STOPPING);
             try{
                 int failedDeleteAttempts = 0;
+                final String pvcName = kubeCloudInstance.getPVCName();
                 while (!myApiConnector.deletePod(kubeCloudInstance.getName(), gracePeriod)){
                     failedDeleteAttempts++;
-                    if(failedDeleteAttempts == 10) throw new KubeCloudException("Failed to delete pod " + kubeCloudInstance.getName());
+                    if(failedDeleteAttempts == 3) throw new KubeCloudException("Failed to delete pod " + kubeCloudInstance.getName());
+                }
+                failedDeleteAttempts = 0;
+                while (pvcName != null && !myApiConnector.deletePVC(pvcName)){
+                    failedDeleteAttempts++;
+                    if(failedDeleteAttempts == 3) throw new KubeCloudException("Failed to delete PersistentVolumeClaim " + pvcName);
                 }
                 kubeCloudInstance.setError(null);
             } catch (KubernetesClientException ex){
                 kubeCloudInstance.setError(new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex));
             } finally {
-                kubeCloudInstance.setStatus(InstanceStatus.STOPPING);
+                kubeCloudInstance.setStatus(InstanceStatus.STOPPED);
             }
             kubeCloudInstance.getImage().populateInstances();
         });

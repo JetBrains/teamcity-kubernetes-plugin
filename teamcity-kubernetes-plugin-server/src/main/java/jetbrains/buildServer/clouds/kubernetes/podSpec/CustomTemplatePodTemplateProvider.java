@@ -16,21 +16,17 @@
 
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
-import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.utils.Serialization;
-import java.io.File;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.serverSide.ServerSettings;
-import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
-import java.util.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
@@ -67,8 +63,8 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
                               @NotNull KubeCloudImage kubeCloudImage,
                               @NotNull KubeCloudClientParameters kubeClientParams) {
 
-        String spec = kubeCloudImage.getCustomPodTemplateSpec();
-        return getPodTemplateInternal(cloudInstanceUserData, kubeCloudImage.getId(), kubeClientParams.getNamespace(), kubeInstanceName, spec);
+        String podTemplate = kubeCloudImage.getPodTemplate();
+        return getPodTemplateInternal(cloudInstanceUserData, kubeCloudImage.getId(), kubeClientParams.getNamespace(), kubeInstanceName, podTemplate);
     }
 
     @Used("tests")
@@ -94,5 +90,22 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
                                       myServerSettings.getServerUUID(),
                                       imageId,
                                       cloudInstanceUserData);
+    }
+
+    @Nullable
+    @Override
+    public PersistentVolumeClaim getPVC(@NotNull final String instanceName,
+                                        @NotNull final KubeCloudImage kubeCloudImage) {
+        String pvcTemplate = kubeCloudImage.getPVCTemplate();
+        if (StringUtil.isEmpty(pvcTemplate)){
+            return null;
+        }
+        pvcTemplate = pvcTemplate.replaceAll("%instance\\.id%", instanceName);
+        final PersistentVolumeClaim pvc = Serialization.unmarshal(
+          new ByteArrayInputStream(pvcTemplate.getBytes()),
+          PersistentVolumeClaim.class
+        );
+
+        return pvc;
     }
 }

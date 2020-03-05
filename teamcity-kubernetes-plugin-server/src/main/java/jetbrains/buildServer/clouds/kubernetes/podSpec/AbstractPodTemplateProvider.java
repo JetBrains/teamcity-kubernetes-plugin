@@ -20,15 +20,15 @@ import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import java.util.*;
 import java.util.regex.Pattern;
-import jetbrains.buildServer.clouds.CloudConstants;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.util.CollectionsUtil;
-import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.*;
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
+import static jetbrains.buildServer.clouds.kubernetes.KubeTeamCityLabels.*;
 
 public abstract class AbstractPodTemplateProvider implements BuildAgentPodTemplateProvider {
   private static final Pattern ENV_VAR_NAME = Pattern.compile("([A-Z]+[_])*[A-Z]+");
@@ -88,6 +88,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
     // check for run in Kubernetes:
     if ("true".equals(customParams.get(RUN_IN_KUBE_FEATURE))){
+      //TODO uncheck when will work on that feature
       /*
       final String buildId = customParams.get(CloudConstants.BUILD_ID);
       if (StringUtil.isNotEmpty(buildId)){
@@ -136,4 +137,11 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
                                     @NotNull final CloudInstanceUserData cloudInstanceUserData,
                                     @NotNull final KubeCloudImage kubeCloudImage,
                                     @NotNull final KubeCloudClientParameters clientParameters);
+
+  @Nullable
+  @Override
+  public PersistentVolumeClaim getPVC(@NotNull final String instanceName,
+                                      @NotNull final KubeCloudImage kubeCloudImage) {
+    return null;
+  }
 }
