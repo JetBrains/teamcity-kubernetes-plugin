@@ -56,6 +56,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imagesTableWrapper = $j('.imagesTableWrapper');
 
         this.$authStrategySelector = $j('#authStrategy');
+        this.$eksUseInstanceProfile = $j('#eksUseInstanceProfile');
+        this.$eksAssumeIAMRole = $j('#eksAssumeIAMRole');
 
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
         this.$addImageButton = $j('#kubeAddImageButton');
@@ -95,6 +97,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this._renderImagesTable();
         this.$addImageButton.removeAttr('disabled');
         this._toggleAuth();
+        this._toggleEKSCredentials();
+        this._toggleEKSIAM();
 
         this._resetDataAndDialog();
 
@@ -126,6 +130,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         });
 
         this.$authStrategySelector.on('change', this._toggleAuth.bind(this));
+        this.$eksUseInstanceProfile.on('change', this._toggleEKSCredentials.bind(this));
+        this.$eksAssumeIAMRole.on('change', this._toggleEKSIAM.bind(this));
 
         this.$podSpecModeSelector.on('change', function(e, value) {
             if (arguments.length === 1) {
@@ -332,10 +338,32 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         var selectedStrategyId = this.$authStrategySelector.val();
         $j('.auth-ui').toggleClass('hidden', true);
         if(selectedStrategyId) {
-            $j('.' + selectedStrategyId).removeClass('hidden');
+            $j('.auth-ui.' + selectedStrategyId).removeClass('hidden');
         }
         //workaround for TW-51797
         BS.MultilineProperties.updateVisible();
+    },
+
+    _toggleEKSCredentials: function () {
+        var selectedStrategyId = this.$authStrategySelector.val();
+        if (selectedStrategyId == "eks") {
+            var checked = this.$eksUseInstanceProfile.is(":checked");
+            $j('.eks.aws-credential').toggleClass('hidden', checked);
+
+            //workaround for TW-51797
+            BS.MultilineProperties.updateVisible();
+        }
+    },
+
+    _toggleEKSIAM: function () {
+        var selectedStrategyId = this.$authStrategySelector.val();
+        if (selectedStrategyId == "eks") {
+            var checked = this.$eksAssumeIAMRole.is(":checked");
+            $j('.eks.aws-iam').toggleClass('hidden', !checked);
+
+            //workaround for TW-51797
+            BS.MultilineProperties.updateVisible();
+        }
     },
 
     _togglePodSpecMode: function () {

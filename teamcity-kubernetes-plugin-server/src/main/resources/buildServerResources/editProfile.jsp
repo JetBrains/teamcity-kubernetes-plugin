@@ -150,18 +150,35 @@
             <span id="error_secure:${cons.oidcRefreshToken}" class="error"></span>
         </td>
     </tr>
-
     <tr class="hidden eks auth-ui">
+        <th><label for="${cons.eksUseInstanceProfile}">Use Server Instance Profile: </label></th>
+        <td><props:checkboxProperty name="${cons.eksUseInstanceProfile}" className="longField"/>
+            <span id="error_${cons.eksUseInstanceProfile}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden eks auth-ui aws-credential">
         <th><label for="${cons.eksAccessId}">Access ID: <l:star/></label></th>
         <td><props:textProperty name="${cons.eksAccessId}" className="longField"/>
             <span id="error_${cons.eksAccessId}" class="error"></span>
         </td>
     </tr>
-    <tr class="hidden eks auth-ui">
+    <tr class="hidden eks auth-ui aws-credential">
         <th><label for="secure:${cons.eksSecretKey}">Secret Key: <l:star/></label></th>
         <td>
             <props:passwordProperty name="secure:${cons.eksSecretKey}" className="longField"/>
             <span id="error_secure:${cons.eksSecretKey}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden eks auth-ui">
+        <th><label for="${cons.eksAssumeIamRole}">Assume an IAM Role: </label></th>
+        <td><props:checkboxProperty name="${cons.eksAssumeIamRole}" className="longField"/>
+            <span id="error_${cons.eksAssumeIamRole}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden eks aws-iam">
+        <th><label for="${cons.eksIAMRoleArn}">IAM Role ARN: <l:star/></label></th>
+        <td><props:textProperty name="${cons.eksIAMRoleArn}" className="longField"/>
+            <span id="error_${cons.eksIAMRoleArn}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden eks auth-ui">
@@ -170,7 +187,6 @@
             <span id="error_${cons.eksClusterName}" class="error"></span>
         </td>
     </tr>
-
     <tr>
         <th class="noBorder"></th>
         <td class="noBorder">
