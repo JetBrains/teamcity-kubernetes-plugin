@@ -237,7 +237,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         if(podSpecMode){
             switch (podSpecMode){
                 case 'custom-pod-template':
-                    imageDescription = 'Custom pod template';
+                    imageDescription = 'Custom pod template: ' + image['agentNamePrefix'];
                     break;
                 case 'deployment-base':
                     imageDescription = 'Use deployment: ' + image['sourceDeployment'];
