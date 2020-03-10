@@ -307,9 +307,10 @@
             </td>
         </tr>
         <tr class="hidden custom-pod-template pod-spec-ui">
-            <th>Pod Template Content:&nbsp;<l:star/></th>
-            <td>
-                <textarea id="${cons.customPodTemplate}" wrap="off" class="podTemplateContent"></textarea>
+            <th><label for="${cons.customPodTemplate}">Pod Template Content:<l:star/></label></th>
+            <td class="codeHighlightTD">
+                <props:multilineProperty highlight="yaml" expanded="${true}" name="${cons.customPodTemplate}" rows="10" cols="30"
+                                         linkTitle="Edit the custom pod yaml content" className="longField"/>
                 <span class="error option-error option-error_${cons.customPodTemplate}"></span>
             </td>
         </tr>

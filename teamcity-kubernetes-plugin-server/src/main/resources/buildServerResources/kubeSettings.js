@@ -220,15 +220,19 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
-        this.$customPodTemplate.on('change', function (e, value) {
+        this.$customPodTemplate
+        .on('change', function(e, data){
+            var val = e.target.value;
             if (arguments.length === 1) {
-                this._image['customPodTemplate'] = this.$customPodTemplate.val();
-                this._updateImageDescription(this._image);
+                self._image[this.getAttribute('id')] = val;
             } else {
-                this.$customPodTemplate.val(value);
+                this.value = data;
+                $j(this).trigger('cm-set-value', data);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
-        }.bind(this));
+        })
+        .on('cm-change', function(e, value){
+            self._image[this.getAttribute('id')] = value;
+        });
     },
 
     _updateImageDescription: function (image) {
