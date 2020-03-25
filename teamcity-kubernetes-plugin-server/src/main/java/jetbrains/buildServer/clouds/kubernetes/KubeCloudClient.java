@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.concurrent.ExecutorService;
 import jetbrains.buildServer.agent.Constants;
@@ -29,6 +30,7 @@ import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProv
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
+import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,6 +92,7 @@ public class KubeCloudClient implements CloudClientEx {
     public void dispose() {
         LOG.debug("KubeCloudClient disposed.");
         myUpdater.unregisterClient(this);
+        FileUtil.close(myApiConnector);
     }
 
     @NotNull

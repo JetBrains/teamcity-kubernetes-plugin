@@ -18,6 +18,7 @@ package jetbrains.buildServer.clouds.kubernetes.web;
 
 import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.BuildProject;
+import jetbrains.buildServer.agent.IOUtil;
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
@@ -33,6 +34,7 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil;
+import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
@@ -145,9 +147,10 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 }
             };
             final String authStrategyName = props.get(KubeParametersConstants.AUTH_STRATEGY);
+            KubeApiConnectorImpl apiConnector = null;
             try {
                 final KubeAuthStrategy strategy = myAuthStrategyProvider.get(authStrategyName);
-                KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", connectionSettings, strategy);
+                apiConnector = new KubeApiConnectorImpl("editProfile", connectionSettings, strategy);
                 KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
                 if(!connectionCheckResult.isSuccess()){
                     if (strategy.isRefreshable() && connectionCheckResult.isNeedRefresh()){
@@ -168,6 +171,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 final ActionErrors errors = new ActionErrors();
                 errors.addError("connection", ex.getMessage());
                 writeErrors(xmlResponse, errors);
+            } finally {
+                FileUtil.close(apiConnector);
             }
         }
     }

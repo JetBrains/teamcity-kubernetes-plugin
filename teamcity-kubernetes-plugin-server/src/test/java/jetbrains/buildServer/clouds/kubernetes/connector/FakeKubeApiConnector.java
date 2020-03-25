@@ -22,6 +22,7 @@ import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import java.util.Collection;
 import java.util.Map;
+import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,6 +90,10 @@ public class FakeKubeApiConnector implements KubeApiConnector {
 
   @Override
   public void invalidate() {
+  }
+
+  @Override
+  public void close() {
 
   }
 }

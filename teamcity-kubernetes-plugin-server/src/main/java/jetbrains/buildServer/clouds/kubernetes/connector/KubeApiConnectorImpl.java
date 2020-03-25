@@ -23,10 +23,13 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.*;
+import java.io.IOException;
 import java.util.Date;
 import java.util.function.Function;
+import jetbrains.buildServer.clouds.CloudException;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +52,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private final KubeApiConnection myConnectionSettings;
     private volatile KubernetesClient myKubernetesClient;
     private final KubeAuthStrategy myAuthStrategy;
+    private volatile boolean myCloseInitiated = false;
 
     public KubeApiConnectorImpl(@NotNull String profileId,  @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
         myProfileId = profileId;
@@ -59,6 +63,9 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     @NotNull
     protected KubernetesClient createClient(@NotNull final Config config){
+        if (myCloseInitiated){
+            throw new CloudException("Attempting to create a KubernetesClient for a closing api connector");
+        }
         LOG.info("Creating new client with config" + getConfigDescription(config));
         return new DefaultKubernetesClient(config);
     }
@@ -181,7 +188,9 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                 if (result.isNeedRefresh()){
                     LOG.info("Will now invalidate and recreate client for " + myProfileId);
                     invalidate();
+                    KubernetesClient oldClient = myKubernetesClient;
                     myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
+                    FileUtil.close(oldClient);
                 }
                 return withKubernetesClient(true, function);
             }
@@ -213,5 +222,13 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         }
         else
             return "";
+    }
+
+    @Override
+    public void close() {
+        myCloseInitiated = true;
+        if (myKubernetesClient != null){
+            myKubernetesClient.close();
+        }
     }
 }

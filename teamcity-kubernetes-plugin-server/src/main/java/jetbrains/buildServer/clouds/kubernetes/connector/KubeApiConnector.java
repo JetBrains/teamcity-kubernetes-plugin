@@ -20,6 +20,7 @@ import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import java.io.Closeable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +30,7 @@ import java.util.Map;
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
  */
-public interface KubeApiConnector {
+public interface KubeApiConnector extends Closeable {
     String NEVER_RESTART_POLICY = "Never";
 
     @NotNull
