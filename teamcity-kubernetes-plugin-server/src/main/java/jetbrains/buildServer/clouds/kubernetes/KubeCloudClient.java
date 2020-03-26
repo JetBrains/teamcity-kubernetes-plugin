@@ -94,7 +94,7 @@ public class KubeCloudClient implements CloudClientEx {
         myUpdater.unregisterClient(this);
         List<Runnable> runnables = myExecutorService.shutdownNow();
         if (runnables.size() > 0) {
-            LOG.info(String.format("Forced shutdown of executor for '%s'. %d might have been cancelled", myCloudProfileId, runnables.size()));
+            LOG.info(String.format("Forced shutdown of executor for '%s'. %d tasks might have been cancelled", myCloudProfileId, runnables.size()));
         }
         FileUtil.close(myApiConnector);
     }
