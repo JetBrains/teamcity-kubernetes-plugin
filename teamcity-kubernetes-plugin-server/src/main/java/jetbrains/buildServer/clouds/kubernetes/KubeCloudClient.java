@@ -90,8 +90,12 @@ public class KubeCloudClient implements CloudClientEx {
 
     @Override
     public void dispose() {
-        LOG.debug("KubeCloudClient disposed.");
+        LOG.debug("Disposing " + myCloudProfileId);
         myUpdater.unregisterClient(this);
+        List<Runnable> runnables = myExecutorService.shutdownNow();
+        if (runnables.size() > 0) {
+            LOG.info(String.format("Forced shutdown of executor for '%s'. %d might have been cancelled", myCloudProfileId, runnables.size()));
+        }
         FileUtil.close(myApiConnector);
     }
 

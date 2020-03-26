@@ -30,6 +30,7 @@ import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.executors.ExecutorsFactory;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -113,7 +114,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     public CloudClientEx createNewClient(@NotNull CloudState cloudState, @NotNull CloudClientParameters cloudClientParameters) {
         try {
             final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
-            final ExecutorService executorService = new ScheduledThreadPoolExecutor(2);
+            final ExecutorService executorService = ExecutorsFactory.newFixedScheduledDaemonExecutor("Async cloud tasks for " + cloudState.getProfileId(), 2);
             final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudClientParameters.getProfileId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
                 final KubeCloudImageImpl kubeCloudImage =
