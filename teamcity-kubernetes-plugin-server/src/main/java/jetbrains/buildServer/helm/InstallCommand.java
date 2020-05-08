@@ -35,7 +35,7 @@ public class InstallCommand implements HelmCommand {
     @NotNull
     @Override
     public String getId() {
-        return HELM_INSTALL_COMMAND_NAME;
+        return HELM_INSTALL_COMMAND;
     }
 
     @NotNull
@@ -55,9 +55,9 @@ public class InstallCommand implements HelmCommand {
     public PropertiesProcessor getPropertiesProcessor() {
         return properties -> {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
-            final String chart = properties.get(HELM_INSTALL_COMMAND_NAME + CHART);
+            final String chart = properties.get(CHART);
             if (PropertiesUtil.isEmptyOrNull(chart)) {
-                result.add(new InvalidProperty(HELM_INSTALL_COMMAND_NAME + CHART, "Chart must be specified"));
+                result.add(new InvalidProperty(CHART, "Chart must be specified"));
             }
             return result;
         };
@@ -78,7 +78,7 @@ public class InstallCommand implements HelmCommand {
     @NotNull
     @Override
     public String describeParameters(@NotNull Map<String, String> parameters) {
-        String flags = parameters.get(HELM_INSTALL_COMMAND_NAME + ADDITIONAL_FLAGS);
-        return String.format("Chart: %s\nAdditional flags: %s", parameters.get(HELM_INSTALL_COMMAND_NAME + CHART), flags != null ? flags : "not specified");
+        String flags = parameters.get(ADDITIONAL_FLAGS);
+        return String.format("Chart: %s\nAdditional flags: %s", parameters.get(CHART), flags != null ? flags : "not specified");
     }
 }

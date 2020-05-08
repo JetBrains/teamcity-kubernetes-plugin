@@ -31,14 +31,14 @@ public class InstallArgumentsProvider implements HelmCommandArgumentsProvider {
     @NotNull
     @Override
     public String getCommandId() {
-        return HELM_INSTALL_COMMAND_NAME;
+        return HELM_INSTALL_COMMAND;
     }
 
     @NotNull
     @Override
     public List<String> getArguments(@NotNull Map<String, String> runnerParameters) {
-        String chart = runnerParameters.get(HELM_INSTALL_COMMAND_NAME + CHART);
-        String additionalFlags = runnerParameters.get(HELM_INSTALL_COMMAND_NAME + ADDITIONAL_FLAGS);
+        String chart = runnerParameters.get(CHART);
+        String additionalFlags = runnerParameters.get(ADDITIONAL_FLAGS);
         return StringUtil.splitCommandArgumentsAndUnquote(String.format("%s %s %s", HELM_INSTALL_COMMAND, StringUtil.emptyIfNull(chart), StringUtil.emptyIfNull(additionalFlags)));
     }
 }

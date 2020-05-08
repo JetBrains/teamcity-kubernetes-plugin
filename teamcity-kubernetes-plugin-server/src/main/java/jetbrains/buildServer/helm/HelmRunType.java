@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.helm;
 
+import java.util.*;
 import jetbrains.buildServer.requirements.Requirement;
 import jetbrains.buildServer.requirements.RequirementType;
 import jetbrains.buildServer.serverSide.InvalidProperty;
@@ -26,11 +27,6 @@ import jetbrains.buildServer.util.PropertiesUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 import static jetbrains.buildServer.helm.HelmConstants.HELM_PATH_CONFIG_PARAM;
 import static jetbrains.buildServer.helm.HelmConstants.HELM_RUN_TYPE;
@@ -68,7 +64,7 @@ public class HelmRunType extends RunType {
     @Override
     public PropertiesProcessor getRunnerPropertiesProcessor() {
         return properties -> {
-            List<InvalidProperty> result = new Vector<>();
+            List<InvalidProperty> result = new ArrayList<>();
             final String commandId = properties.get(HelmConstants.COMMAND_ID);
             if (PropertiesUtil.isEmptyOrNull(commandId)) {
                 result.add(new InvalidProperty(HelmConstants.COMMAND_ID, "Command to run must be specified"));

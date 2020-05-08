@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import static jetbrains.buildServer.helm.HelmConstants.HELM_TEST_COMMAND_NAME;
+import static jetbrains.buildServer.helm.HelmConstants.*;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
@@ -35,7 +35,7 @@ public class TestCommand implements HelmCommand {
     @NotNull
     @Override
     public String getId() {
-        return HELM_TEST_COMMAND_NAME;
+        return HELM_TEST_COMMAND;
     }
 
     @NotNull
@@ -55,9 +55,9 @@ public class TestCommand implements HelmCommand {
     public PropertiesProcessor getPropertiesProcessor() {
         return properties -> {
             List<InvalidProperty> result = new Vector<InvalidProperty>();
-            final String chart = properties.get(HELM_TEST_COMMAND_NAME + HelmConstants.RELEASE_NAME);
+            final String chart = properties.get(RELEASE_NAME);
             if (PropertiesUtil.isEmptyOrNull(chart)) {
-                result.add(new InvalidProperty(HELM_TEST_COMMAND_NAME + HelmConstants.RELEASE_NAME, "Release name must be specified"));
+                result.add(new InvalidProperty(RELEASE_NAME, "Release name must be specified"));
             }
             return result;
         };
@@ -78,7 +78,7 @@ public class TestCommand implements HelmCommand {
     @NotNull
     @Override
     public String describeParameters(@NotNull Map<String, String> parameters) {
-        String flags = parameters.get(HELM_TEST_COMMAND_NAME + HelmConstants.ADDITIONAL_FLAGS);
-        return String.format("Release name: %s\nAdditional flags: %s", parameters.get(HELM_TEST_COMMAND_NAME + HelmConstants.RELEASE_NAME), flags != null ? flags : "not specified");
+        String flags = parameters.get(ADDITIONAL_FLAGS);
+        return String.format("Release name: %s\nAdditional flags: %s", parameters.get(RELEASE_NAME), flags != null ? flags : "not specified");
     }
 }

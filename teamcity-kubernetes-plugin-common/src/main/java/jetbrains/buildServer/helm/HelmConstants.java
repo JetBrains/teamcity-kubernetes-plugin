@@ -16,32 +16,65 @@
 
 package jetbrains.buildServer.helm;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 17.10.17.
  */
-public interface HelmConstants {
-    String HELM_RUN_TYPE = "jetbrains.helm";
+public class HelmConstants {
+    public static final String HELM_RUN_TYPE = "jetbrains.helm";
 
-    String HELM_PATH_CONFIG_PARAM = "Helm_Path";
+    public static final String HELM_PATH_CONFIG_PARAM = "Helm_Path";
 
-    String HELM_INSTALL_COMMAND = "install";
-    String HELM_INSTALL_COMMAND_NAME = "helm-install";
+    public static final String HELM_INSTALL_COMMAND = "install";
+    public static final String HELM_DELETE_COMMAND = "delete";
+    public static final String HELM_UPGRADE_COMMAND = "upgrade";
+    public static final String HELM_ROLLBACK_COMMAND = "rollback";
+    public static final String HELM_TEST_COMMAND = "test";
 
-    String HELM_DELETE_COMMAND = "delete";
-    String HELM_DELETE_COMMAND_NAME = "helm-delete";
+    public static final String CHART = "chart";
+    public static final String ADDITIONAL_FLAGS = "additionalFlags";
+    public static final String RELEASE_NAME = "releaseName";
+    public static final String REVISION = "revision";
+    public static final String COMMAND_ID = "command";
 
-    String HELM_UPGRADE_COMMAND = "upgrade";
-    String HELM_UPGRADE_COMMAND_NAME = "helm-upgrade";
+    public String getChartKey() {
+        return CHART;
+    }
 
-    String HELM_ROLLBACK_COMMAND = "rollback";
-    String HELM_ROLLBACK_COMMAND_NAME = "helm-rollback";
+    public String getReleaseName() {
+        return RELEASE_NAME;
+    }
 
-    String HELM_TEST_COMMAND = "test";
-    String HELM_TEST_COMMAND_NAME = "helm-test";
+    public String getRevision() {
+        return REVISION;
+    }
 
-    String CHART = "teamcity.helm.chart";
-    String ADDITIONAL_FLAGS = "teamcity.helm.additionalFlags";
-    String RELEASE_NAME = "teamcity.helm.releaseName";
-    String REVISION = "teamcity.helm.revision";
-    String COMMAND_ID = "teamcity.helm.command";
+    public String getAdditionalFlagsKey() {
+        return ADDITIONAL_FLAGS;
+    }
+
+    public String getDeleteCommandId() {
+        return HELM_DELETE_COMMAND;
+    }
+
+    public String getInstallCommandId() {
+        return HELM_INSTALL_COMMAND;
+    }
+
+    public String getRollbackCommandId() {
+        return HELM_ROLLBACK_COMMAND;
+    }
+
+    public String getTestCommandId() {
+        return HELM_TEST_COMMAND;
+    }
+
+    public String getUpgradeCommandId() {
+        return HELM_UPGRADE_COMMAND;
+    }
+
 }

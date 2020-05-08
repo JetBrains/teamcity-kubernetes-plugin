@@ -16,10 +16,13 @@
 
 package jetbrains.buildServer.internal;
 
+import java.util.Map;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 
 import javax.servlet.http.HttpServletRequest;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 //NOTE: copy pasted from PluginPropertiesUtil
 public class PluginPropertiesUtil {

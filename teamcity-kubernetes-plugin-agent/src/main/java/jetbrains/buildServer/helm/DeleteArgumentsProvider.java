@@ -32,7 +32,7 @@ public class DeleteArgumentsProvider implements HelmCommandArgumentsProvider {
     @NotNull
     @Override
     public String getCommandId() {
-        return HELM_DELETE_COMMAND_NAME;
+        return HELM_DELETE_COMMAND;
     }
 
     @NotNull
@@ -40,8 +40,8 @@ public class DeleteArgumentsProvider implements HelmCommandArgumentsProvider {
     public List<String> getArguments(@NotNull Map<String, String> runnerParameters) {
         List<String> result = new LinkedList<String>();
         result.add(HELM_DELETE_COMMAND);
-        result.add(StringUtil.emptyIfNull(runnerParameters.get(HELM_DELETE_COMMAND_NAME + ADDITIONAL_FLAGS)));
-        result.add(StringUtil.emptyIfNull(runnerParameters.get(HELM_DELETE_COMMAND_NAME + RELEASE_NAME)));
+        result.add(StringUtil.emptyIfNull(runnerParameters.get(ADDITIONAL_FLAGS)));
+        result.add(StringUtil.emptyIfNull(runnerParameters.get(RELEASE_NAME)));
         return result;
     }
 }

@@ -32,7 +32,7 @@ public class TestArgumentsProvider implements HelmCommandArgumentsProvider {
     @NotNull
     @Override
     public String getCommandId() {
-        return HELM_TEST_COMMAND_NAME;
+        return HELM_TEST_COMMAND;
     }
 
     @NotNull
@@ -40,8 +40,8 @@ public class TestArgumentsProvider implements HelmCommandArgumentsProvider {
     public List<String> getArguments(@NotNull Map<String, String> runnerParameters) {
         List<String> result = new LinkedList<String>();
         result.add(HELM_TEST_COMMAND);
-        result.add(StringUtil.emptyIfNull(runnerParameters.get(HELM_TEST_COMMAND_NAME + RELEASE_NAME)));
-        result.add(StringUtil.emptyIfNull(runnerParameters.get(HELM_TEST_COMMAND_NAME + ADDITIONAL_FLAGS)));
+        result.add(StringUtil.emptyIfNull(runnerParameters.get(RELEASE_NAME)));
+        result.add(StringUtil.emptyIfNull(runnerParameters.get(ADDITIONAL_FLAGS)));
         return result;
     }
 }

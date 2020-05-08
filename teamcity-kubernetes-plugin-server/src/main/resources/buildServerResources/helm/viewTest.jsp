@@ -21,9 +21,9 @@
 <jsp:useBean id="constants" class="jetbrains.buildServer.helm.HelmConstantsBean"/>
 
 <div class="parameter">
-    Release: <strong><props:displayValue name="${constants.testCommandId}${constants.releaseName}" emptyValue="not specified"/></strong>
+    Release: <strong><props:displayValue name="${constants.releaseName}" emptyValue="not specified"/></strong>
 </div>
 
 <div class="parameter">
-    Additional command flags: <strong><props:displayValue name="${constants.testCommandId}${constants.additionalFlagsKey}" emptyValue="not specified"/></strong>
+    Additional command flags: <strong><props:displayValue name="${constants.additionalFlagsKey}" emptyValue="not specified"/></strong>
 </div>
