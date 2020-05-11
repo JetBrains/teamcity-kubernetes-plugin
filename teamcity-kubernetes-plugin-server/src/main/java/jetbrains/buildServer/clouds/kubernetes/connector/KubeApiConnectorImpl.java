@@ -100,7 +100,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                     false);
         } catch (KubernetesClientException e) {
             return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getCause() == null ? e.getMessage() : e.getCause().getMessage()),
-                                                      e.getStatus().getCode() == 401);
+                                                      e.getStatus() != null && e.getStatus().getCode() == 401);
         } catch (Exception e) {
             return KubeApiConnectionCheckResult.error(
               String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getMessage()),
