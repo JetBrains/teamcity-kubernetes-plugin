@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.CLIENT_CERTIFICATE_DATA;
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.CLIENT_KEY_DATA;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 26.06.17.
@@ -39,22 +40,27 @@ public class ClientCertificateAuthStrategy implements KubeAuthStrategy {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Client Certificate";
+        return "Client Certificate & Key";
     }
 
     @Nullable
     @Override
     public String getDescription() {
-        return "Authenticate with X509 Client Certificate";
+        return "Authenticate with Client Certificate & Key";
     }
 
     @NotNull
     @Override
     public ConfigBuilder apply(@NotNull ConfigBuilder clientConfig, @NotNull KubeApiConnection connection) {
         String clientCertData = connection.getCustomParameter(CLIENT_CERTIFICATE_DATA);
+        String clientKeyData = connection.getCustomParameter(CLIENT_KEY_DATA);
         if(StringUtil.isEmpty(clientCertData)) {
-            throw new KubeCloudException("Client certificate data is empty for connection " + connection);
+            throw new KubeCloudException("Client certificate data is empty");
         }
-        return clientConfig.withClientCertData(Base64.encodeBase64String(clientCertData.getBytes()));
+        if(StringUtil.isEmpty(clientKeyData)) {
+            throw new KubeCloudException("Client key data is empty");
+        }
+        return clientConfig.withClientCertData(Base64.encodeBase64String(clientCertData.getBytes()))
+                           .withClientKeyData(Base64.encodeBase64String(clientKeyData.getBytes()));
     }
 }

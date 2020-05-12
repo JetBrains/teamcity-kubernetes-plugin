@@ -54,6 +54,7 @@
         <th><label for="${cons.caCertData}">Certificate Authority (CA):</label></th>
         <td><props:multilineProperty name="secure:${cons.caCertData}"
                                      className="longField"
+                                     expanded="false"
                                      linkTitle="Enter CA certificate content"
                                      cols="35" rows="3"/>
             <span id="error_${cons.caCertData}" class="error"></span>
@@ -110,10 +111,20 @@
         <th><label for="${cons.clientCertData}">Client certificate: <l:star/></label></th>
         <td><props:multilineProperty name="secure:${cons.clientCertData}"
                                      className="longField"
-                                     linkTitle="Enter X509 Client Sertificate Content"
-                                     cols="35" rows="3"
-                                     expanded="true"/>
+                                     linkTitle="Enter Client Certificate Data"
+                                     expanded="false"
+                                     cols="35" rows="3"/>
             <span id="error_${cons.clientCertData}" class="error"></span>
+        </td>
+    </tr>
+    <tr class="hidden client-cert auth-ui">
+        <th><label for="${cons.clientKeyData}">Client Key: <l:star/></label></th>
+        <td><props:multilineProperty name="secure:${cons.clientKeyData}"
+                                     expanded="false"
+                                     className="longField"
+                                     linkTitle="Enter Client Key Data"
+                                     cols="35" rows="3"/>
+            <span id="error_${cons.clientKeyData}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden token auth-ui">

@@ -38,6 +38,7 @@ public class KubeParametersConstants {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String CLIENT_CERTIFICATE_DATA = "clientCertData";
+    public static final String CLIENT_KEY_DATA = "clientKeyData";
     public static final String AUTH_TOKEN = "authToken";
     public static final String OIDC_CLIENT_ID = "oidcClientId";
     public static final String OIDC_CLIENT_SECRET = "oidcClientSecret";
@@ -131,6 +132,10 @@ public class KubeParametersConstants {
 
     public String getClientCertData() {
         return CLIENT_CERTIFICATE_DATA;
+    }
+
+    public String getClientKeyData() {
+        return CLIENT_KEY_DATA;
     }
 
     public String getPodSpecMode() {
