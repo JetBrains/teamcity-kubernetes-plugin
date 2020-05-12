@@ -15,7 +15,28 @@
  */
 
 if (!BS) BS = {};
-if (!BS.Kube) BS.Kube = {};
+if (!BS.Kube) BS.Kube = {
+    serializeParameters: function() {
+        var parameters = BS.Clouds.Admin.CreateProfileForm.serializeParameters();
+        var split = parameters.split('&');
+        var result = '';
+        for (var i = 0; i < split.length; i++) {
+            var pair = split[i].split('=');
+            if (pair[0] === 'prop%3Asource_images_json'){
+                continue;
+            }
+            if (pair[0].startsWith('prop:encrypted:')){
+                // check whether value is empty or not
+                var s = pair[0].substr('prop:encrypted:'.length);
+                if (!$j('#' + s.replace(':', '\\:')).val())
+                    continue;
+            }
+            result += '&'
+            result += split[i];
+        }
+        return result.substr(1);
+    }
+};
 
 if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
 
@@ -493,7 +514,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     testConnection: function() {
         BS.ajaxRequest(this.testConnectionUrl, {
-            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            parameters: BS.Kube.serializeParameters(),
             onFailure: function (response) {
                 BS.TestConnectionDialog.show(false, response, null);
             }.bind(this),
@@ -674,7 +695,7 @@ if(!BS.Kube.NamespaceChooser){
 
     BS.Kube.NamespaceChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
-            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            parameters: BS.Kube.serializeParameters(),
             url: dataLoadUrl,
             shift:{x:15,y:15}
         });
@@ -696,7 +717,7 @@ if(!BS.Kube.DeploymentChooser){
 
     BS.Kube.DeploymentChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
-            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            parameters: BS.Kube.serializeParameters(),
             url: dataLoadUrl,
             shift:{x:15,y:15}
         });

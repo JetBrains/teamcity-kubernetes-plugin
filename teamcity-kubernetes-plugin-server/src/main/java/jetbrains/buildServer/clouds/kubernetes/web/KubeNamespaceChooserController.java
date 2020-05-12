@@ -45,7 +45,7 @@ public class KubeNamespaceChooserController extends BaseController {
     private static final String URL = "kubeNamespaces.html";
 
     private final PluginDescriptor myPluginDescriptor;
-    private KubeAuthStrategyProvider myAuthStrategyProvider;
+    private final KubeAuthStrategyProvider myAuthStrategyProvider;
 
     public KubeNamespaceChooserController(WebControllerManager web,
                                           PluginDescriptor pluginDescriptor,
