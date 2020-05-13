@@ -164,7 +164,7 @@
     </tr>
     <tr class="hidden eks auth-ui">
         <th><label for="${cons.eksUseInstanceProfile}">Use server instance profile: </label></th>
-        <td><props:checkboxProperty name="${cons.eksUseInstanceProfile}" className="longField"/>
+        <td><props:checkboxProperty name="${cons.eksUseInstanceProfile}"/>
             <span id="error_${cons.eksUseInstanceProfile}" class="error"></span>
         </td>
     </tr>
@@ -183,7 +183,7 @@
     </tr>
     <tr class="hidden eks auth-ui">
         <th><label for="${cons.eksAssumeIamRole}">Assume an IAM role: </label></th>
-        <td><props:checkboxProperty name="${cons.eksAssumeIamRole}" className="longField"/>
+        <td><props:checkboxProperty name="${cons.eksAssumeIamRole}"/>
             <span id="error_${cons.eksAssumeIamRole}" class="error"></span>
         </td>
     </tr>
