@@ -40,7 +40,7 @@ public class ClientCertificateAuthStrategy implements KubeAuthStrategy {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Client certificate & ley";
+        return "Client certificate & key";
     }
 
     @Nullable
