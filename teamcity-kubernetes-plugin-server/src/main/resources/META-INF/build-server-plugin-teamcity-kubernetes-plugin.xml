@@ -31,12 +31,4 @@
     <bean id="kubeDeleteImageDialogController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeDeleteImageDialogController" />
 <!--    <bean class="jetbrains.buildServer.clouds.kubernetes.buildFeature.RunInKubeFeature" />-->
 <!--    <bean class="jetbrains.buildServer.clouds.kubernetes.buildFeature.RunInKubeAgentsFilter" />-->
-
-    <!--helm support-->
-    <bean id="helmRunType" class="jetbrains.buildServer.helm.HelmRunType" />
-    <bean id="installCommand" class="jetbrains.buildServer.helm.InstallCommand" />
-    <bean id="deleteCommand" class="jetbrains.buildServer.helm.DeleteCommand" />
-    <bean id="testCommand" class="jetbrains.buildServer.helm.TestCommand" />
-    <bean id="upgradeCommand" class="jetbrains.buildServer.helm.UpgradeCommand" />
-    <bean id="rollbackCommand" class="jetbrains.buildServer.helm.RollbackCommand" />
 </beans>

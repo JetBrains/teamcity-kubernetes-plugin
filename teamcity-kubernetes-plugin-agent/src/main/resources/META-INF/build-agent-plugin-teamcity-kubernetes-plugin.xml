@@ -21,8 +21,4 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
     <bean id="kubeAgentConfigurationProvider" class="jetbrains.buildServer.clouds.kubernetes.KubeAgentConfigurationProvider" />
-    <bean id="helmAgentConfigurationProvider" class="jetbrains.buildServer.helm.HelmAgentConfigurationProvider" />
-
-    <bean id="helmBuildServiceFactory" class="jetbrains.buildServer.helm.HelmBuildServiceFactory" />
-    <bean id="helmCommandArgumentsProviders" class="jetbrains.buildServer.helm.HelmCommandArgumentsProvidersImpl" />
 </beans>
