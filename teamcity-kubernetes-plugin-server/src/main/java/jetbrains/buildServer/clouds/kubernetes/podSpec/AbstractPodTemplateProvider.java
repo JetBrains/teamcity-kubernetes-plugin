@@ -40,6 +40,9 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
                                        @NotNull String imageId,
                                        @NotNull CloudInstanceUserData cloudInstanceUserData
                                       ) {
+    if (podTemplateSpec.getMetadata() == null) {
+      podTemplateSpec.setMetadata(new ObjectMeta());
+    }
     final ObjectMeta metadata = podTemplateSpec.getMetadata();
     patchMetadata(instanceName, namespace, serverUUID, imageId, cloudInstanceUserData, metadata);
 
@@ -115,7 +118,8 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
                              @NotNull final String namespace,
                              @NotNull final String serverUUID,
                              @NotNull final String imageId,
-                             @NotNull final CloudInstanceUserData cloudInstanceUserData, final ObjectMeta metadata) {
+                             @NotNull final CloudInstanceUserData cloudInstanceUserData,
+                             @NotNull final ObjectMeta metadata) {
     metadata.setName(instanceName);
     metadata.setNamespace(namespace);
 
