@@ -290,30 +290,33 @@
                             <props:option value="${policy.name}"><c:out value="${policy.displayName}"/></props:option>
                         </c:forEach>
                     </select>
-                    <div class="smallNoteAttention">Policy to use by kubelet to pull an image
-                        &nbsp;<a href="https://kubernetes.io/docs/concepts/containers/images/#updating-images"><bs:helpIcon/></a></div>
+                    <div class="smallNoteAttention">Policy to use by kubelet to pull an image <a
+                        href="https://kubernetes.io/docs/concepts/containers/images/#updating-images"
+                        target="_blank" rel="noreferrer"><bs:helpIcon/></a></div>
                     <span class="error option-error option-error_${cons.imagePullPolicy}"></span>
                 </div>
             </td>
         </tr>
         <tr class="hidden simple pod-spec-ui">
-            <th>Docker command:</th>
+            <th>Command:</th>
             <td>
                 <div>
                     <input type="text" id="${cons.dockerCommand}" value="" class="longField" data-id="${cons.dockerCommand}" data-err-id="${cons.dockerCommand}"/>
-                    <div class="smallNoteAttention">Docker entry point to use. Leave empty to use the Docker image's 'ENTRYPOINT'
-                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a>.</div>
+                    <div class="smallNoteAttention">Command to use. Leave empty to use the Docker image's 'ENTRYPOINT'. <a
+                        href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes" target="_blank"
+                        rel="noreferrer"><bs:helpIcon/></a></div>
                     <span class="error option-error option-error_${cons.dockerCommand}"></span>
                 </div>
             </td>
         </tr>
         <tr class="hidden simple pod-spec-ui">
-            <th>Docker arguments:</th>
+            <th>Command arguments:</th>
             <td>
                 <div>
                     <input type="text" id="${cons.dockerArguments}" value="" class="longField" data-id="${cons.dockerArguments}" data-err-id="${cons.dockerArguments}"/>
-                    <div class="smallNoteAttention">Arguments for the Docker entry point. Leave empty to use the Docker image's 'CMD'
-                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a>.</div>
+                    <div class="smallNoteAttention">Arguments for the command. Leave empty to use the Docker image's 'CMD'. <a
+                        href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes" target="_blank"
+                        rel="noreferrer"><bs:helpIcon/></a></div>
                     <span class="error option-error option-error_${cons.dockerArguments}"></span>
                 </div>
             </td>
