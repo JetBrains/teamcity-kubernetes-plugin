@@ -18,7 +18,6 @@ package jetbrains.buildServer.clouds.kubernetes.web;
 
 import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.BuildProject;
-import jetbrains.buildServer.agent.IOUtil;
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
@@ -67,8 +66,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final AgentPoolManager myAgentPoolManager;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
-    private final KubeNamespaceChooserController myKubeNamespaceChooserController;
-    private final KubeDeploymentChooserController myKubeDeploymentChooserController;
+    private final ChooserController.Namespaces myNamespacesChooser;
+    private final ChooserController.Deployments myDeploymentsChooser;
     private final KubeDeleteImageDialogController myKubeDeleteImageDialogController;
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
@@ -77,8 +76,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
                                      @NotNull final AgentPoolManager agentPoolManager,
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
                                      @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
-                                     @NotNull final KubeNamespaceChooserController kubeNamespaceChooserController,
-                                     @NotNull final KubeDeploymentChooserController kubeDeploymentChooserController,
+                                     @NotNull final ChooserController.Namespaces namespacesChooser,
+                                     @NotNull final ChooserController.Deployments deploymentsChooser,
                                      @NotNull final KubeDeleteImageDialogController kubeDeleteImageDialogController) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
@@ -86,8 +85,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
         myAgentPoolManager = agentPoolManager;
         myAuthStrategyProvider = authStrategyProvider;
         myPodTemplateProviders = podTemplateProviders;
-        myKubeNamespaceChooserController = kubeNamespaceChooserController;
-        myKubeDeploymentChooserController = kubeDeploymentChooserController;
+        myNamespacesChooser = namespacesChooser;
+        myDeploymentsChooser = deploymentsChooser;
         myKubeDeleteImageDialogController = kubeDeleteImageDialogController;
         web.registerController(myPath, this);
     }
@@ -97,8 +96,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("editProfile.jsp"));
         Map<String, Object> model = modelAndView.getModel();
         model.put("testConnectionUrl", myPath + "?testConnection=true");
-        model.put("namespaceChooserUrl", myKubeNamespaceChooserController.getUrl());
-        model.put("deploymentChooserUrl", myKubeDeploymentChooserController.getUrl());
+        model.put("namespaceChooserUrl", myNamespacesChooser.getUrl());
+        model.put("deploymentChooserUrl", myDeploymentsChooser.getUrl());
         model.put("deleteImageUrl", myKubeDeleteImageDialogController.getUrl());
         final String projectId = httpServletRequest.getParameter("projectId");
 

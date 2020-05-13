@@ -16,9 +16,10 @@
 
 package jetbrains.buildServer.clouds.kubernetes.web;
 
-import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
+import java.util.Collection;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
@@ -41,15 +42,14 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 05.10.17.
  */
-public class KubeNamespaceChooserController extends BaseController {
-    private static final String URL = "kubeNamespaces.html";
+public abstract class ChooserController extends BaseController {
 
     private final PluginDescriptor myPluginDescriptor;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
 
-    public KubeNamespaceChooserController(WebControllerManager web,
-                                          PluginDescriptor pluginDescriptor,
-                                          KubeAuthStrategyProvider authStrategyProvider) {
+    public ChooserController(WebControllerManager web,
+                             PluginDescriptor pluginDescriptor,
+                             KubeAuthStrategyProvider authStrategyProvider) {
         myPluginDescriptor = pluginDescriptor;
         myAuthStrategyProvider = authStrategyProvider;
         web.registerController(getUrl(), this);
@@ -57,7 +57,7 @@ public class KubeNamespaceChooserController extends BaseController {
 
     @NotNull
     public String getUrl() {
-        return myPluginDescriptor.getPluginResourcesPath(URL);
+        return myPluginDescriptor.getPluginResourcesPath(getHtmlName());
     }
 
     @Nullable
@@ -71,7 +71,7 @@ public class KubeNamespaceChooserController extends BaseController {
             @NotNull
             @Override
             public String getApiServerUrl() {
-                return props.get(KubeParametersConstants.API_SERVER_URL);
+                return props.get(API_SERVER_URL);
             }
 
             @NotNull
@@ -95,15 +95,95 @@ public class KubeNamespaceChooserController extends BaseController {
         };
         String authStrategy = props.get(AUTH_STRATEGY);
 
-        ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("kubeNamespaces.jsp"));
+        ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath(getJspName()));
         try {
-          KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", apiConnection, myAuthStrategyProvider.get(authStrategy));
-            modelAndView.getModelMap().put("namespaces", apiConnector.listNamespaces());
+            KubeApiConnector apiConnector = new KubeApiConnectorImpl("editProfile", apiConnection, myAuthStrategyProvider.get(authStrategy));
+            modelAndView.getModelMap().put(getItemsName(), getItems(apiConnector));
             modelAndView.getModelMap().put("error","");
         } catch (Exception ex){
-            modelAndView.getModelMap().put("namespaces", Collections.emptyList());
-            modelAndView.getModelMap().put("error", ex.getLocalizedMessage());
+            modelAndView.getModelMap().put(getItemsName(), Collections.emptyList());
+            modelAndView.getModelMap().put("error", getErrorMessage() + ":" + ex.getLocalizedMessage());
         }
         return modelAndView;
+    }
+
+    @NotNull
+    protected abstract Collection<String> getItems(KubeApiConnector apiConnector);
+
+    @NotNull
+    protected abstract String getItemsName();
+
+    @NotNull
+    protected abstract String getErrorMessage();
+
+    @NotNull
+    protected abstract String getHtmlName();
+    protected abstract String getJspName();
+
+    public static class Deployments extends ChooserController{
+
+        public Deployments(final WebControllerManager web,
+                           final PluginDescriptor pluginDescriptor,
+                           final KubeAuthStrategyProvider authStrategyProvider) {
+            super(web, pluginDescriptor, authStrategyProvider);
+        }
+
+        @Override
+        protected Collection<String> getItems(final KubeApiConnector apiConnector) {
+            return apiConnector.listDeployments();
+        }
+
+        @Override
+        protected String getItemsName() {
+            return "deployments";
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return "Unable to list deployments";
+        }
+
+        @Override
+        protected String getHtmlName() {
+            return "kubeDeployments.html";
+        }
+
+        protected String getJspName() {
+            return "kubeDeployments.jsp";
+        }
+    }
+
+    public static class Namespaces extends ChooserController{
+
+        public Namespaces(final WebControllerManager web,
+                          final PluginDescriptor pluginDescriptor,
+                          final KubeAuthStrategyProvider authStrategyProvider) {
+            super(web, pluginDescriptor, authStrategyProvider);
+        }
+
+        @Override
+        protected Collection<String> getItems(final KubeApiConnector apiConnector) {
+            return apiConnector.listNamespaces();
+        }
+
+        @Override
+        protected String getItemsName() {
+            return "namespaces";
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return "Unable to list namespaces";
+        }
+
+        @Override
+        protected String getHtmlName() {
+            return "kubeNamespaces.html";
+        }
+
+        @Override
+        protected String getJspName() {
+            return "kubeNamespaces.jsp";
+        }
     }
 }
