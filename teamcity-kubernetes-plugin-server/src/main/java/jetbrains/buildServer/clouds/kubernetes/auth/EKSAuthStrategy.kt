@@ -36,7 +36,6 @@ import java.net.URISyntaxException
 import java.util.*
 
 class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>(myTimeService) {
-    var credentialsProvider: AWSCredentialsProvider? = null
 
     override fun retrieveNewToken(dataHolder: EKSData): Pair<String, Long>? {
         val credentials = getAwsCredentialProvider(dataHolder)
@@ -59,16 +58,13 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
     }
 
     private fun getAwsCredentialProvider(dataHolder: EKSData): AWSCredentialsProvider {
-        // Only initialize the credential provider once. Static creds never change and the AssumeRole handles refreshing credentials itself
-        if (credentialsProvider != null) return credentialsProvider!!
-
-        var baseCreds = if (dataHolder.useInstanceProfile) {
+        val baseCreds = if (dataHolder.useInstanceProfile) {
             InstanceProfileCredentialsProvider.getInstance()
         } else {
             AWSStaticCredentialsProvider(BasicAWSCredentials(dataHolder.accessId, dataHolder.secretKey))
         }
 
-        credentialsProvider = if (!dataHolder.iamRoleArn.isNullOrEmpty()) {
+        return if (!dataHolder.iamRoleArn.isNullOrEmpty()) {
             val stsClient = AWSSecurityTokenServiceClientBuilder
                     .standard()
                     .withRegion(Regions.EU_WEST_1)
@@ -81,7 +77,6 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
         } else {
             baseCreds
         }
-        return credentialsProvider!!
     }
 
     @Throws(URISyntaxException::class)
@@ -135,9 +130,9 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
 
     override fun getId() = "eks"
 
-    override fun getDisplayName() = "Amazon EKS (experimental)"
+    override fun getDisplayName() = "Amazon EKS"
 
-    override fun getDescription() = "Amazon EKS"
+    override fun getDescription() = null
 }
 
 data class EKSData(val useInstanceProfile: Boolean,
