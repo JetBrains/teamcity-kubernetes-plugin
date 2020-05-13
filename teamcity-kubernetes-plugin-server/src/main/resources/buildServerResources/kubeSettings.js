@@ -162,7 +162,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 this.$podSpecModeSelector.val(value);
             }
             this._togglePodSpecMode();
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         ///// Change handlers
@@ -173,7 +172,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.$dockerImage.val(value);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$imagePullPolicy.on('change', function(e, value) {
@@ -183,7 +181,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.$imagePullPolicy.val(value);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$dockerCommand.on('change', function (e, value) {
@@ -193,7 +190,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.$dockerCommand.val(value);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$dockerArgs.on('change', function (e, value) {
@@ -203,14 +199,12 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.$dockerArgs.val(value);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$deploymentName.on('change', function (e, value) {
             if(value !== undefined) this.$deploymentName.val(value);
             this._image['sourceDeployment'] = this.$deploymentName.val();
             this._updateImageDescription(this._image);
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$agentNamePrefix.on('change', function (e, value) {
@@ -220,7 +214,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.$agentNamePrefix.val(value);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$imageInstanceLimit.on('change', function (e, value) {
@@ -229,7 +222,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.$imageInstanceLimit.val(value);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$agentPoolSelector.on('change', function(e, value) {
@@ -238,7 +230,6 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             } else {
                 this.$agentPoolSelector.val(value);
             }
-            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$customPodTemplate

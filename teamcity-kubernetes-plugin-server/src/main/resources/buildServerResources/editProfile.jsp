@@ -44,7 +44,7 @@
 
 <table class="runnerFormTable">
     <tr>
-        <th><label for="${cons.apiServerUrl}">Kubernetes API server URL: <l:star/></label></th>
+        <th><label for="${cons.apiServerUrl}">Kubernetes API server URL:<l:star/></label></th>
         <td><props:textProperty name="${cons.apiServerUrl}" className="longField"/>
             <span id="error_${cons.apiServerUrl}" class="error"></span>
             <span class="smallNote">Target Kubernetes API server URL</span>
@@ -65,15 +65,16 @@
         <th><label for="${cons.kubernetesNamespace}">Kubernetes namespace: </label></th>
         <td>
             <div style="white-space: nowrap">
-                <props:textProperty name="${cons.kubernetesNamespace}" className="longField"/>
-                <i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i>
+                <props:textProperty name="${cons.kubernetesNamespace}" className="longField">
+                    <jsp:attribute name="afterTextField"><i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i></jsp:attribute>
+                </props:textProperty>
             </div>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
             <span class="smallNote">Kubernetes namespace to use. Leave empty to use the default namespace.</span>
         </td>
     </tr>
     <tr>
-        <th><label for="${cons.authStrategy}">Authentication strategy: <l:star/></label></th>
+        <th><label for="${cons.authStrategy}">Authentication strategy:<l:star/></label></th>
         <td>
             <div>
                 <c:set var="selectedAuthStrategy" value="${propertiesBean.properties[cons.authStrategy]}" />
@@ -94,21 +95,21 @@
         </td>
     </tr>
     <tr class="hidden user-passwd auth-ui">
-        <th><label for="${cons.username}">Username: <l:star/></label></th>
+        <th><label for="${cons.username}">Username:<l:star/></label></th>
         <td><props:textProperty name="${cons.username}" className="longField"/>
             <span id="error_${cons.username}" class="error"></span>
             <span class="smallNote">Username of an authorized Kubernetes user</span>
         </td>
     </tr>
     <tr class="hidden user-passwd auth-ui">
-        <th><label for="secure:${cons.password}">Password: <l:star/></label></th>
+        <th><label for="secure:${cons.password}">Password:<l:star/></label></th>
         <td><props:passwordProperty name="secure:${cons.password}" className="longField"/>
             <span id="error_secure:${cons.password}" class="error"></span>
             <span class="smallNote">Password of an authorized Kubernetes user</span>
         </td>
     </tr>
     <tr class="hidden client-cert auth-ui">
-        <th><label for="${cons.clientCertData}">Client certificate: <l:star/></label></th>
+        <th><label for="${cons.clientCertData}">Client certificate:<l:star/></label></th>
         <td><props:multilineProperty name="secure:${cons.clientCertData}"
                                      className="longField"
                                      linkTitle="Enter client certificate content"
@@ -118,7 +119,7 @@
         </td>
     </tr>
     <tr class="hidden client-cert auth-ui">
-        <th><label for="${cons.clientKeyData}">Client Key: <l:star/></label></th>
+        <th><label for="${cons.clientKeyData}">Client Key:<l:star/></label></th>
         <td><props:multilineProperty name="secure:${cons.clientKeyData}"
                                      expanded="false"
                                      className="longField"
@@ -128,7 +129,7 @@
         </td>
     </tr>
     <tr class="hidden token auth-ui">
-        <th><label for="secure:${cons.authToken}">Token: <l:star/></label></th>
+        <th><label for="secure:${cons.authToken}">Token:<l:star/></label></th>
         <td>
             <props:passwordProperty name="secure:${cons.authToken}" className="longField"/>
             <span id="error_secure:${cons.authToken}" class="error"></span>
@@ -136,26 +137,26 @@
         </td>
     </tr>
     <tr class="hidden oidc auth-ui">
-        <th><label for="${cons.oidcIssuerUrl}">IdP issuer URL: <l:star/></label></th>
+        <th><label for="${cons.oidcIssuerUrl}">IdP issuer URL:<l:star/></label></th>
         <td><props:textProperty name="${cons.oidcIssuerUrl}" className="longField"/>
             <span id="error_${cons.oidcIssuerUrl}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden oidc auth-ui">
-        <th><label for="${cons.oidcClientId}">Client ID: <l:star/></label></th>
+        <th><label for="${cons.oidcClientId}">Client ID:<l:star/></label></th>
         <td><props:textProperty name="${cons.oidcClientId}" className="longField"/>
             <span id="error_${cons.oidcClientId}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden oidc auth-ui">
-        <th><label for="secure:${cons.oidcClientSecret}">Client secret: <l:star/></label></th>
+        <th><label for="secure:${cons.oidcClientSecret}">Client secret:<l:star/></label></th>
         <td>
             <props:passwordProperty name="secure:${cons.oidcClientSecret}" className="longField"/>
             <span id="error_secure:${cons.oidcClientSecret}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden oidc auth-ui">
-        <th><label for="secure:${cons.oidcRefreshToken}">Refresh token: <l:star/></label></th>
+        <th><label for="secure:${cons.oidcRefreshToken}">Refresh token:<l:star/></label></th>
         <td>
             <props:passwordProperty name="secure:${cons.oidcRefreshToken}" className="longField"/>
             <span id="error_secure:${cons.oidcRefreshToken}" class="error"></span>
@@ -168,13 +169,13 @@
         </td>
     </tr>
     <tr class="hidden eks auth-ui aws-credential">
-        <th><label for="${cons.eksAccessId}">Access ID: <l:star/></label></th>
+        <th><label for="${cons.eksAccessId}">Access ID:<l:star/></label></th>
         <td><props:textProperty name="${cons.eksAccessId}" className="longField"/>
             <span id="error_${cons.eksAccessId}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden eks auth-ui aws-credential">
-        <th><label for="secure:${cons.eksSecretKey}">Secret Key: <l:star/></label></th>
+        <th><label for="secure:${cons.eksSecretKey}">Secret Key:<l:star/></label></th>
         <td>
             <props:passwordProperty name="secure:${cons.eksSecretKey}" className="longField"/>
             <span id="error_secure:${cons.eksSecretKey}" class="error"></span>
@@ -187,13 +188,13 @@
         </td>
     </tr>
     <tr class="hidden eks aws-iam">
-        <th><label for="${cons.eksIAMRoleArn}">IAM role ARN: <l:star/></label></th>
+        <th><label for="${cons.eksIAMRoleArn}">IAM role ARN:<l:star/></label></th>
         <td><props:textProperty name="${cons.eksIAMRoleArn}" className="longField"/>
             <span id="error_${cons.eksIAMRoleArn}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden eks auth-ui">
-        <th><label for="${cons.eksClusterName}">Cluster name: <l:star/></label></th>
+        <th><label for="${cons.eksClusterName}">Cluster name:<l:star/></label></th>
         <td><props:textProperty name="${cons.eksClusterName}" className="longField"/>
             <span id="error_${cons.eksClusterName}" class="error"></span>
         </td>
@@ -250,7 +251,7 @@
             </td>
         </tr>
         <tr>
-            <th><label for="${cons.podSpecMode}">Pod specification: <l:star/></label></th>
+            <th><label for="${cons.podSpecMode}">Pod specification:<l:star/></label></th>
             <td>
                 <div>
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
@@ -346,7 +347,7 @@
             </td>
         </tr>
         <tr>
-            <th><label for="${cons.agentPoolIdField}">Agent pool: <l:star/></label></th>
+            <th><label for="${cons.agentPoolIdField}">Agent pool:<l:star/></label></th>
             <td>
                 <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
                     <props:option value=""><c:out value="<Select agent pool>"/></props:option>
