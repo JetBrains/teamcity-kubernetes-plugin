@@ -24,10 +24,10 @@ import jetbrains.buildServer.clouds.CloudImageParameters;
 public class KubeParametersConstants {
     public static final String DEFAULT_NAMESPACE = "default";
 
-    public static final String API_SERVER_URL = "api-server-url";
+    public static final String API_SERVER_URL = "apiServerUrl";
     public static final String AUTH_STRATEGY = "authStrategy";
-    public static final String KUBERNETES_NAMESPACE = "kubernetes-namespace";
-    public static final String CA_CERT_DATA = "ca-cert-data";
+    public static final String KUBERNETES_NAMESPACE = "namespace";
+    public static final String CA_CERT_DATA = "caCertData";
     public static final String PROFILE_INSTANCE_LIMIT = "profileInstanceLimit";
     public static final String IMAGE_INSTANCE_LIMIT = "imageInstanceLimit";
     public static final String POD_TEMPLATE_MODE = "podTemplateMode";
@@ -43,7 +43,7 @@ public class KubeParametersConstants {
     public static final String OIDC_CLIENT_ID = "oidcClientId";
     public static final String OIDC_CLIENT_SECRET = "oidcClientSecret";
     public static final String OIDC_REFRESH_TOKEN = "oidcRefreshToken";
-    public static final String OIDC_ISSUER_URL = "issuer_url";
+    public static final String OIDC_ISSUER_URL = "idpIssuerUrl";
     public static final String CUSTOM_POD_TEMPLATE = "customPodTemplate";
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
     public static final String AGENT_NAME_PREFIX = "agentNamePrefix";
@@ -56,9 +56,10 @@ public class KubeParametersConstants {
     public static final String EKS_REGION = "eksRegion";
     public static final String EKS_CLUSTER_NAME = "eksClusterName";
 
+    // Run in Kube feature
     public static final String RUN_IN_KUBE_FEATURE = "RunInKubernetes";
-    public static final String RUN_IN_KUBE_AGENT_SOURCE = "run-in-kube-source";
-    public static final String RUN_IN_KUBE_DOCKER_IMAGE = "run-in-kube-image";
+    public static final String RUN_IN_KUBE_AGENT_SOURCE = "runInKubeSource";
+    public static final String RUN_IN_KUBE_DOCKER_IMAGE = "runInKubeImage";
     public static final String RUN_IN_KUBE_ENV = "RUN_IN_KUBERNETES";
 
 
