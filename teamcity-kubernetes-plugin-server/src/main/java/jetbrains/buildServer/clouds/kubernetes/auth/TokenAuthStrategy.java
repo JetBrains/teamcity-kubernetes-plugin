@@ -44,7 +44,7 @@ public class TokenAuthStrategy implements KubeAuthStrategy {
     @Nullable
     @Override
     public String getDescription() {
-        return "Authenticate with Bearer Token";
+        return "Authenticate with a bearer token";
     }
 
     @NotNull

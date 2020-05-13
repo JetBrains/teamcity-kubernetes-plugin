@@ -58,7 +58,7 @@
                                      linkTitle="Enter CA certificate content"
                                      cols="35" rows="3"/>
             <span id="error_${cons.caCertData}" class="error"></span>
-            <span class="smallNote">Leave blank to skip TLS verify (insecure!).</span>
+            <span class="smallNote">Leave empty to skip TLS verification (insecure option)</span>
         </td>
     </tr>
     <tr>
@@ -69,7 +69,7 @@
                 <i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i>
             </div>
             <span id="error_${cons.kubernetesNamespace}" class="error"></span>
-            <span class="smallNote">Kubernetes namespace to use. Leave blank to use default namespace.</span>
+            <span class="smallNote">Kubernetes namespace to use. Leave empty to use the default namespace.</span>
         </td>
     </tr>
     <tr>
@@ -97,21 +97,21 @@
         <th><label for="${cons.username}">Username: <l:star/></label></th>
         <td><props:textProperty name="${cons.username}" className="longField"/>
             <span id="error_${cons.username}" class="error"></span>
-            <span class="smallNote">Authorized Kubernetes user.</span>
+            <span class="smallNote">Username of an authorized Kubernetes user</span>
         </td>
     </tr>
     <tr class="hidden user-passwd auth-ui">
         <th><label for="secure:${cons.password}">Password: <l:star/></label></th>
         <td><props:passwordProperty name="secure:${cons.password}" className="longField"/>
             <span id="error_secure:${cons.password}" class="error"></span>
-            <span class="smallNote">Password of authorized Kubernetes user.</span>
+            <span class="smallNote">Password of an authorized Kubernetes user</span>
         </td>
     </tr>
     <tr class="hidden client-cert auth-ui">
         <th><label for="${cons.clientCertData}">Client certificate: <l:star/></label></th>
         <td><props:multilineProperty name="secure:${cons.clientCertData}"
                                      className="longField"
-                                     linkTitle="Enter Client Certificate Data"
+                                     linkTitle="Enter client certificate content"
                                      expanded="false"
                                      cols="35" rows="3"/>
             <span id="error_${cons.clientCertData}" class="error"></span>
@@ -122,7 +122,7 @@
         <td><props:multilineProperty name="secure:${cons.clientKeyData}"
                                      expanded="false"
                                      className="longField"
-                                     linkTitle="Enter Client Key Data"
+                                     linkTitle="Enter client key content"
                                      cols="35" rows="3"/>
             <span id="error_${cons.clientKeyData}" class="error"></span>
         </td>
@@ -132,11 +132,11 @@
         <td>
             <props:passwordProperty name="secure:${cons.authToken}" className="longField"/>
             <span id="error_secure:${cons.authToken}" class="error"></span>
-            <span class="smallNote">Bearer Token.</span>
+            <span class="smallNote">Bearer token</span>
         </td>
     </tr>
     <tr class="hidden oidc auth-ui">
-        <th><label for="${cons.oidcIssuerUrl}">IDP Issuer URL: <l:star/></label></th>
+        <th><label for="${cons.oidcIssuerUrl}">IdP issuer URL: <l:star/></label></th>
         <td><props:textProperty name="${cons.oidcIssuerUrl}" className="longField"/>
             <span id="error_${cons.oidcIssuerUrl}" class="error"></span>
         </td>
@@ -148,21 +148,21 @@
         </td>
     </tr>
     <tr class="hidden oidc auth-ui">
-        <th><label for="secure:${cons.oidcClientSecret}">Client Secret: <l:star/></label></th>
+        <th><label for="secure:${cons.oidcClientSecret}">Client secret: <l:star/></label></th>
         <td>
             <props:passwordProperty name="secure:${cons.oidcClientSecret}" className="longField"/>
             <span id="error_secure:${cons.oidcClientSecret}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden oidc auth-ui">
-        <th><label for="secure:${cons.oidcRefreshToken}">Refresh Token: <l:star/></label></th>
+        <th><label for="secure:${cons.oidcRefreshToken}">Refresh token: <l:star/></label></th>
         <td>
             <props:passwordProperty name="secure:${cons.oidcRefreshToken}" className="longField"/>
             <span id="error_secure:${cons.oidcRefreshToken}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden eks auth-ui">
-        <th><label for="${cons.eksUseInstanceProfile}">Use Server Instance Profile: </label></th>
+        <th><label for="${cons.eksUseInstanceProfile}">Use server instance profile: </label></th>
         <td><props:checkboxProperty name="${cons.eksUseInstanceProfile}" className="longField"/>
             <span id="error_${cons.eksUseInstanceProfile}" class="error"></span>
         </td>
@@ -181,19 +181,19 @@
         </td>
     </tr>
     <tr class="hidden eks auth-ui">
-        <th><label for="${cons.eksAssumeIamRole}">Assume an IAM Role: </label></th>
+        <th><label for="${cons.eksAssumeIamRole}">Assume an IAM role: </label></th>
         <td><props:checkboxProperty name="${cons.eksAssumeIamRole}" className="longField"/>
             <span id="error_${cons.eksAssumeIamRole}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden eks aws-iam">
-        <th><label for="${cons.eksIAMRoleArn}">IAM Role ARN: <l:star/></label></th>
+        <th><label for="${cons.eksIAMRoleArn}">IAM role ARN: <l:star/></label></th>
         <td><props:textProperty name="${cons.eksIAMRoleArn}" className="longField"/>
             <span id="error_${cons.eksIAMRoleArn}" class="error"></span>
         </td>
     </tr>
     <tr class="hidden eks auth-ui">
-        <th><label for="${cons.eksClusterName}">Cluster Name: <l:star/></label></th>
+        <th><label for="${cons.eksClusterName}">Cluster name: <l:star/></label></th>
         <td><props:textProperty name="${cons.eksClusterName}" className="longField"/>
             <span id="error_${cons.eksClusterName}" class="error"></span>
         </td>
@@ -255,7 +255,7 @@
                 <div>
                     <c:set var="selectedPodSpecMode" value="${propertiesBean.properties[cons.podSpecMode]}" />
                     <props:selectProperty name="${cons.podSpecMode}" className="longField">
-                        <props:option value="notSelected" selected="${empty selectedPodSpecMode}">--- Choose what you need ---</props:option>
+                        <props:option value="notSelected" selected="${empty selectedPodSpecMode}"><c:out value="<Select pod specification>"/></props:option>
                         <c:forEach var="podTemplateProvider" items="${podTemplateProviders}">
                             <props:option value="${podTemplateProvider.id}" selected="${not empty selectedPodSpecMode and podTemplateProvider.id eq selectedPodSpecMode}"><c:out value="${podTemplateProvider.displayName}"/></props:option>
                         </c:forEach>
@@ -275,7 +275,7 @@
             <td>
                 <div>
                     <input type="text" id="${cons.dockerImage}" value="" class="longField" data-id="${cons.dockerImage}" data-err-id="${cons.dockerImage}"/>
-                    <div class="smallNoteAttention">Docker image name to use.</div>
+                    <div class="smallNoteAttention">Docker image name to use</div>
                     <span class="error option-error option-error_${cons.dockerImage}"></span>
                 </div>
             </td>
@@ -289,7 +289,7 @@
                             <props:option value="${policy.name}"><c:out value="${policy.displayName}"/></props:option>
                         </c:forEach>
                     </select>
-                    <div class="smallNoteAttention">Policy to use by Kubelet to pull an image.
+                    <div class="smallNoteAttention">Policy to use by kubelet to pull an image
                         &nbsp;<a href="https://kubernetes.io/docs/concepts/containers/images/#updating-images"><bs:helpIcon/></a></div>
                     <span class="error option-error option-error_${cons.imagePullPolicy}"></span>
                 </div>
@@ -300,8 +300,8 @@
             <td>
                 <div>
                     <input type="text" id="${cons.dockerCommand}" value="" class="longField" data-id="${cons.dockerCommand}" data-err-id="${cons.dockerCommand}"/>
-                    <div class="smallNoteAttention">Docker entrypoint to use. The docker image's ENTRYPOINT is used if this is not provided.
-                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a></div>
+                    <div class="smallNoteAttention">Docker entry point to use. Leave empty to use the Docker image's 'ENTRYPOINT'
+                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a>.</div>
                     <span class="error option-error option-error_${cons.dockerCommand}"></span>
                 </div>
             </td>
@@ -311,17 +311,17 @@
             <td>
                 <div>
                     <input type="text" id="${cons.dockerArguments}" value="" class="longField" data-id="${cons.dockerArguments}" data-err-id="${cons.dockerArguments}"/>
-                    <div class="smallNoteAttention">Arguments for docker entrypoint. The docker image's CMD is used if this is not provided.
-                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a></div>
+                    <div class="smallNoteAttention">Arguments for the Docker entry point. Leave empty to use the Docker image's 'CMD'
+                        &nbsp;<a href="https://kubernetes.io/docs/api-reference/v1.6/#container-v1-core"><bs:helpIcon/></a>.</div>
                     <span class="error option-error option-error_${cons.dockerArguments}"></span>
                 </div>
             </td>
         </tr>
         <tr class="hidden custom-pod-template pod-spec-ui">
-            <th><label for="${cons.customPodTemplate}">Pod Template Content:<l:star/></label></th>
+            <th><label for="${cons.customPodTemplate}">Pod template content:<l:star/></label></th>
             <td class="codeHighlightTD">
                 <props:multilineProperty highlight="yaml" expanded="${true}" name="${cons.customPodTemplate}" rows="10" cols="30"
-                                         linkTitle="Edit the custom pod yaml content" className="longField"/>
+                                         linkTitle="Edit the custom pod's YAML content" className="longField"/>
                 <span class="error option-error option-error_${cons.customPodTemplate}"></span>
             </td>
         </tr>
@@ -332,7 +332,7 @@
                     <input type="text" id="${cons.sourceDeployment}" value="" class="longField" data-id="${cons.sourceDeployment}" data-err-id="${cons.sourceDeployment}"/>
                     <i class="icon-magic" style="cursor:pointer;" title="Choose deployment" onclick="BS.Kube.DeploymentChooser.showPopup(this, '<c:url value="${deploymentChooserUrl}"/>')"></i>
                 </div>
-                <div class="smallNoteAttention">Deployment to use as a pod template.</div>
+                <div class="smallNoteAttention">Deployment to use as a pod template</div>
                 <span class="error option-error option-error_${cons.sourceDeployment}"></span>
             </td>
         </tr>
@@ -349,7 +349,7 @@
             <th><label for="${cons.agentPoolIdField}">Agent pool: <l:star/></label></th>
             <td>
                 <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
-                    <props:option value=""><c:out value="<Please select agent pool>"/></props:option>
+                    <props:option value=""><c:out value="<Select agent pool>"/></props:option>
                     <c:forEach var="ap" items="${agentPools}">
                         <props:option selected="${ap.agentPoolId eq propertiesBean.properties['agent_pool_id']}" value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
                     </c:forEach>

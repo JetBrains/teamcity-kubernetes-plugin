@@ -49,7 +49,7 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Simply run single container";
+        return "Run single container";
     }
 
     @Nullable

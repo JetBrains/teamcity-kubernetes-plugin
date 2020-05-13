@@ -40,13 +40,13 @@ public class ClientCertificateAuthStrategy implements KubeAuthStrategy {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Client Certificate & Key";
+        return "Client certificate & ley";
     }
 
     @Nullable
     @Override
     public String getDescription() {
-        return "Authenticate with Client Certificate & Key";
+        return "Authenticate with the client certificate & the key";
     }
 
     @NotNull

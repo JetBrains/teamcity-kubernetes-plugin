@@ -43,7 +43,7 @@ public class UnauthorizedAccessStrategy implements KubeAuthStrategy {
     @Nullable
     @Override
     public String getDescription() {
-        return "Use unauthorized access to Kubernetes API server";
+        return "Use unauthorized access to the Kubernetes API server";
     }
 
     @NotNull

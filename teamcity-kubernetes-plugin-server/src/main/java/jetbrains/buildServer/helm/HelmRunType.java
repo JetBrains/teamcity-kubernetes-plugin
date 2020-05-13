@@ -57,7 +57,7 @@ public class HelmRunType extends RunType {
     @NotNull
     @Override
     public String getDescription() {
-        return "Run Helm command";
+        return "Runs a Helm command";
     }
 
     @Nullable

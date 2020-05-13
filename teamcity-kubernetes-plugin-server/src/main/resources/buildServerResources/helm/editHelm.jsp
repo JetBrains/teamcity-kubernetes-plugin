@@ -115,6 +115,6 @@
   <th><label for="${cons.additionalFlagsKey}">Additional '<span class="commandText"></span>' command flags: </label></th>
     <td><props:textProperty name="${cons.additionalFlagsKey}" className="longField"/>
         <span class="error" id="error_${cons.additionalFlagsKey}"></span>
-        <span class="smallNote">Additional options for '<span class="commandText"></span>' command line</span>
+        <span class="smallNote">Additional options for the '<span class="commandText"></span>' command line</span>
     </td>
 </tr>

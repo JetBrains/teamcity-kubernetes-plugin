@@ -28,7 +28,7 @@ public enum ImagePullPolicy {
 
         @Override
         public String getDisplayName() {
-            return "If Not Present";
+            return "If not present";
         }
     },
     Always {

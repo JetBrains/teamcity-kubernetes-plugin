@@ -34,27 +34,27 @@ public class HelmParametersBean {
     public String getNote(@NotNull String command, @NotNull String property){
         if (command.equals(HELM_DELETE_COMMAND)){
             if (property.equals(RELEASE_NAME)){
-                return "Release name to delete from Kubernetes. Removes all of the resources associated with the last release of the chart";
+                return "Release to delete from Kubernetes. Removes all the resources associated with the last release of the chart.";
             }
         } else if (command.equals(HELM_INSTALL_COMMAND)){
             if (property.equals(CHART)){
-                return "Chart to install. Can be a chart reference, path to a packaged chart or an unpacked chart directory, or an absolute URL";
+                return "Chart to install. It can be a chart reference, a path to a packaged chart or unpacked chart directory, or an absolute URL.";
             }
         } else if (command.equals(HELM_UPGRADE_COMMAND)){
             if (property.equals(RELEASE_NAME)){
                 return "Release to upgrade";
             } else if (property.equals(CHART)){
-                return "New version of chart";
+                return "Version of the chart to upgrade to";
             }
         } else if (command.equals(HELM_ROLLBACK_COMMAND)){
             if (property.equals(RELEASE_NAME)){
-                return "Release to rollback";
+                return "Release to roll back";
             } else if (property.equals(REVISION)){
                 return "Release revision to rollback onto";
             }
         } else if (command.equals(HELM_TEST_COMMAND)){
             if (property.equals(RELEASE_NAME)){
-                return "Release name to test. The tests to be run are defined in the chart that was installed";
+                return "Release to test. The tests to be run are defined in the installed chart.";
             }
         }
         return null;
