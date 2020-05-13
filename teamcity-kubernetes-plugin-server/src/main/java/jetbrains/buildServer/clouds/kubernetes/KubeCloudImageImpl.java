@@ -190,14 +190,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @NotNull
     @Override
     public String getName() {
-        switch (getPodSpecMode()){
-            case SimpleRunContainerProvider.ID:
-                return "Docker Image: " + getDockerImage();
-            case DeploymentBuildAgentPodTemplateProvider.ID:
-                return "Deployment: " + getSourceDeploymentName();
-            default:
-                return "Custom template: " + getAgentNamePrefix();
-        }
+        return getId();
     }
 
     @NotNull

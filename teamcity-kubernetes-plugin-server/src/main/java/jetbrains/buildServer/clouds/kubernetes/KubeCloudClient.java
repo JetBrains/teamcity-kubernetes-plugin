@@ -55,8 +55,8 @@ public class KubeCloudClient implements CloudClientEx {
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
     private final KubeCloudClientParametersImpl myKubeClientParams;
     private final KubeBackgroundUpdater myUpdater;
-    private KubePodNameGenerator myNameGenerator;
-    private BuildAgentPodTemplateProviders myPodTemplateProviders;
+    private final KubePodNameGenerator myNameGenerator;
+    private final BuildAgentPodTemplateProviders myPodTemplateProviders;
     private final ExecutorService myExecutorService;
 
     @Nullable private final String myServerUuid;
@@ -68,7 +68,7 @@ public class KubeCloudClient implements CloudClientEx {
                            @NotNull List<KubeCloudImage> images,
                            @NotNull KubeCloudClientParametersImpl kubeClientParams,
                            @NotNull KubeBackgroundUpdater updater,
-                           final BuildAgentPodTemplateProviders podTemplateProviders,
+                           @NotNull BuildAgentPodTemplateProviders podTemplateProviders,
                            @Nullable ExecutorService executorService,
                            @NotNull KubePodNameGenerator nameGenerator) {
         myApiConnector = apiConnector;
