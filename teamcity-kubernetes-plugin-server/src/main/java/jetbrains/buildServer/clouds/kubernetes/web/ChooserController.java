@@ -102,7 +102,11 @@ public abstract class ChooserController extends BaseController {
             modelAndView.getModelMap().put("error","");
         } catch (Exception ex){
             modelAndView.getModelMap().put(getItemsName(), Collections.emptyList());
-            modelAndView.getModelMap().put("error", getErrorMessage() + ":" + ex.getLocalizedMessage());
+            if (ex.getCause() != null) {
+                modelAndView.getModelMap().put("error", ex.getCause().getLocalizedMessage());
+            } else {
+                modelAndView.getModelMap().put("error", ex.getLocalizedMessage());
+            }
         }
         return modelAndView;
     }
@@ -112,9 +116,6 @@ public abstract class ChooserController extends BaseController {
 
     @NotNull
     protected abstract String getItemsName();
-
-    @NotNull
-    protected abstract String getErrorMessage();
 
     @NotNull
     protected abstract String getHtmlName();
@@ -136,11 +137,6 @@ public abstract class ChooserController extends BaseController {
         @Override
         protected String getItemsName() {
             return "deployments";
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return "Unable to list deployments";
         }
 
         @Override
@@ -169,11 +165,6 @@ public abstract class ChooserController extends BaseController {
         @Override
         protected String getItemsName() {
             return "namespaces";
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return "Unable to list namespaces";
         }
 
         @Override

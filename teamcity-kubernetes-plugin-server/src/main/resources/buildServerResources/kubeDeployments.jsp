@@ -26,7 +26,8 @@
 
 <c:choose>
     <c:when test="${not empty error}">
-        <span class="testConnectionFailed"><c:out value="${error}"/></span>
+        <span class="testConnectionFailed">Unable to list deployments:</span><br/>
+        <span><c:out value="${error}"/></span>
     </c:when>
     <c:otherwise>
         <c:choose>
