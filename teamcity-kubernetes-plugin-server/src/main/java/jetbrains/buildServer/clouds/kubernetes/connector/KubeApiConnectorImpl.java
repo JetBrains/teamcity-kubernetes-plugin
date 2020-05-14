@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.function.Function;
 import jetbrains.buildServer.clouds.CloudException;
+import jetbrains.buildServer.clouds.kubernetes.KubeUtils;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.FileUtil;
@@ -81,7 +82,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         if(StringUtil.isEmptyOrSpaces(caCertData)){
             configBuilder.withTrustCerts(true);
         } else {
-            configBuilder.withCaCertData(Base64.encodeBase64String(caCertData.getBytes()));
+            configBuilder.withCaCertData(KubeUtils.encodeBase64IfNecessary(caCertData));
         }
         configBuilder = authStrategy.apply(configBuilder, connectionSettings);
         return configBuilder.build();

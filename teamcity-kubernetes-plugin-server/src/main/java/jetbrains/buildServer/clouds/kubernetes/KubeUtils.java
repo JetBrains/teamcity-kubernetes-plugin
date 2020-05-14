@@ -19,8 +19,10 @@ package jetbrains.buildServer.clouds.kubernetes;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.InstanceStatus;
+import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,6 +74,13 @@ public class KubeUtils {
             return null;
         }
         return value.replaceAll("[^A-Za-z0-9\\-]", "-");
+    }
+
+    public static String encodeBase64IfNecessary(@NotNull String dataString){
+        if (Base64.isBase64(dataString))
+            return dataString;
+        else
+            return Base64.encodeBase64String(dataString.getBytes());
     }
 
     static {

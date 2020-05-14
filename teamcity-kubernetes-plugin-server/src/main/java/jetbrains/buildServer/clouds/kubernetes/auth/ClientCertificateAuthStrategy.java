@@ -18,6 +18,7 @@ package jetbrains.buildServer.clouds.kubernetes.auth;
 
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
+import jetbrains.buildServer.clouds.kubernetes.KubeUtils;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.util.StringUtil;
 import org.apache.commons.codec.binary.Base64;
@@ -60,7 +61,7 @@ public class ClientCertificateAuthStrategy implements KubeAuthStrategy {
         if(StringUtil.isEmpty(clientKeyData)) {
             throw new KubeCloudException("Client key data is empty");
         }
-        return clientConfig.withClientCertData(Base64.encodeBase64String(clientCertData.getBytes()))
-                           .withClientKeyData(Base64.encodeBase64String(clientKeyData.getBytes()));
+        return clientConfig.withClientCertData(KubeUtils.encodeBase64IfNecessary(clientCertData))
+                           .withClientKeyData(KubeUtils.encodeBase64IfNecessary(clientKeyData));
     }
 }
