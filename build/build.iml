@@ -11,7 +11,7 @@
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-agent" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-common" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-server" />
-    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-client:3.1.10" level="project" />
+    <orderEntry type="library" name="Maven: io.fabric8:kubernetes-client:4.0.4" level="project" />
     <orderEntry type="library" name="Maven: io.fabric8:kubernetes-model:2.0.8" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.5" level="project" />
     <orderEntry type="library" name="Maven: javax.validation:validation-api:1.1.0.Final" level="project" />
