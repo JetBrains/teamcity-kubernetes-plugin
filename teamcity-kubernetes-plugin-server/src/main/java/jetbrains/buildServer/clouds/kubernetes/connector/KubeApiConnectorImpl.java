@@ -77,6 +77,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
           .withMasterUrl(connectionSettings.getApiServerUrl())
           .withNamespace(connectionSettings.getNamespace())
           .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
+          .withHttp2Disable(true)
           .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
         final String caCertData = connectionSettings.getCACertData();
         if(StringUtil.isEmptyOrSpaces(caCertData)){
