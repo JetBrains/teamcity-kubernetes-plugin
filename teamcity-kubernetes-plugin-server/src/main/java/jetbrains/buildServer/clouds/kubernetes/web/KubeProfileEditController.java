@@ -168,7 +168,13 @@ public class KubeProfileEditController extends BaseFormXmlController {
             } catch (Exception ex){
                 LOG.debug(ex);
                 final ActionErrors errors = new ActionErrors();
-                errors.addError("connection", ex.getMessage());
+                final String errorMessage;
+                if (ex.getCause() != null) {
+                    errorMessage = ex.getMessage() + ": " + ex.getCause().getMessage();
+                } else {
+                    errorMessage = ex.getMessage();
+                }
+                errors.addError("connection", errorMessage);
                 writeErrors(xmlResponse, errors);
             } finally {
                 FileUtil.close(apiConnector);

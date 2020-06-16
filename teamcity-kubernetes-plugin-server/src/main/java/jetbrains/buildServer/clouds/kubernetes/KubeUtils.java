@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.InstanceStatus;
+import jetbrains.buildServer.util.StringUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,7 +78,13 @@ public class KubeUtils {
     }
 
     public static String encodeBase64IfNecessary(@NotNull String dataString){
-        if (Base64.isBase64(dataString))
+        byte[] decodedString;
+        try {
+            decodedString = Base64.decodeBase64(dataString);
+        } catch (Exception ex) {
+            decodedString = null;
+        }
+        if (StringUtil.areEqual(dataString, Base64.encodeBase64String(decodedString)))
             return dataString;
         else
             return Base64.encodeBase64String(dataString.getBytes());
