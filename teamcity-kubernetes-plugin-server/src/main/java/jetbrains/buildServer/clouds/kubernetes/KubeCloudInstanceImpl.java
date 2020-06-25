@@ -130,7 +130,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     @Nullable
     @Override
     public CloudErrorInfo getErrorInfo() {
-        return KubeUtils.getErrorMessage(myPod.getStatus());
+        return myCurrentError;
     }
 
     @Override
@@ -145,6 +145,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         if (podStatus.isCanTerminate()) { // don't update status if instance is going to be terminated
             return;
         }
+        myCurrentError = KubeUtils.getErrorMessage(myPod.getStatus());
         if (podStatus == InstanceStatus.STOPPED) {
             setStatus(InstanceStatus.STOPPED);
         } else if (KubeUtils.isPodStatus(myInstanceStatus)){

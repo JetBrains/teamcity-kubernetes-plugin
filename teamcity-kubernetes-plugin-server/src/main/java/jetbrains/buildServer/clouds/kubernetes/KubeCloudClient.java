@@ -120,6 +120,8 @@ public class KubeCloudClient implements CloudClientEx {
                 final Pod newPod = myApiConnector.createPod(podTemplate);
                 instance.updateState(newPod);
             } catch (KubeCloudException | KubernetesClientException ex){
+                instance.setStatus(InstanceStatus.ERROR);
+                instance.setError(new CloudErrorInfo("Instance cannot be started", ex.getMessage(), ex));
                 throw ex;
             }
         });
