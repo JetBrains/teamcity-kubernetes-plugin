@@ -63,7 +63,8 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         required: 'The field must not be empty',
         notSelectedPodTemplateMode: 'Select pod specification',
         notSelectedAgentPool: 'Select agent pool',
-        nonNegative: 'Must be non-negative number'
+        nonNegative: 'Must be non-negative number',
+        invalidAgentNamePrefix: 'Invalid agent name prefix'
     },
 
     _displayedErrors: {},
@@ -421,6 +422,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 if (this._image['podTemplateMode'] === 'custom-pod-template' && !this._image['agentNamePrefix']) {
                     this.addOptionError('required', 'agentNamePrefix');
                     isValid = false;
+                } else if (this._image['agentNamePrefix']){
+                    if (!(/([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]$/.test(this._image['agentNamePrefix']))){
+                        this.addOptionError('invalidAgentNamePrefix', 'agentNamePrefix');
+                        isValid = false;
+                    }
                 }
             }.bind(this),
 
