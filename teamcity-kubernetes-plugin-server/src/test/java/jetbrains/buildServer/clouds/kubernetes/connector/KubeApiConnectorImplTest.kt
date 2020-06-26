@@ -24,6 +24,7 @@ import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.auth.RefreshableStrategy
+import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.AfterMethod
@@ -106,6 +107,10 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         override fun retrieveNewToken(dataHolder: DummyData): Pair<String, Long>? {
             retrieveCnt++
             return Pair.create("Token-$retrieveCnt", 100)
+        }
+
+        override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty> {
+            return arrayListOf()
         }
     }
 

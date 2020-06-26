@@ -29,7 +29,10 @@ import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import com.intellij.openapi.util.Pair
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
+import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*
+import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy.*
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.TimeService
 import java.net.URI
 import java.net.URISyntaxException
@@ -115,15 +118,15 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
     }
 
     override fun createData(connection: KubeApiConnection): EKSData {
-        val useInstanceProfile = (connection.getCustomParameter(KubeParametersConstants.EKS_USE_INSTANCE_PROFILE) ?: "false").toBoolean()
+        val useInstanceProfile = (connection.getCustomParameter(EKS_USE_INSTANCE_PROFILE) ?: "false").toBoolean()
         var accessId: String? = null
         var secretKey: String? = null
         if (!useInstanceProfile) {
-            accessId = connection.getCustomParameter(KubeParametersConstants.EKS_ACCESS_ID) ?: throw KubeCloudException("Access ID is empty for connection to " + connection.apiServerUrl)
-            secretKey = connection.getCustomParameter(KubeParametersConstants.EKS_SECRET_KEY) ?: throw KubeCloudException("Secret key is empty for connection to " + connection.apiServerUrl)
+            accessId = connection.getCustomParameter(EKS_ACCESS_ID) ?: throw KubeCloudException("Access ID is empty for connection to " + connection.apiServerUrl)
+            secretKey = connection.getCustomParameter(SECURE_PREFIX + EKS_SECRET_KEY) ?: throw KubeCloudException("Secret key is empty for connection to " + connection.apiServerUrl)
         }
-        val iamRoleArn: String? = connection.getCustomParameter(KubeParametersConstants.EKS_IAM_ROLE_ARN)
-        val clusterName = connection.getCustomParameter(KubeParametersConstants.EKS_CLUSTER_NAME) ?: throw KubeCloudException("Cluster name is empty for connection to " + connection.apiServerUrl)
+        val iamRoleArn: String? = connection.getCustomParameter(EKS_IAM_ROLE_ARN)
+        val clusterName = connection.getCustomParameter(EKS_CLUSTER_NAME) ?: throw KubeCloudException("Cluster name is empty for connection to " + connection.apiServerUrl)
 
         return EKSData(useInstanceProfile, accessId, secretKey, iamRoleArn, clusterName)
     }
@@ -133,6 +136,23 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
     override fun getDisplayName() = "Amazon EKS"
 
     override fun getDescription() = null
+
+    override fun process(props: MutableMap<String, String>): MutableCollection<InvalidProperty> {
+        val retval = arrayListOf<InvalidProperty>();
+        if (props[EKS_CLUSTER_NAME].isNullOrEmpty()){
+            retval.add(InvalidProperty(EKS_CLUSTER_NAME, "Cluster name is required"))
+        }
+
+        if (props[EKS_USE_INSTANCE_PROFILE].isNullOrEmpty() || !props[EKS_USE_INSTANCE_PROFILE]!!.toBoolean()){
+            if (props[EKS_ACCESS_ID].isNullOrEmpty()){
+                retval.add(InvalidProperty(EKS_ACCESS_ID, "Access ID is required if instance profile is not used"))
+            }
+            if (props[SECURE_PREFIX + EKS_SECRET_KEY].isNullOrEmpty()){
+                retval.add(InvalidProperty(EKS_SECRET_KEY, "Secret Key is required if instance profile is not used"))
+            }
+        }
+        return retval;
+    }
 }
 
 data class EKSData(val useInstanceProfile: Boolean,

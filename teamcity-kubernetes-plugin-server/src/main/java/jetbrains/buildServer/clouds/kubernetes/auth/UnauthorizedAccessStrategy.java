@@ -17,7 +17,10 @@
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
 import io.fabric8.kubernetes.client.ConfigBuilder;
+import java.util.Collection;
+import java.util.Map;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
+import jetbrains.buildServer.serverSide.InvalidProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,5 +53,10 @@ public class UnauthorizedAccessStrategy implements KubeAuthStrategy {
     @Override
     public ConfigBuilder apply(@NotNull ConfigBuilder clientConfig, @NotNull KubeApiConnection connection) {
         return clientConfig;
+    }
+
+    @Override
+    public Collection<InvalidProperty> process(final Map<String, String> properties) {
+        return null;
     }
 }

@@ -22,6 +22,7 @@ import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.AfterMethod
@@ -103,6 +104,10 @@ abstract class DummyRefreshableStrategy(myTimeService: TimeService) : Refreshabl
     override fun getDisplayName() = "Dummy"
 
     override fun getDescription() = "Dummy description"
+
+    override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty> {
+        return arrayListOf()
+    }
 }
 
 

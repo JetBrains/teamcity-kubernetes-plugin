@@ -17,8 +17,11 @@
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
 import io.fabric8.kubernetes.client.ConfigBuilder;
+import java.util.Collection;
+import java.util.Map;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
+import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -66,5 +69,10 @@ public class DefaultServiceAccountAuthStrategy implements KubeAuthStrategy {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    @Override
+    public Collection<InvalidProperty> process(final Map<String, String> properties) {
+        return null;
     }
 }

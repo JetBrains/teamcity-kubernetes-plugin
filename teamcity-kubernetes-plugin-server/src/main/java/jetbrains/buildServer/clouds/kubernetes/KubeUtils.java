@@ -90,6 +90,19 @@ public class KubeUtils {
             return Base64.encodeBase64String(dataString.getBytes());
     }
 
+    public static byte[] decodeBase64IfNecessary(@NotNull String dataString){
+        byte[] decodedString;
+        try {
+            decodedString = Base64.decodeBase64(dataString);
+        } catch (Exception ex) {
+            decodedString = null;
+        }
+        if (StringUtil.areEqual(dataString, Base64.encodeBase64String(decodedString)))
+            return Base64.decodeBase64(dataString);
+        else
+            return dataString.getBytes();
+    }
+
     static {
         myPhasesMap.put("Running", InstanceStatus.RUNNING);
         myPhasesMap.put("Pending", InstanceStatus.SCHEDULED_TO_START);

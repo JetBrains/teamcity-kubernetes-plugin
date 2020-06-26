@@ -22,7 +22,9 @@ import com.intellij.openapi.util.Pair
 import com.intellij.openapi.util.io.StreamUtil
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*
+import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy.*
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.FileUtil
 import jetbrains.buildServer.util.StringUtil
 import jetbrains.buildServer.util.TimeService
@@ -85,9 +87,9 @@ class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCDat
 
     override fun createData(connection: KubeApiConnection): OIDCData {
         val clientId = connection.getCustomParameter(OIDC_CLIENT_ID) ?: throw KubeCloudException("Client ID is empty for connection to " + connection.apiServerUrl)
-        val clientSecret = connection.getCustomParameter(OIDC_CLIENT_SECRET) ?: throw KubeCloudException("Client secret is empty for connection to " + connection.apiServerUrl)
+        val clientSecret = connection.getCustomParameter(SECURE_PREFIX + OIDC_CLIENT_SECRET) ?: throw KubeCloudException("Client secret is empty for connection to " + connection.apiServerUrl)
         val issuerUrl = connection.getCustomParameter(OIDC_ISSUER_URL) ?: throw KubeCloudException("Issuer URL is empty for connection to " + connection.apiServerUrl)
-        val refreshToken = connection.getCustomParameter(OIDC_REFRESH_TOKEN) ?: throw KubeCloudException("Refresh token is empty for connection to " + connection.apiServerUrl)
+        val refreshToken = connection.getCustomParameter(SECURE_PREFIX + OIDC_REFRESH_TOKEN) ?: throw KubeCloudException("Refresh token is empty for connection to " + connection.apiServerUrl)
 
         return OIDCData(clientId, clientSecret, issuerUrl, refreshToken)
     }
@@ -97,6 +99,22 @@ class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCDat
     override fun getDisplayName() = "Open ID"
 
     override fun getDescription() = "Authenticate with Open ID provider"
+    override fun process(props: MutableMap<String, String>): MutableCollection<InvalidProperty> {
+        val retval = arrayListOf<InvalidProperty>()
+        if (props[OIDC_CLIENT_ID].isNullOrEmpty()) {
+            retval.add(InvalidProperty(OIDC_CLIENT_ID, "Client ID is required"))
+        }
+        if (props[SECURE_PREFIX + OIDC_CLIENT_SECRET].isNullOrEmpty()) {
+            retval.add(InvalidProperty(OIDC_CLIENT_SECRET, "Client secret is required"))
+        }
+        if (props[OIDC_ISSUER_URL].isNullOrEmpty()) {
+            retval.add(InvalidProperty(OIDC_ISSUER_URL, "Client ID is required"))
+        }
+        if (props[SECURE_PREFIX + OIDC_REFRESH_TOKEN].isNullOrEmpty()) {
+            retval.add(InvalidProperty(OIDC_REFRESH_TOKEN, "Client ID is required"))
+        }
+        return retval
+    }
 }
 
 data class OIDCData(val myClientId: String,

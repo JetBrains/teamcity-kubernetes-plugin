@@ -97,7 +97,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     @NotNull
     @Override
     public PropertiesProcessor getPropertiesProcessor() {
-        return new KubeProfilePropertiesProcessor();
+        return new KubeProfilePropertiesProcessor(myAuthStrategies);
     }
 
     @Override
