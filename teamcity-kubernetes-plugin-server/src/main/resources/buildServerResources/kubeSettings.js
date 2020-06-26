@@ -688,6 +688,7 @@ if(!BS.Kube.NamespaceChooser){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Kube.serializeParameters(),
             url: dataLoadUrl,
+            method: "post",
             shift:{x:15,y:15}
         });
     };
@@ -710,6 +711,7 @@ if(!BS.Kube.DeploymentChooser){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Kube.serializeParameters(),
             url: dataLoadUrl,
+            method: "post",
             shift:{x:15,y:15}
         });
     };
