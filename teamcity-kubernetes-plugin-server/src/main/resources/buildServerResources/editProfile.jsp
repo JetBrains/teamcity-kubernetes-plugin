@@ -187,7 +187,7 @@
             <span id="error_${cons.eksAssumeIamRole}" class="error"></span>
         </td>
     </tr>
-    <tr class="hidden eks aws-iam">
+    <tr class="hidden eks auth-ui aws-iam">
         <th><label for="${cons.eksIAMRoleArn}">IAM role ARN:<l:star/></label></th>
         <td><props:textProperty name="${cons.eksIAMRoleArn}" className="longField"/>
             <span id="error_${cons.eksIAMRoleArn}" class="error"></span>

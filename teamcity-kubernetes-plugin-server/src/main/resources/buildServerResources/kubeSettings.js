@@ -359,6 +359,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         }
         //workaround for TW-51797
         BS.MultilineProperties.updateVisible();
+        this._toggleEKSIAM();
     },
 
     _toggleEKSCredentials: function () {
