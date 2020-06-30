@@ -142,10 +142,10 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
     public void updateState(@NotNull Pod actualPod){
         myPod = actualPod;
         InstanceStatus podStatus = KubeUtils.mapPodPhase(actualPod.getStatus());
-        if (!podStatus.isCanTerminate()) { // don't update status if instance is going to be terminated
+        myCurrentError = KubeUtils.getErrorMessage(myPod.getStatus());
+        if (!getStatus().isCanTerminate()) { // don't update status if instance is going to be terminated
             return;
         }
-        myCurrentError = KubeUtils.getErrorMessage(myPod.getStatus());
         if (podStatus == InstanceStatus.STOPPED) {
             setStatus(InstanceStatus.STOPPED);
         } else if (KubeUtils.isPodStatus(myInstanceStatus)){

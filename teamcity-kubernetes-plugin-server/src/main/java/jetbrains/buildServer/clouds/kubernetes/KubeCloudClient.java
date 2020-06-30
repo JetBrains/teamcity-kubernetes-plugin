@@ -153,10 +153,10 @@ public class KubeCloudClient implements CloudClientEx {
                     if(failedDeleteAttempts == 3) throw new KubeCloudException("Failed to delete PersistentVolumeClaim " + pvcName);
                 }
                 kubeCloudInstance.setError(null);
-            } catch (KubernetesClientException ex){
-                kubeCloudInstance.setError(new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex));
-            } finally {
                 kubeCloudInstance.setStatus(InstanceStatus.STOPPED);
+            } catch (KubernetesClientException ex){
+                kubeCloudInstance.setStatus(InstanceStatus.ERROR);
+                kubeCloudInstance.setError(new CloudErrorInfo("Failed to terminate instance", ex.getMessage(), ex));
             }
             kubeCloudInstance.getImage().populateInstances();
         });
