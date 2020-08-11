@@ -108,6 +108,20 @@
             <span class="smallNote">Password of an authorized Kubernetes user</span>
         </td>
     </tr>
+    <tr class="hidden openshift-user-passwd auth-ui">
+        <th><label for="${cons.username}">Username:<l:star/></label></th>
+        <td><props:textProperty name="${cons.username}" className="longField"/>
+            <span id="error_${cons.username}" class="error"></span>
+            <span class="smallNote">Username of an authorized Kubernetes user</span>
+        </td>
+    </tr>
+    <tr class="hidden openshift-user-passwd auth-ui">
+        <th><label for="secure:${cons.password}">Password:<l:star/></label></th>
+        <td><props:passwordProperty name="secure:${cons.password}" className="longField"/>
+            <span id="error_secure:${cons.password}" class="error"></span>
+            <span class="smallNote">Password of an authorized Kubernetes user</span>
+        </td>
+    </tr>
     <tr class="hidden client-cert auth-ui">
         <th><label for="${cons.clientCertData}">Client certificate:<l:star/></label></th>
         <td><props:multilineProperty name="secure:${cons.clientCertData}"

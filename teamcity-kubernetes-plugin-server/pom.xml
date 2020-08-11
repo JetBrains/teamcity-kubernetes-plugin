@@ -19,6 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <properties>
     <kubernetes-client.version>4.7.0</kubernetes-client.version>
+    <openshift-client.version>4.7.0</openshift-client.version>
   </properties>
   <parent>
     <artifactId>teamcity-kubernetes-plugin</artifactId>
@@ -123,6 +124,18 @@
       <groupId>io.fabric8</groupId>
       <artifactId>kubernetes-client</artifactId>
       <version>${kubernetes-client.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>*</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    
+     <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>openshift-client</artifactId>
+      <version>${openshift-client.version}</version>
         <exclusions>
             <exclusion>
                 <groupId>org.slf4j</groupId>
