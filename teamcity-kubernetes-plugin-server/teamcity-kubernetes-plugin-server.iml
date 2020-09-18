@@ -46,5 +46,6 @@
     <orderEntry type="library" name="aws-sdk-common" level="project" />
     <orderEntry type="library" name="aws-sdk-sources" level="project" />
     <orderEntry type="library" name="io.fabric8:kubernetes-client:4.7.0" level="project" />
+    <orderEntry type="library" name="com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.10.1" level="project" />
   </component>
 </module>
