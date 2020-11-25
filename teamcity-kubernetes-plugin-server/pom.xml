@@ -146,13 +146,13 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-sts</artifactId>
-      <version>1.11.816</version>
+      <version>1.11.908</version>
     </dependency>
 
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-eks</artifactId>
-      <version>1.11.816</version>
+      <version>1.11.908</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
