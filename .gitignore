@@ -1,0 +1,3 @@
+teamcity-kubernetes-plugin-server/target/*
+teamcity-kubernetes-plugin-common/target/*
+teamcity-kubernetes-plugin-agent/target/*
