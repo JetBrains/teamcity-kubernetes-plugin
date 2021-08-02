@@ -17,5 +17,20 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-common" />
     <orderEntry type="module" module-name="agent" />
+    <orderEntry type="module" module-name="agent-openapi" />
+    <orderEntry type="module" module-name="agent-upgrade" />
+    <orderEntry type="module" module-name="common-tools" />
+    <orderEntry type="module" module-name="common" />
+    <orderEntry type="module" module-name="runtime-util" />
+    <orderEntry type="module" module-name="server-logging" />
+    <orderEntry type="module" module-name="common-runtime" />
+    <orderEntry type="module" module-name="messages" />
+    <orderEntry type="module" module-name="agent-upgrade-common" />
+    <orderEntry type="module" module-name="plugin-model-common" />
+    <orderEntry type="module" module-name="agent-launcher-common" />
+    <orderEntry type="module" module-name="common-spring" />
+    <orderEntry type="library" name="Spring-Framework" level="project" />
+    <orderEntry type="library" name="JetLauncher API" level="project" />
+    <orderEntry type="library" name="annotations.jar" level="project" />
   </component>
 </module>
