@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.*;
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
-import static jetbrains.buildServer.clouds.kubernetes.KubeTeamCityLabels.*;
 
 public abstract class AbstractPodTemplateProvider implements BuildAgentPodTemplateProvider {
   private static final Pattern ENV_VAR_NAME = Pattern.compile("([A-Z]+[_])*[A-Z]+");
@@ -49,7 +48,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
     final PodSpec spec = podTemplateSpec.getSpec();
 
     spec.getContainers().forEach(
-      container -> container.setEnv(patchEnvVars(instanceName, serverUUID, imageId, cloudInstanceUserData, container.getEnv()))
+      container -> container.setEnv(getPatchedEnvVars(instanceName, serverUUID, imageId, cloudInstanceUserData, container.getEnv()))
     );
 
     final Pod pod = new PodBuilder().build();
@@ -59,32 +58,23 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
   }
 
   @NotNull
-  private List<EnvVar> patchEnvVars(@NotNull final String instanceName,
-                                    @NotNull final String serverUUID,
-                                    @NotNull final String imageId,
-                                    @NotNull final CloudInstanceUserData cloudInstanceUserData,
-                                    final List<EnvVar> containerEnvData) {
-    final Map<String, String> envDataMap = new HashMap<>();
-    for (EnvVar env : containerEnvData) {
-      envDataMap.put(env.getName(), env.getValue());
+  protected List<EnvVar> getPatchedEnvVars(@NotNull final String instanceName,
+                                           @NotNull final String serverUUID,
+                                           @NotNull final String imageId,
+                                           @NotNull final CloudInstanceUserData cloudInstanceUserData,
+                                           @NotNull final List<EnvVar> initialEnvData) {
+    final Set<String> envNamesSet = new HashSet<>();
+    for (EnvVar env : initialEnvData) {
+      envNamesSet.add(env.getName());
     }
 
-    for (Pair<String, String> env : Arrays.asList(
-      new Pair<>(SERVER_UUID, serverUUID),
-      new Pair<>(PROFILE_ID, cloudInstanceUserData.getProfileId()),
-      new Pair<>(IMAGE_NAME, imageId),
-      new Pair<>(INSTANCE_NAME, instanceName))
-    ) {
-      envDataMap.put(env.first, env.second);
-    }
+    final List<EnvVar> retval = new ArrayList<>(initialEnvData);
 
     final Map<String, String> customParams = cloudInstanceUserData.getCustomAgentConfigurationParameters();
     customParams.forEach((k, v)->{
-      if (!envDataMap.containsKey(k) && k.startsWith(TEAMCITY_KUBERNETES_PREFIX)){
+      if (!envNamesSet.contains(k) && k.startsWith(TEAMCITY_KUBERNETES_PREFIX)){
         if (ENV_VAR_NAME.matcher(k).matches()) {
-          envDataMap.put(k, v);
-        } else {
-          // Do noting
+          retval.add(new EnvVar(k, v, null));
         }
       }
     });
@@ -100,18 +90,25 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
       */
     }
 
-    if (!envDataMap.containsKey(SERVER_URL)) {
-      envDataMap.put(SERVER_URL, cloudInstanceUserData.getServerAddress());
-    }
-    if (!envDataMap.containsKey(OFFICIAL_IMAGE_SERVER_URL)) {
-      envDataMap.put(OFFICIAL_IMAGE_SERVER_URL, cloudInstanceUserData.getServerAddress());
+    for (Pair<String, String> env : Arrays.asList(
+      new Pair<>(SERVER_UUID, serverUUID),
+      new Pair<>(PROFILE_ID, cloudInstanceUserData.getProfileId()),
+      new Pair<>(IMAGE_NAME, imageId),
+      new Pair<>(INSTANCE_NAME, instanceName))
+    ) {
+      if (!envNamesSet.contains(env.first)) {
+        retval.add(new EnvVar(env.first, env.second, null));
+      }
     }
 
-    final List<EnvVar> patchedEnv = new ArrayList<>();
-    for (String envName : envDataMap.keySet()) {
-      patchedEnv.add(new EnvVar(envName, envDataMap.get(envName), null));
+    if (!envNamesSet.contains(SERVER_URL)) {
+      retval.add(new EnvVar(SERVER_URL, cloudInstanceUserData.getServerAddress(), null));
     }
-    return patchedEnv;
+    if (!envNamesSet.contains(OFFICIAL_IMAGE_SERVER_URL)) {
+      retval.add(new EnvVar(OFFICIAL_IMAGE_SERVER_URL, cloudInstanceUserData.getServerAddress(), null));
+    }
+
+    return retval;
   }
 
   private void patchMetadata(@NotNull final String instanceName,
