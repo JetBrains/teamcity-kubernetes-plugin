@@ -25,6 +25,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -32,15 +33,11 @@ import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.DeploymentBuildAgentPodTemplateProvider;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.ExceptionUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
@@ -278,5 +275,11 @@ public class KubeCloudImageImpl implements KubeCloudImage {
             myCurrentError = new CloudErrorInfo("Failed populate instances", ex.getMessage(), ex);
             throw ex;
         }
+    }
+
+    @NotNull
+    @Override
+    public String getProfileId() {
+        return myImageData.getProfileId();
     }
 }
