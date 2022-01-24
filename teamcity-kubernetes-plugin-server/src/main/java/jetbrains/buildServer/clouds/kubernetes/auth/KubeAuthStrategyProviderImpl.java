@@ -33,6 +33,7 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
 
     public KubeAuthStrategyProviderImpl(@NotNull TimeService timeService) {
         registerStrategy(new UserPasswdAuthStrategy());
+        registerStrategy(new OpenShiftUserPasswdAuthStrategy());
         registerStrategy(new DefaultServiceAccountAuthStrategy());
         registerStrategy(new UnauthorizedAccessStrategy());
         registerStrategy(new ClientCertificateAuthStrategy());

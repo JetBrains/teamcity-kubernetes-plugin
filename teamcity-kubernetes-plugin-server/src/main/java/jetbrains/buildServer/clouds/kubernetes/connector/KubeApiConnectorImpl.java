@@ -59,7 +59,15 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         myProfileId = profileId;
         myConnectionSettings = connectionSettings;
         myAuthStrategy = authStrategy;
-        myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
+        if(myAuthStrategy.getId().equalsIgnoreCase("openshift-user-passwd")) {
+        	LOG.info("Creating OpenShift Client for User / Password Authentication");
+        	myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy)).adapt(OpenShiftClient.class);
+        }
+        else {
+        	LOG.info("Defaulting to kubernetes client for auth strategy");
+        	myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
+        }
+        
     }
 
     @NotNull
