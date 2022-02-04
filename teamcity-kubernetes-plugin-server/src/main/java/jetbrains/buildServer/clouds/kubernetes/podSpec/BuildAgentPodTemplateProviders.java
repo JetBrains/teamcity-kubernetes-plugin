@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
+import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,5 +33,9 @@ public interface BuildAgentPodTemplateProviders {
     BuildAgentPodTemplateProvider find(@Nullable String id);
 
     @NotNull
-    BuildAgentPodTemplateProvider get(@Nullable String id);
+    default BuildAgentPodTemplateProvider get(@Nullable String id){
+        BuildAgentPodTemplateProvider podTemplateProvider = find(id);
+        if(podTemplateProvider == null) throw new KubeCloudException("Unknown pod specification provider " + id);
+        return podTemplateProvider;
+    }
 }

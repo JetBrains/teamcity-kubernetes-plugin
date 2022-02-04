@@ -30,4 +30,6 @@ public interface KubeCloudClientParameters extends KubeApiConnection {
 
     @NotNull
     String getAuthStrategy();
+
+    int getInstanceLimit();
 }

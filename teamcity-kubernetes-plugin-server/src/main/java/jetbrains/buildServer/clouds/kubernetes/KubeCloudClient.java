@@ -53,7 +53,7 @@ public class KubeCloudClient implements CloudClientEx {
 
     private final KubeApiConnector myApiConnector;
     private final ConcurrentHashMap<String, KubeCloudImage> myImageIdToImageMap;
-    private final KubeCloudClientParametersImpl myKubeClientParams;
+    private final KubeCloudClientParameters myKubeClientParams;
     private final KubeBackgroundUpdater myUpdater;
     private final KubePodNameGenerator myNameGenerator;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
@@ -66,7 +66,7 @@ public class KubeCloudClient implements CloudClientEx {
                            @Nullable String serverUuid,
                            @NotNull String cloudProfileId,
                            @NotNull List<KubeCloudImage> images,
-                           @NotNull KubeCloudClientParametersImpl kubeClientParams,
+                           @NotNull KubeCloudClientParameters kubeClientParams,
                            @NotNull KubeBackgroundUpdater updater,
                            @NotNull BuildAgentPodTemplateProviders podTemplateProviders,
                            @Nullable ExecutorService executorService,
@@ -113,13 +113,20 @@ public class KubeCloudClient implements CloudClientEx {
         KubeCloudInstance instance = new KubeCloudInstanceImpl(kubeCloudImage, podTemplate);
         kubeCloudImage.addStartedInstance(instance);
         myExecutorService.submit(() -> {
+            Pod newPod = null;
+            PersistentVolumeClaim newPVC = null;
             try {
                 if (pvc !=null){
-                    myApiConnector.createPVC(pvc);
+                    newPVC = myApiConnector.createPVC(pvc);
                 }
-                final Pod newPod = myApiConnector.createPod(podTemplate);
+                newPod = myApiConnector.createPod(podTemplate);
                 instance.updateState(newPod);
             } catch (KubeCloudException | KubernetesClientException ex){
+                LOG.warnAndDebugDetails("An error occurred while starting new instance", ex);
+                if (newPod == null && newPVC != null && newPVC.getMetadata() != null) {
+                    LOG.warn("a PVC '" + newPVC.getMetadata().getName() +"' was created as a part of the POD '"+podTemplate.getMetadata().getName()+"' creation. Pod failed to create (see above). Will now delete the PVC as well.");
+                    myApiConnector.deletePVC(newPVC.getMetadata().getName());
+                }
                 instance.setStatus(InstanceStatus.ERROR);
                 instance.setError(new CloudErrorInfo("Instance cannot be started", ex.getMessage(), ex));
                 throw ex;

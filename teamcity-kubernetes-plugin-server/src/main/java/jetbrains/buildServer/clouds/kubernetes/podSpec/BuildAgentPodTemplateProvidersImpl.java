@@ -51,14 +51,6 @@ public class BuildAgentPodTemplateProvidersImpl implements BuildAgentPodTemplate
         return myIdToProviderMap.get(id);
     }
 
-    @NotNull
-    @Override
-    public BuildAgentPodTemplateProvider get(@Nullable String id) {
-        BuildAgentPodTemplateProvider podTemplateProvider = find(id);
-        if(podTemplateProvider == null) throw new KubeCloudException("Unknown pod specification provider " + id);
-        return podTemplateProvider;
-    }
-
     private void registerProvider(BuildAgentPodTemplateProvider podTemplateProvider) {
         myIdToProviderMap.put(podTemplateProvider.getId(), podTemplateProvider);
     }

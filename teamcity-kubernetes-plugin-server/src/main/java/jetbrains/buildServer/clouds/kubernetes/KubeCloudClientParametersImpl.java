@@ -78,6 +78,7 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
         return myParameters.getParameter(AUTH_STRATEGY);
     }
 
+    @Override
     public int getInstanceLimit() {
         String parameter = myParameters.getParameter(PROFILE_INSTANCE_LIMIT);
         return StringUtil.isEmpty(parameter) ? -1 : Integer.valueOf(parameter);
