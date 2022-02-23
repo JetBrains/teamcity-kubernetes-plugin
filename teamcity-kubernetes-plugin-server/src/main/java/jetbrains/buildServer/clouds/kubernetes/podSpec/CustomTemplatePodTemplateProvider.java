@@ -21,6 +21,7 @@ import io.fabric8.kubernetes.client.utils.Serialization;
 import jetbrains.buildServer.Used;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -61,10 +62,10 @@ public class CustomTemplatePodTemplateProvider extends AbstractPodTemplateProvid
     public Pod getPodTemplate(@NotNull String kubeInstanceName,
                               @NotNull CloudInstanceUserData cloudInstanceUserData,
                               @NotNull KubeCloudImage kubeCloudImage,
-                              @NotNull KubeCloudClientParameters kubeClientParams) {
+                              @NotNull KubeApiConnector apiConnector) {
 
         String podTemplate = kubeCloudImage.getPodTemplate();
-        return getPodTemplateInternal(cloudInstanceUserData, kubeCloudImage.getId(), kubeClientParams.getNamespace(), kubeInstanceName, podTemplate);
+        return getPodTemplateInternal(cloudInstanceUserData, kubeCloudImage.getId(), apiConnector.getNamespace(), kubeInstanceName, podTemplate);
     }
 
     @Used("tests")

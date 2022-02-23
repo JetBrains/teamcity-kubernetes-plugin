@@ -17,6 +17,7 @@
 package jetbrains.buildServer.clouds.kubernetes.web;
 
 import com.intellij.openapi.diagnostic.Logger;
+import java.util.Collection;
 import jetbrains.buildServer.BuildProject;
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
@@ -108,7 +109,11 @@ public class KubeProfileEditController extends BaseFormXmlController {
         pools.addAll(myAgentPoolManager.getProjectOwnedAgentPools(projectId));
 
         model.put("agentPools", pools);
-        model.put("authStrategies", myAuthStrategyProvider.getAll());
+
+        final Collection<KubeAuthStrategy> authStrategies = myAuthStrategyProvider.getAll(projectId);
+        model.put("authStrategies", authStrategies);
+        authStrategies.forEach(auth -> auth.fillModel(modelAndView));
+
         model.put("podTemplateProviders", myPodTemplateProviders.getAll());
         return modelAndView;
     }

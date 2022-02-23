@@ -16,19 +16,15 @@
 
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
-import com.intellij.openapi.util.Pair;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import java.io.File;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.serverSide.ServerSettings;
-import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
@@ -37,13 +33,9 @@ public class DeploymentBuildAgentPodTemplateProvider extends AbstractPodTemplate
   public static final String ID = "deployment-base";
 
   private final ServerSettings myServerSettings;
-  private final DeploymentContentProvider myDeploymentContentProvider;
-  private KubePodNameGenerator myPodNameGenerator;
 
-  public DeploymentBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings,
-                                                 @NotNull DeploymentContentProvider deploymentContentProvider) {
+  public DeploymentBuildAgentPodTemplateProvider(@NotNull ServerSettings serverSettings) {
     myServerSettings = serverSettings;
-    myDeploymentContentProvider = deploymentContentProvider;
   }
 
   @NotNull
@@ -69,13 +61,14 @@ public class DeploymentBuildAgentPodTemplateProvider extends AbstractPodTemplate
   public Pod getPodTemplate(@NotNull String instanceName,
                             @NotNull CloudInstanceUserData cloudInstanceUserData,
                             @NotNull KubeCloudImage kubeCloudImage,
-                            @NotNull KubeCloudClientParameters kubeClientParams) {
+                            @NotNull KubeApiConnector apiConnector) {
     String sourceDeploymentName = kubeCloudImage.getSourceDeploymentName();
     if (StringUtil.isEmpty(sourceDeploymentName)) {
       throw new KubeCloudException("Deployment name is not set in kubernetes cloud image " + kubeCloudImage.getId());
     }
 
-    Deployment sourceDeployment = myDeploymentContentProvider.findDeployment(sourceDeploymentName, kubeClientParams);
+
+    Deployment sourceDeployment = apiConnector.getDeployment(sourceDeploymentName);
     if (sourceDeployment == null) {
       throw new KubeCloudException("Can't find source deployment by name " + sourceDeploymentName);
     }
@@ -85,7 +78,7 @@ public class DeploymentBuildAgentPodTemplateProvider extends AbstractPodTemplate
 
     return patchedPodTemplateSpec(sourceDeployment.getSpec().getTemplate(),
                                   instanceName,
-                                  kubeClientParams.getNamespace(),
+                                  apiConnector.getNamespace(),
                                   myServerSettings.getServerUUID(),
                                   kubeCloudImage.getId(),
                                   cloudInstanceUserData

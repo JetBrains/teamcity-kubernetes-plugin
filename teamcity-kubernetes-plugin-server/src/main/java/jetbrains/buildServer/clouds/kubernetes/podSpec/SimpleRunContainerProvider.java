@@ -18,7 +18,6 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
 import io.fabric8.kubernetes.api.model.*;
 import java.util.Collections;
-import jetbrains.buildServer.clouds.CloudConstants;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
@@ -63,7 +62,7 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
     public Pod getPodTemplate(@NotNull String instanceName,
                               @NotNull CloudInstanceUserData cloudInstanceUserData,
                               @NotNull KubeCloudImage kubeCloudImage,
-                              @NotNull KubeCloudClientParameters clientParameters) {
+                              @NotNull KubeApiConnector apiConnector) {
 
         ImagePullPolicy imagePullPolicy = kubeCloudImage.getImagePullPolicy();
         String serverAddress = cloudInstanceUserData.getServerAddress();
@@ -89,7 +88,7 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
         return new PodBuilder()
                 .withNewMetadata()
                 .withName(instanceName)
-                .withNamespace(clientParameters.getNamespace())
+                .withNamespace(apiConnector.getNamespace())
                 .withLabels(CollectionsUtil.asMap(
                         KubeTeamCityLabels.TEAMCITY_AGENT_LABEL, "",
                         KubeTeamCityLabels.TEAMCITY_SERVER_UUID, serverUUID,

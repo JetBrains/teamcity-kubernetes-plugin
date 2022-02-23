@@ -105,7 +105,7 @@ public class KubeCloudClient implements CloudClientEx {
         final KubeCloudImage kubeCloudImage = (KubeCloudImage)cloudImage;
         BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
         final String instanceName = myNameGenerator.generateNewVmName(kubeCloudImage);
-        final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceName, cloudInstanceUserData, kubeCloudImage, myKubeClientParams);
+        final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceName, cloudInstanceUserData, kubeCloudImage, myApiConnector);
         final PersistentVolumeClaim pvc = podTemplateProvider.getPVC(instanceName, kubeCloudImage);
         if (pvc != null){
             KubeTeamCityLabels.addCustomLabel(podTemplate, KubeTeamCityLabels.POD_PVC_NAME, pvc.getMetadata().getName());

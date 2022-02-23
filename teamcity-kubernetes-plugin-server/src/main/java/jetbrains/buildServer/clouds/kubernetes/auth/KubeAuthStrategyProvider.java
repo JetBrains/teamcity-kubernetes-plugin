@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +27,7 @@ import java.util.Collection;
  */
 public interface KubeAuthStrategyProvider {
     @NotNull
-    Collection<KubeAuthStrategy> getAll();
+    Collection<KubeAuthStrategy> getAll(@NotNull String projectId);
 
     @Nullable
     KubeAuthStrategy find(@Nullable String id);

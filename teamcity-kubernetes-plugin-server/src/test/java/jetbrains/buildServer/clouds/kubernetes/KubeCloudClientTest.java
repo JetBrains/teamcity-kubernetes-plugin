@@ -192,6 +192,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         final BuildAgentPodTemplateProvider provider = m.mock(BuildAgentPodTemplateProvider.class);
         KubeCloudImage image = m.mock(KubeCloudImage.class);
         KubeCloudClientParametersImpl parameters = KubeCloudClientParametersImpl.create(new MockCloudClientParameters(Collections.emptyMap()));
+        KubeApiConnector apiConnector = m.mock(KubeApiConnector.class);
         Pod podTemplate = new Pod();
         ObjectMeta podMetadata = new ObjectMeta();
         podMetadata.setName("image-1-id-123");
@@ -220,7 +221,8 @@ public class KubeCloudClientTest extends BaseTestCase {
             allowing(image).getId(); will(returnValue("image-1-id"));
             allowing(image).getPodSpecMode(); will(returnValue(podSpecMode));
             allowing(image).addStartedInstance(with(any(KubeCloudInstance.class)));
-            oneOf(provider).getPodTemplate("image-1-id-123", userData, image, parameters); will(returnValue(podTemplate));
+            allowing(apiConnector).getNamespace(); will(returnValue("leer"));
+            oneOf(provider).getPodTemplate("image-1-id-123", userData, image, apiConnector); will(returnValue(podTemplate));
             oneOf(provider).getPVC("image-1-id-123", image); will(returnValue(pvcTemplate));
             oneOf(myApi).createPVC(pvcTemplate); will(returnValue(newPVC));
             oneOf(myApi).createPod(podTemplate); will(throwException(podCreationException));

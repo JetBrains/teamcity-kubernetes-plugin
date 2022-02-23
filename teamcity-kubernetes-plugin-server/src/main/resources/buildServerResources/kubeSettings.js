@@ -353,9 +353,12 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
     _toggleAuth: function () {
         var selectedStrategyId = this.$authStrategySelector.val();
+        debugger;
         $j('.auth-ui').toggleClass('hidden', true);
+        $j('.common-settings').removeClass('hidden');
         if(selectedStrategyId) {
             $j('.auth-ui.' + selectedStrategyId).removeClass('hidden');
+            $j('.common-settings.hide-'+ selectedStrategyId).toggleClass('hidden', true);
         }
         //workaround for TW-51797
         BS.MultilineProperties.updateVisible();

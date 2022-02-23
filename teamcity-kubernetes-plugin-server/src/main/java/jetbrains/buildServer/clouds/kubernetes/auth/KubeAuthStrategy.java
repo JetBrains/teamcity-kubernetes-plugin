@@ -21,6 +21,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 14.06.17.
@@ -42,4 +43,6 @@ public interface KubeAuthStrategy extends PropertiesProcessor {
     }
 
     default void invalidate(@NotNull final KubeApiConnection connection){}
+
+    default void fillModel(@NotNull ModelAndView mv){}
 }

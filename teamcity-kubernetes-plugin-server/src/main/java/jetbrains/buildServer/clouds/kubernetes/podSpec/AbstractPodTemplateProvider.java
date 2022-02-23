@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.util.CollectionsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -137,7 +138,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
   public abstract Pod getPodTemplate(@NotNull String kubeInstanceName,
                                     @NotNull final CloudInstanceUserData cloudInstanceUserData,
                                     @NotNull final KubeCloudImage kubeCloudImage,
-                                    @NotNull final KubeCloudClientParameters clientParameters);
+                                    @NotNull final KubeApiConnector apiConnector);
 
   @Nullable
   @Override

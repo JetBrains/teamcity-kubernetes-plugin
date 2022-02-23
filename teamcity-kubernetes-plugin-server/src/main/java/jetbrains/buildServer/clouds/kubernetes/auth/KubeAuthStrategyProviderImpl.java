@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
+import java.util.List;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.util.TimeService;
 import org.jetbrains.annotations.NotNull;
@@ -37,13 +38,15 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
         registerStrategy(new UnauthorizedAccessStrategy());
         registerStrategy(new ClientCertificateAuthStrategy());
         registerStrategy(new TokenAuthStrategy());
+        registerStrategy(new KubeconfigAuthStrategy());
         registerStrategy(new OIDCAuthStrategy(timeService));
         registerStrategy(new EKSAuthStrategy(timeService));
     }
 
     @NotNull
     @Override
-    public Collection<KubeAuthStrategy> getAll() {
+    public Collection<KubeAuthStrategy> getAll(@NotNull String projectId) {
+
         return myIdToStrategyMap.values();
     }
 

@@ -28,6 +28,7 @@ import jetbrains.buildServer.clouds.CloudImageParameters;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.connector.FakeKubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvidersImpl;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerProvider;
 import jetbrains.buildServer.clouds.server.impl.profile.CloudClientParametersImpl;
@@ -41,6 +42,8 @@ import jetbrains.buildServer.serverSide.impl.ServerSettingsImpl;
 import jetbrains.buildServer.serverSide.impl.executors.SimpleExecutorServices;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.jetbrains.annotations.Nullable;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -57,7 +60,8 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   private ServerPaths myServerPaths;
   private ExecutorServices myExecutorServices;
   private EventDispatcher<BuildServerListener> myEventDispatcher;
-  private BuildAgentPodTemplateProvidersImpl myPodTemplateProviders;
+  private Mockery m;
+
 
   @BeforeMethod
   public void setUp() throws Exception {
@@ -75,8 +79,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     myEventDispatcher = EventDispatcher.create(BuildServerListener.class);
     myNameGenerator = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
     myContainerProvider = new SimpleRunContainerProvider(myServerSettings);
-    myPodTemplateProviders = new BuildAgentPodTemplateProvidersImpl(myServerSettings, (name, kubeClientParams) -> null);
-
+    m = new Mockery();
   }
 
   public void check_generated_name(){
@@ -177,10 +180,13 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
 
   private Pod createTemplate(Map<String, String> imageParameters){
     final CloudInstanceUserData instanceTag = createInstanceTag();
-    final CloudClientParameters parameters = new CloudClientParametersImpl(createMap(), createSet());
+    final KubeApiConnector apiConnector = m.mock(KubeApiConnector.class);
+    m.checking(new Expectations(){{
+      allowing(apiConnector).getNamespace(); will (returnValue("nichts"));
+    }});
     KubeCloudImage image = createImage(imageParameters);
     String newPodName = myNameGenerator.generateNewVmName(image);
-    return myContainerProvider.getPodTemplate(newPodName, instanceTag, image, new KubeCloudClientParametersImpl(parameters));
+    return myContainerProvider.getPodTemplate(newPodName, instanceTag, image, apiConnector);
   }
 
   private KubeCloudImage createImage(Map<String, String> imageParameters){

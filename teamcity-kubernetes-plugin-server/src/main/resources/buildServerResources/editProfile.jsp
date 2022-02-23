@@ -29,6 +29,8 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 <jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy>"/>
+<jsp:useBean id="contextNames" scope="request" type="java.util.Collection<java.lang.String>"/>
+<jsp:useBean id="currentContext" scope="request" type="java.lang.String"/>
 <jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider>"/>
 
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
@@ -43,14 +45,14 @@
 </table>
 
 <table class="runnerFormTable">
-    <tr>
+    <tr class="common-settings hide-kubeconfig">
         <th><label for="${cons.apiServerUrl}">Kubernetes API server URL:<l:star/></label></th>
         <td><props:textProperty name="${cons.apiServerUrl}" className="longField"/>
             <span id="error_${cons.apiServerUrl}" class="error"></span>
             <span class="smallNote">Target Kubernetes API server URL</span>
         </td>
     </tr>
-    <tr>
+    <tr class="common-settings hide-kubeconfig">
         <th><label for="${cons.caCertData}">Certificate Authority (CA):</label></th>
         <td><props:multilineProperty name="secure:${cons.caCertData}"
                                      className="longField"
@@ -61,7 +63,7 @@
             <span class="smallNote">Leave empty to skip TLS verification (insecure option)</span>
         </td>
     </tr>
-    <tr>
+    <tr class="common-settings hide-kubeconfig">
         <th><label for="${cons.kubernetesNamespace}">Kubernetes namespace: </label></th>
         <td>
             <div style="white-space: nowrap">
@@ -196,6 +198,24 @@
     <tr class="hidden eks auth-ui">
         <th><label for="${cons.eksClusterName}">Cluster name:<l:star/></label></th>
         <td><props:textProperty name="${cons.eksClusterName}" className="longField"/>
+            <span id="error_${cons.eksClusterName}" class="error"></span>
+        </td>
+    </tr>
+
+    <tr class="hidden kubeconfig auth-ui">
+        <th><label for="${cons.kubeconfigContext}">Current Context:<l:star/></label></th>
+        <td>
+            <c:set var="selectedContext"
+            ><c:if test="${not empty propertiesBean.properties[cons.kubeconfigContext]}"
+            ><c:out value="${propertiesBean.properties[cons.kubeconfigContext]}" /></c:if
+            ><c:if test="${empty propertiesBean.properties[cons.kubeconfigContext]}"
+            ><c:out value="${currentContext}" /></c:if></c:set>
+            <props:selectProperty name="${cons.kubeconfigContext}" id="${cons.kubeconfigContext}" enableFilter="${true}">
+                <c:forEach var="context" items="${contextNames}">
+                    <props:option value="${context}" selected="${context eq selectedContext}"
+                    ><c:out value="${context}"/></props:option>
+                </c:forEach>
+            </props:selectProperty>
             <span id="error_${cons.eksClusterName}" class="error"></span>
         </td>
     </tr>

@@ -6,8 +6,8 @@ import io.fabric8.kubernetes.api.model.ObjectFieldSelector
 import io.fabric8.kubernetes.api.model.Pod
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudInstanceUserData
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudClientParameters
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector
 import jetbrains.buildServer.util.TestFor
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.BeforeMethod
@@ -38,7 +38,7 @@ class AbstractPodTemplateProviderTest : BaseTestCase() {
                 TODO("Not yet implemented")
             }
 
-            override fun getPodTemplate(kubeInstanceName: String, cloudInstanceUserData: CloudInstanceUserData, kubeCloudImage: KubeCloudImage, clientParameters: KubeCloudClientParameters): Pod {
+            override fun getPodTemplate(kubeInstanceName: String, cloudInstanceUserData: CloudInstanceUserData, kubeCloudImage: KubeCloudImage, apiConnector: KubeApiConnector): Pod {
                 TODO("Not yet implemented")
             }
         }

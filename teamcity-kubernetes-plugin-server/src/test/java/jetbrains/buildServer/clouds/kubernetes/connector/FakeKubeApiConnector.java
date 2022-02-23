@@ -59,6 +59,11 @@ public class FakeKubeApiConnector implements KubeApiConnector {
     return null;
   }
 
+  @Override
+  public String getNamespace() {
+    return null;
+  }
+
   @Nullable
   @Override
   public Deployment getDeployment(@NotNull final String deploymentName) {

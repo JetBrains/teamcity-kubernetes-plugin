@@ -19,8 +19,8 @@ package jetbrains.buildServer.clouds.kubernetes.podSpec;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudClientParameters;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +36,7 @@ public interface BuildAgentPodTemplateProvider {
     Pod getPodTemplate(@NotNull String instanceName,
                        @NotNull CloudInstanceUserData cloudInstanceUserData,
                        @NotNull KubeCloudImage kubeCloudImage,
-                       @NotNull KubeCloudClientParameters clientParameters);
+                       @NotNull KubeApiConnector apiConnector);
 
     @Nullable
     PersistentVolumeClaim getPVC(@NotNull String instanceName,

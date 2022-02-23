@@ -23,7 +23,6 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.*;
-import java.io.IOException;
 import java.util.Date;
 import java.util.function.Function;
 import jetbrains.buildServer.clouds.CloudException;
@@ -32,7 +31,6 @@ import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
-import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,15 +49,17 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private String myProfileId;
     @NotNull
     private final KubeApiConnection myConnectionSettings;
-    private volatile KubernetesClient myKubernetesClient;
     private final KubeAuthStrategy myAuthStrategy;
+    private volatile Config myConfig;
+    private volatile KubernetesClient myKubernetesClient;
     private volatile boolean myCloseInitiated = false;
 
     public KubeApiConnectorImpl(@NotNull String profileId,  @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
         myProfileId = profileId;
         myConnectionSettings = connectionSettings;
         myAuthStrategy = authStrategy;
-        myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
+        myConfig = createConfig(myConnectionSettings, myAuthStrategy);
+        myKubernetesClient = createClient(myConfig);
     }
 
     @NotNull
@@ -93,19 +93,19 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Override
     public KubeApiConnectionCheckResult testConnection() {
         try {
-            String currentNamespaceName = myKubernetesClient.getNamespace();
+            String currentNamespaceName = myConfig.getNamespace();
             Namespace currentNamespace = myKubernetesClient.namespaces().withName(currentNamespaceName).get();
             return currentNamespace != null
                     ? KubeApiConnectionCheckResult.ok("Connection successful")
                     : KubeApiConnectionCheckResult.error(
-                      String.format("Error connecting to %s: invalid namespace %s", myConnectionSettings.getApiServerUrl(), StringUtil.isEmptyOrSpaces(currentNamespaceName) ? "Default" : currentNamespaceName),
+                      String.format("Error connecting to %s: invalid namespace %s", myConfig.getMasterUrl(), StringUtil.isEmptyOrSpaces(currentNamespaceName) ? "Default" : currentNamespaceName),
                     false);
         } catch (KubernetesClientException e) {
-            return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getCause() == null ? e.getMessage() : e.getCause().getMessage()),
+            return KubeApiConnectionCheckResult.error(String.format("Error connecting to %s: %s", myConfig.getMasterUrl(), e.getCause() == null ? e.getMessage() : e.getCause().getMessage()),
                                                       e.getStatus() != null && e.getStatus().getCode() == 401);
         } catch (Exception e) {
             return KubeApiConnectionCheckResult.error(
-              String.format("Error connecting to %s: %s", myConnectionSettings.getApiServerUrl(), e.getMessage()),
+              String.format("Error connecting to %s: %s", myConfig.getMasterUrl(), e.getMessage()),
               false
             );
         }
@@ -137,6 +137,11 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Override
     public Deployment getDeployment(@NotNull String deploymentName) {
         return withKubernetesClient(kubernetesClient -> kubernetesClient.apps().deployments().withName(deploymentName).get());
+    }
+
+    @Override
+    public String getNamespace() {
+        return myConfig.getNamespace();
     }
 
     @Nullable
@@ -191,7 +196,8 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                     LOG.info("Will now invalidate and recreate client for " + myProfileId);
                     invalidate();
                     KubernetesClient oldClient = myKubernetesClient;
-                    myKubernetesClient = createClient(createConfig(myConnectionSettings, myAuthStrategy));
+                    myConfig = createConfig(myConnectionSettings, myAuthStrategy);
+                    myKubernetesClient = createClient(myConfig);
                     FileUtil.close(oldClient);
                 }
                 return withKubernetesClient(true, function);

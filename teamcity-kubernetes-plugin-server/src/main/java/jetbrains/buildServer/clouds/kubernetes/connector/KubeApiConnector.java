@@ -49,6 +49,8 @@ public interface KubeApiConnector extends Closeable {
     @Nullable
     Deployment getDeployment(@NotNull String deploymentName);
 
+    String getNamespace();
+
     @Nullable
     PodStatus getPodStatus(@NotNull String podName);
 

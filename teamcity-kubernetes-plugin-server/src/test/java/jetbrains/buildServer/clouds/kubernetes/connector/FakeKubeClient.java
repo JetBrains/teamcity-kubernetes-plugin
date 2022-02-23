@@ -16,7 +16,6 @@
 
 package jetbrains.buildServer.clouds.kubernetes.connector;
 
-import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
@@ -25,6 +24,8 @@ import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import io.fabric8.kubernetes.client.dsl.base.BaseOperation;
 import io.fabric8.kubernetes.client.dsl.base.OperationContext;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class FakeKubeClient extends DefaultKubernetesClient {
 
@@ -32,13 +33,13 @@ public class FakeKubeClient extends DefaultKubernetesClient {
 
 
   @Override
-  public MixedOperation<Pod, PodList, DoneablePod, PodResource<Pod, DoneablePod>> pods() {
+  public MixedOperation<Pod, PodList, PodResource<Pod>> pods() {
     if (myException != null){
       throw myException;
     }
     return new MyOperation(){
       @Override
-      public Object create(final Object[] resources) throws KubernetesClientException {
+      protected Object handleCreate(Object resource) {
         return new Pod();
       }
     };
@@ -48,7 +49,7 @@ public class FakeKubeClient extends DefaultKubernetesClient {
 
     protected MyOperation() {
       super(new OperationContext(null, null, null, null, null, null, null, false, null, null, null, null, null, null,
-              null, null, false, 10000, null));
+              null, null, false, 10000, null, false, false, null));
     }
   }
 }
