@@ -23,7 +23,7 @@
   <packaging>pom</packaging>
   <properties>
       <teamcity-version>2021.2</teamcity-version>
-      <kotlin.version>1.3.0</kotlin.version>
+      <kotlin.version>1.5.32</kotlin.version>
   </properties>
   <repositories>
     <repository>

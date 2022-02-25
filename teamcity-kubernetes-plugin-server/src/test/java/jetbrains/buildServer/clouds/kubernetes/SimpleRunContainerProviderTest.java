@@ -21,6 +21,7 @@ import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.TempFiles;
 import jetbrains.buildServer.clouds.CloudClientParameters;
@@ -61,6 +62,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   private ExecutorServices myExecutorServices;
   private EventDispatcher<BuildServerListener> myEventDispatcher;
   private Mockery m;
+  private AtomicInteger idx;
 
 
   @BeforeMethod
@@ -80,6 +82,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     myNameGenerator = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
     myContainerProvider = new SimpleRunContainerProvider(myServerSettings);
     m = new Mockery();
+    idx = new AtomicInteger();
   }
 
   public void check_generated_name(){
@@ -180,7 +183,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
 
   private Pod createTemplate(Map<String, String> imageParameters){
     final CloudInstanceUserData instanceTag = createInstanceTag();
-    final KubeApiConnector apiConnector = m.mock(KubeApiConnector.class);
+    final KubeApiConnector apiConnector = m.mock(KubeApiConnector.class, "KubeApiConnector-" + idx.incrementAndGet());
     m.checking(new Expectations(){{
       allowing(apiConnector).getNamespace(); will (returnValue("nichts"));
     }});
