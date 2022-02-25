@@ -37,23 +37,14 @@
     <orderEntry type="module" module-name="test-api" scope="TEST" />
     <orderEntry type="module" module-name="web" />
     <orderEntry type="module" module-name="web-openapi" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../lib/kubernetes-client-5.12.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="commons-codec" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="kotlin" level="project" />
     <orderEntry type="module" module-name="common-test-core" />
     <orderEntry type="library" name="aws-sdk-eks" level="project" />
     <orderEntry type="library" name="aws-sdk-common" level="project" />
     <orderEntry type="library" name="aws-sdk-sources" level="project" />
-    <orderEntry type="library" name="com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2" level="project" />
-    <orderEntry type="library" name="io.fabric8:kubernetes-client:5.12.1" level="project" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-common" />
+    <orderEntry type="library" name="kubernetes-client-patched-lib" level="project" />
+    <orderEntry type="library" name="io.fabric8.kubernetes.client.onlydeps" level="project" />
   </component>
 </module>

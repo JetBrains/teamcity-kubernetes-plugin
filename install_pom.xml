@@ -23,6 +23,7 @@
     <teamcity-lib-path>${TeamCityDist}/webapps/ROOT/WEB-INF/lib/</teamcity-lib-path>
     <teamcity-devpackage-path>${TeamCityDist}/devPackage/</teamcity-devpackage-path>
     <open-api-path>open-api</open-api-path>
+    <kubernetes-client-lib>kubernetes-client-lib</kubernetes-client-lib>
     <teamcity-agent-lib-path>${TeamCityDist}/buildAgent/lib/</teamcity-agent-lib-path>
   </properties>
   <build>
@@ -60,6 +61,22 @@
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-lib-path}/cloud-server-api.jar</file>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>install-cloud-interface</id>
+            <phase>package</phase>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+            <configuration>
+              <artifactId>cloud-interface</artifactId>
+              <groupId>org.jetbrains.teamcity</groupId>
+              <version>${TeamCityVersion}</version>
+              <packaging>jar</packaging>
+              <createChecksum>true</createChecksum>
+              <file>${teamcity-lib-path}/cloud-interface.jar</file>
             </configuration>
           </execution>
 
@@ -140,6 +157,22 @@
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
               <file>${teamcity-agent-lib-path}/agent.jar</file>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>install-kubernetes-client</id>
+            <phase>package</phase>
+            <goals>
+              <goal>install-file</goal>
+            </goals>
+            <configuration>
+              <artifactId>kubernetes-client</artifactId>
+              <groupId>io.fabric8</groupId>
+              <version>5.12.1-teamcity-patched</version>
+              <packaging>jar</packaging>
+              <createChecksum>true</createChecksum>
+              <file>${kubernetes-client-lib}/kubernetes-client-5.12.1-teamcity-patched.jar</file>
             </configuration>
           </execution>
         </executions>

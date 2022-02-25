@@ -1,14 +1,13 @@
 package jetbrains.buildServer.clouds.kubernetes.auth
 
 import com.intellij.openapi.diagnostic.Logger
-import io.fabric8.kubernetes.api.model.NamedContext
 import io.fabric8.kubernetes.client.Config
 import io.fabric8.kubernetes.client.ConfigBuilder
+import io.fabric8.kubernetes.client.internal.KubeConfigUtils
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
 import jetbrains.buildServer.serverSide.InvalidProperty
-import jetbrains.buildServer.serverSide.TeamCityProperties
 import jetbrains.buildServer.util.FileUtil
 import org.springframework.web.servlet.ModelAndView
 import java.io.File
@@ -25,7 +24,6 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
         init{
             // disable autoconfiguration by default
             System.setProperty("kubernetes.disable.autoConfig", "true")
-//            System.setProperty("kubernetes.auth.tryKubeConfig", "false")
         }
     }
 
@@ -44,31 +42,49 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
             else
                 it
         }
-        val kubeconfigFilename = Config.getKubeconfigFilename()
-        if (kubeconfigFilename.isNullOrEmpty()) {
-            throw KubeCloudException("cannot find kubeconfig file")
-        }
-        val contents = FileUtil.readText(File(kubeconfigFilename))
-
         // will ignore all other settings
-        val conf = Config.fromKubeconfig(contextName, contents, kubeconfigFilename)
+        val kubeconfigContent = readKubeconfigContent()
+        val conf = Config.fromKubeconfig(contextName, kubeconfigContent, null)
         return ConfigBuilder(conf)
     }
 
+    private fun readKubeconfigContent(): String? {
+        val kubeconfigFilename: String?
+        try {
+            kubeconfigFilename = Config.getKubeconfigFilename()
+        } catch (th: Throwable) {
+            return null
+        }
+        if (kubeconfigFilename.isNullOrEmpty()) {
+            return null
+        }
+        val file = File(kubeconfigFilename)
+        return if (file.exists()) {
+            FileUtil.readText(file)
+        } else {
+            null
+        }
+    }
 
     override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty>  = mutableListOf()
 
     override fun fillModel(mv: ModelAndView) {
-        val config = Config.autoConfigure(null)
         val model = mv.model
+        val contextsNames = arrayListOf<String>()
+        var currentContextName = ""
         try {
-            val contextsNames = config.contexts.map { it.name }
-            val currentContext = config.currentContext
-            model.put("contextNames", contextsNames)
-            model.put("currentContext", currentContext?.name ?: "")
+            val content = readKubeconfigContent()
+            if (!content.isNullOrEmpty()) {
+                val config = KubeConfigUtils.parseConfigFromString(content)
+                contextsNames.addAll(config.contexts.map{it.name})
+                currentContextName = config.currentContext
+            };
         } catch (ex: Exception) {
             LOG.warnAndDebugDetails("Error listing kubeconfig contexts", ex)
             model.put("kubeconfig-error", ex.toString())
+        } finally {
+            model.put("contextNames", contextsNames)
+            model.put("currentContext", currentContextName)
         }
     }
 }
