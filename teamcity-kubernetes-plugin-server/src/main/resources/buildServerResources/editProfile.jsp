@@ -29,8 +29,7 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 <jsp:useBean id="authStrategies" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy>"/>
-<jsp:useBean id="contextNames" scope="request" type="java.util.Collection<java.lang.String>"/>
-<jsp:useBean id="currentContext" scope="request" type="java.lang.String"/>
+<jsp:useBean id="additionalSettings" scope="request" type="java.util.Map<java.lang.String, java.lang.Object>"/>
 <jsp:useBean id="podTemplateProviders" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider>"/>
 
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
@@ -88,12 +87,6 @@
                 </props:selectProperty>
                 <span id="error_${cons.authStrategy}" class="error"></span>
             </div>
-            <c:forEach var="strategy" items="${authStrategies}">
-                <c:set var="description" value="${strategy.description}"/>
-                <c:if test="${not empty description}">
-                    <div class="smallNote hidden auth-ui ${strategy.id}" style="margin-left: 0"><c:out value="${description}"/></div>
-                </c:if>
-            </c:forEach>
         </td>
     </tr>
     <tr class="hidden user-passwd auth-ui">
@@ -205,18 +198,23 @@
     <tr class="hidden kubeconfig auth-ui">
         <th><label for="${cons.kubeconfigContext}">Current Context:<l:star/></label></th>
         <td>
-            <c:set var="selectedContext"
-            ><c:if test="${not empty propertiesBean.properties[cons.kubeconfigContext]}"
-            ><c:out value="${propertiesBean.properties[cons.kubeconfigContext]}" /></c:if
-            ><c:if test="${empty propertiesBean.properties[cons.kubeconfigContext]}"
-            ><c:out value="${currentContext}" /></c:if></c:set>
-            <props:selectProperty name="${cons.kubeconfigContext}" id="${cons.kubeconfigContext}" enableFilter="${true}">
-                <c:forEach var="context" items="${contextNames}">
-                    <props:option value="${context}" selected="${context eq selectedContext}"
-                    ><c:out value="${context}"/></props:option>
-                </c:forEach>
-            </props:selectProperty>
-            <span id="error_${cons.eksClusterName}" class="error"></span>
+            <c:set var="currentContext"><c:out value="${additionalSettings.get('currentContext')}"/></c:set>
+            <c:if test="${currentContext != null}">
+                <c:set var="contextNames"><c:out value="${additionalSettings.get('contextNames')}"/></c:set>
+                <c:set var="selectedContext"
+                ><c:if test="${not empty propertiesBean.properties[cons.kubeconfigContext]}"
+                ><c:out value="${propertiesBean.properties[cons.kubeconfigContext]}" /></c:if
+                ><c:if test="${empty propertiesBean.properties[cons.kubeconfigContext]}"
+                ><c:out value="" /></c:if></c:set>
+                <props:selectProperty name="${cons.kubeconfigContext}" id="${cons.kubeconfigContext}" enableFilter="${true}">
+                    <props:option value="" selected="${'' eq selectedContext}"><c:out value="Current context (${currentContext})"/></props:option>
+                    <c:forEach var="context" items="${contextNames}">
+                        <props:option value="${context}" selected="${context eq selectedContext}"
+                        ><c:out value="${context}"/></props:option>
+                    </c:forEach>
+                </props:selectProperty>
+                <span id="error_${cons.eksClusterName}" class="error"></span>
+            </c:if>
         </td>
     </tr>
     <tr>

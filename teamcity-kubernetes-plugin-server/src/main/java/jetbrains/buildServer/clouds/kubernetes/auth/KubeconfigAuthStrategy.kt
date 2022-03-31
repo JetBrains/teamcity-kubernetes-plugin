@@ -4,12 +4,11 @@ import com.intellij.openapi.diagnostic.Logger
 import io.fabric8.kubernetes.client.Config
 import io.fabric8.kubernetes.client.ConfigBuilder
 import io.fabric8.kubernetes.client.internal.KubeConfigUtils
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudException
+import jetbrains.buildServer.BuildProject
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.FileUtil
-import org.springframework.web.servlet.ModelAndView
 import java.io.File
 
 /**
@@ -68,8 +67,16 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
 
     override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty>  = mutableListOf()
 
-    override fun fillModel(mv: ModelAndView) {
-        val model = mv.model
+    override fun isAvailable(projectId: String?): Boolean {
+        return BuildProject.ROOT_PROJECT_ID == projectId;
+    }
+
+    override fun fillAdditionalSettings(additionalSettings: MutableMap<String, Any>, isAvailable: Boolean) {
+        if (!isAvailable) {
+            additionalSettings.put("contextNames", emptyList<String>())
+            additionalSettings.put("currentContext", "")
+            return;
+        }
         val contextsNames = arrayListOf<String>()
         var currentContextName = ""
         try {
@@ -81,10 +88,10 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
             };
         } catch (ex: Exception) {
             LOG.warnAndDebugDetails("Error listing kubeconfig contexts", ex)
-            model.put("kubeconfig-error", ex.toString())
+            additionalSettings.put("kubeconfig-error", ex.toString())
         } finally {
-            model.put("contextNames", contextsNames)
-            model.put("currentContext", currentContextName)
+            additionalSettings.put("contextNames", contextsNames)
+            additionalSettings.put("currentContext", currentContextName)
         }
     }
 }

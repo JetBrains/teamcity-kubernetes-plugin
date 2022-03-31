@@ -17,7 +17,7 @@
 package jetbrains.buildServer.clouds.kubernetes.web;
 
 import com.intellij.openapi.diagnostic.Logger;
-import java.util.Collection;
+import java.util.*;
 import jetbrains.buildServer.BuildProject;
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
@@ -45,9 +45,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.CA_CERT_DATA;
@@ -70,6 +67,14 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final ChooserController.Namespaces myNamespacesChooser;
     private final ChooserController.Deployments myDeploymentsChooser;
     private final KubeDeleteImageDialogController myKubeDeleteImageDialogController;
+
+    static {
+        try {
+            Class.forName("io.fabric8.kubernetes.client.Config");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
 
     public KubeProfileEditController(@NotNull final SBuildServer server,
                                      @NotNull final WebControllerManager web,
@@ -112,7 +117,11 @@ public class KubeProfileEditController extends BaseFormXmlController {
 
         final Collection<KubeAuthStrategy> authStrategies = myAuthStrategyProvider.getAll(projectId);
         model.put("authStrategies", authStrategies);
-        authStrategies.forEach(auth -> auth.fillModel(modelAndView));
+        final HashMap<String, Object> additionalSettings = new HashMap<>();
+        authStrategies.forEach(auth -> {
+            auth.fillAdditionalSettings(additionalSettings, auth.isAvailable(projectId));
+        });
+        model.put("additionalSettings", additionalSettings);
 
         model.put("podTemplateProviders", myPodTemplateProviders.getAll());
         return modelAndView;
@@ -150,11 +159,12 @@ public class KubeProfileEditController extends BaseFormXmlController {
                     return props.get(SECURE_PROPERTY_PREFIX + CA_CERT_DATA);
                 }
             };
+            final String projectId = request.getParameter("projectId");
             final String authStrategyName = props.get(KubeParametersConstants.AUTH_STRATEGY);
             KubeApiConnectorImpl apiConnector = null;
             try {
                 final KubeAuthStrategy strategy = myAuthStrategyProvider.get(authStrategyName);
-                apiConnector = new KubeApiConnectorImpl("editProfile", connectionSettings, strategy);
+                apiConnector = new KubeApiConnectorImpl("editProfile", projectId, connectionSettings, strategy);
                 KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
                 if(!connectionCheckResult.isSuccess()){
                     if (strategy.isRefreshable() && connectionCheckResult.isNeedRefresh()){

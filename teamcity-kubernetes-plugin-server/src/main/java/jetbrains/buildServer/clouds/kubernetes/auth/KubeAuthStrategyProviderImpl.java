@@ -17,6 +17,7 @@
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.util.TimeService;
 import org.jetbrains.annotations.NotNull;
@@ -46,8 +47,10 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
     @NotNull
     @Override
     public Collection<KubeAuthStrategy> getAll(@NotNull String projectId) {
-
-        return myIdToStrategyMap.values();
+        return myIdToStrategyMap.values()
+                                .stream()
+                                .filter(strategy -> strategy.isAvailable(projectId))
+                                .collect(Collectors.toList());
     }
 
     @Nullable

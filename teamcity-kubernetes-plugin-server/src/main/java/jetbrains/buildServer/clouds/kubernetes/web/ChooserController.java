@@ -97,7 +97,7 @@ public abstract class ChooserController extends BaseController {
 
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath(getJspName()));
         try {
-            KubeApiConnector apiConnector = new KubeApiConnectorImpl("editProfile", apiConnection, myAuthStrategyProvider.get(authStrategy));
+            KubeApiConnector apiConnector = new KubeApiConnectorImpl("editProfile", "dummy", apiConnection, myAuthStrategyProvider.get(authStrategy));
             modelAndView.getModelMap().put(getItemsName(), getItems(apiConnector));
             modelAndView.getModelMap().put("error","");
         } catch (Exception ex){

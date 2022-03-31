@@ -66,7 +66,7 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         val timeService = MockTimeService()
         val strategy = FakeAuthStrategy(timeService)
         var clientsCreated = 0
-        val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", apiConnection, strategy){
+        val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", "dummy", apiConnection, strategy){
             override fun createClient(config: Config): KubernetesClient {
                 clientsCreated++
                 if (clientsCreated == 2){

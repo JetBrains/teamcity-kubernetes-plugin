@@ -115,7 +115,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
         try {
             final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
             final ExecutorService executorService = ExecutorsFactory.newFixedScheduledDaemonExecutor("Async cloud tasks for " + cloudState.getProfileId(), 2);
-            final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudClientParameters.getProfileId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
+            final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudState.getProfileId(), cloudState.getProjectId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
                 final KubeCloudImageImpl kubeCloudImage =
                     new KubeCloudImageImpl(kubeCloudImageData, apiConnector);

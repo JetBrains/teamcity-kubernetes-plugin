@@ -46,16 +46,18 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
     private static final int DEFAULT_REQUEST_TIMEOUT_MS = 15 * 1000;
 
-    private String myProfileId;
-    @NotNull
-    private final KubeApiConnection myConnectionSettings;
-    private final KubeAuthStrategy myAuthStrategy;
+    @NotNull private final String myProfileId;
+    @NotNull private final String myProjectId;
+    @NotNull private final KubeApiConnection myConnectionSettings;
+    @NotNull private final KubeAuthStrategy myAuthStrategy;
+
     private volatile Config myConfig;
     private volatile KubernetesClient myKubernetesClient;
     private volatile boolean myCloseInitiated = false;
 
-    public KubeApiConnectorImpl(@NotNull String profileId,  @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
+    public KubeApiConnectorImpl(@NotNull String profileId, @NotNull String projectId,  @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
         myProfileId = profileId;
+        myProjectId = projectId;
         myConnectionSettings = connectionSettings;
         myAuthStrategy = authStrategy;
         myConfig = createConfig(myConnectionSettings, myAuthStrategy);

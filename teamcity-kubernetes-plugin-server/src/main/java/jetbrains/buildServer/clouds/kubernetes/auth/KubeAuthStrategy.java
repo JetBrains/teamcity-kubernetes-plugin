@@ -17,11 +17,11 @@
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
 import io.fabric8.kubernetes.client.ConfigBuilder;
+import java.util.Map;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 14.06.17.
@@ -44,5 +44,9 @@ public interface KubeAuthStrategy extends PropertiesProcessor {
 
     default void invalidate(@NotNull final KubeApiConnection connection){}
 
-    default void fillModel(@NotNull ModelAndView mv){}
+    default boolean isAvailable(@Nullable String projectId){
+        return true;
+    }
+
+    default void fillAdditionalSettings(@NotNull Map<String, Object> mv, boolean isAvailable){}
 }
