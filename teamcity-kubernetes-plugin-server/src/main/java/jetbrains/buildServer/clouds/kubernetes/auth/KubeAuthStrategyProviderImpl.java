@@ -16,16 +16,15 @@
 
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
-import jetbrains.buildServer.util.TimeService;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
+import jetbrains.buildServer.util.TimeService;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 14.06.17.
@@ -39,7 +38,9 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
         registerStrategy(new UnauthorizedAccessStrategy());
         registerStrategy(new ClientCertificateAuthStrategy());
         registerStrategy(new TokenAuthStrategy());
-        registerStrategy(new KubeconfigAuthStrategy());
+        if (TeamCityProperties.getBoolean("teamcity.kubernetes.localKubeconfig.enable")) {
+            registerStrategy(new KubeconfigAuthStrategy());
+        }
         registerStrategy(new OIDCAuthStrategy(timeService));
         registerStrategy(new EKSAuthStrategy(timeService));
     }
