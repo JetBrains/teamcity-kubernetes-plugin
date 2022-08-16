@@ -18,6 +18,7 @@ package jetbrains.buildServer.clouds.kubernetes.web;
 
 import com.intellij.openapi.diagnostic.Logger;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import jetbrains.buildServer.BuildProject;
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
@@ -30,6 +31,7 @@ import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.internal.PluginPropertiesUtil;
+import jetbrains.buildServer.serverSide.IOGuard;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
@@ -161,16 +163,17 @@ public class KubeProfileEditController extends BaseFormXmlController {
             };
             final String projectId = request.getParameter("projectId");
             final String authStrategyName = props.get(KubeParametersConstants.AUTH_STRATEGY);
-            KubeApiConnectorImpl apiConnector = null;
-            try {
-                final KubeAuthStrategy strategy = myAuthStrategyProvider.get(authStrategyName);
-                apiConnector = new KubeApiConnectorImpl("editProfile", projectId, connectionSettings, strategy);
-                KubeApiConnectionCheckResult connectionCheckResult = apiConnector.testConnection();
+
+            final KubeAuthStrategy strategy = myAuthStrategyProvider.get(authStrategyName);
+            try (final KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", projectId, connectionSettings, strategy)) {
+                KubeApiConnectionCheckResult connectionCheckResult = IOGuard.allowNetworkCall(()->apiConnector.testConnection());
                 if(!connectionCheckResult.isSuccess()){
                     if (strategy.isRefreshable() && connectionCheckResult.isNeedRefresh()){
-                        apiConnector.invalidate();
-                        connectionCheckResult = apiConnector.testConnection();
-                        if (connectionCheckResult.isSuccess()){
+                        final KubeApiConnectionCheckResult retryResult = IOGuard.allowNetworkCall(()->{
+                            apiConnector.invalidate();
+                            return apiConnector.testConnection();
+                        });
+                        if (retryResult.isSuccess()){
                             return;
                         }
                     }
@@ -191,8 +194,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 }
                 errors.addError("connection", errorMessage);
                 writeErrors(xmlResponse, errors);
-            } finally {
-                FileUtil.close(apiConnector);
             }
         }
     }

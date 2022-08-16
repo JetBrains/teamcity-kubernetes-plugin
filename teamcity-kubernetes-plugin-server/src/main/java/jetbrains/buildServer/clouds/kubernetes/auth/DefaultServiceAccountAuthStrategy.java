@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Map;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
+import jetbrains.buildServer.serverSide.IOGuard;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
@@ -65,7 +66,7 @@ public class DefaultServiceAccountAuthStrategy implements KubeAuthStrategy {
     @Nullable
     private String getDefaultServiceAccountAuthToken() {
         try {
-            return FileUtil.readText(new File(DEFAULT_SERVICE_ACCOUNT_TOKEN_FILE));
+            return IOGuard.allowCommandLine(() -> FileUtil.readText(new File(DEFAULT_SERVICE_ACCOUNT_TOKEN_FILE)));
         } catch (IOException e) {
             return null;
         }

@@ -24,6 +24,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.internal.PluginPropertiesUtil;
+import jetbrains.buildServer.serverSide.IOGuard;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
@@ -96,9 +97,10 @@ public abstract class ChooserController extends BaseController {
         String authStrategy = props.get(AUTH_STRATEGY);
 
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath(getJspName()));
-        try {
-            KubeApiConnector apiConnector = new KubeApiConnectorImpl("editProfile", "dummy", apiConnection, myAuthStrategyProvider.get(authStrategy));
-            modelAndView.getModelMap().put(getItemsName(), getItems(apiConnector));
+        try (KubeApiConnector apiConnector
+               = new KubeApiConnectorImpl("editProfile", "dummy", apiConnection, myAuthStrategyProvider.get(authStrategy))){
+            Collection<String> items = IOGuard.allowNetworkCall(() -> getItems(apiConnector));
+            modelAndView.getModelMap().put(getItemsName(), items);
             modelAndView.getModelMap().put("error","");
         } catch (Exception ex){
             modelAndView.getModelMap().put(getItemsName(), Collections.emptyList());

@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.client.internal.KubeConfigUtils
 import jetbrains.buildServer.BuildProject
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.serverSide.IOGuard
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.FileUtil
 import java.io.File
@@ -34,16 +35,17 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
 
     //just return the default config
     override fun apply(clientConfig: ConfigBuilder, connection: KubeApiConnection): ConfigBuilder {
-        // =nullIfEmpty, because Config.fromKubeconfig requires contextName to be empty to use the currentContext
-        val contextName = connection.getCustomParameter(KubeParametersConstants.KUBECONFIG_CONTEXT).let {
-            if (it.isNullOrEmpty())
-                null
-            else
-                it
+        val conf = IOGuard.allowNetworkAndCommandLine <Config, Exception> {
+            val contextName = connection.getCustomParameter(KubeParametersConstants.KUBECONFIG_CONTEXT).let {
+                if (it.isNullOrEmpty())
+                    null
+                else
+                    it
+            }
+            // will ignore all other settings
+            val kubeconfigContent = readKubeconfigContent()
+            Config.fromKubeconfig(contextName, kubeconfigContent, null)
         }
-        // will ignore all other settings
-        val kubeconfigContent = readKubeconfigContent()
-        val conf = Config.fromKubeconfig(contextName, kubeconfigContent, null)
         return ConfigBuilder(conf)
     }
 
