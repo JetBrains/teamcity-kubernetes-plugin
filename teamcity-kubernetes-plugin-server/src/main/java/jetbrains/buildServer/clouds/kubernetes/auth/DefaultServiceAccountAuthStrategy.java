@@ -66,7 +66,7 @@ public class DefaultServiceAccountAuthStrategy implements KubeAuthStrategy {
     @Nullable
     private String getDefaultServiceAccountAuthToken() {
         try {
-            return IOGuard.allowCommandLine(() -> FileUtil.readText(new File(DEFAULT_SERVICE_ACCOUNT_TOKEN_FILE)));
+            return FileUtil.readText(new File(DEFAULT_SERVICE_ACCOUNT_TOKEN_FILE));
         } catch (IOException e) {
             return null;
         }
