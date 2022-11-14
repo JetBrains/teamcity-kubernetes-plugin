@@ -207,20 +207,24 @@ public class KubeCloudClient implements CloudClientEx {
         return null;
     }
 
+    @NotNull
     @Override
-    public boolean canStartNewInstance(@NotNull CloudImage cloudImage) {
-        KubeCloudImage kubeCloudImage = (KubeCloudImage) cloudImage;
+    public CanStartNewInstanceResult canStartNewInstanceWithDetails(@NotNull CloudImage image) {
+        KubeCloudImage kubeCloudImage = (KubeCloudImage)image;
         String kubeCloudImageId = kubeCloudImage.getId();
         if(!myImageIdToImageMap.containsKey(kubeCloudImageId)){
-            LOG.debug("Can't start instance of unknown cloud image with id " + kubeCloudImageId);
-            return false;
+            return CanStartNewInstanceResult.no("Can't start instance of unknown cloud image with id " + kubeCloudImageId);
         }
         int profileInstanceLimit = myKubeClientParams.getInstanceLimit();
-        if(profileInstanceLimit >= 0 && myImageIdToImageMap.values().stream().mapToInt(KubeCloudImage::getRunningInstanceCount).sum() >= profileInstanceLimit)
-            return false;
+        if(profileInstanceLimit >= 0 && myImageIdToImageMap.values().stream().mapToInt(KubeCloudImage::getRunningInstanceCount).sum() >= profileInstanceLimit) {
+            return CanStartNewInstanceResult.no("Profile instance limit reached");
+        }
 
         int imageLimit = kubeCloudImage.getInstanceLimit();
-        return imageLimit < 0 || kubeCloudImage.getRunningInstanceCount() < imageLimit;
+        if (imageLimit >= 0 && kubeCloudImage.getRunningInstanceCount() >= imageLimit){
+            return CanStartNewInstanceResult.no("Image instance limit reached");
+        }
+        return CanStartNewInstanceResult.yes();
     }
 
     @Nullable
