@@ -130,7 +130,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         }});
         List<KubeCloudImage> images = Collections.singletonList(image);
         KubeCloudClient cloudClient = createClient(images);
-        assertTrue(cloudClient.canStartNewInstance(image));
+        assertTrue(cloudClient.canStartNewInstanceWithDetails(image).isPositive());
     }
 
     public void testCanStartNewInstance_ProfileLimit() throws Exception {
@@ -156,7 +156,7 @@ public class KubeCloudClientTest extends BaseTestCase {
         List<KubeCloudImage> images = Collections.singletonList(image);
         CloudClientParameters cloudClientParameters = new MockCloudClientParameters(Collections.singletonMap(PROFILE_INSTANCE_LIMIT, "5"));
         KubeCloudClient cloudClient = createClient(images, cloudClientParameters);
-        assertTrue(cloudClient.canStartNewInstance(image));
+        assertTrue(cloudClient.canStartNewInstanceWithDetails(image).isPositive());
     }
 
     public void testCanStartNewInstance_ImageLimit() throws Exception {
