@@ -22,12 +22,14 @@ import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.CloudKeys
+import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.kubernetes.connector.FakeKubeApiConnector
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders
 import jetbrains.buildServer.clouds.server.impl.profile.CloudImageDataImpl
 import jetbrains.buildServer.clouds.server.impl.profile.CloudImageParametersImpl
+import jetbrains.buildServer.util.TestFor
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
@@ -76,6 +78,36 @@ class KubeCloudImageTest : BaseTestCase() {
         then(image1Profile1.instances.first().name).isEqualTo("jetbrains-teamcity-agent-1")
         image1Profile2.populateInstances()
         then(image1Profile2.instances).hasSize(0)
+    }
+
+    @TestFor(issues=["TW-52354"])
+    public fun dont_drop_scheduled_2_start_during_populate(){
+        val img = createImage(createMap(
+                CloudImageParameters.SOURCE_ID_FIELD, "image1",
+                CloudKeys.PROFILE_ID, "kube-1",
+                KubeParametersConstants.DOCKER_IMAGE, "jetbrains/teamcity-agent"))
+        val pod = Pod()
+        pod.metadata = ObjectMeta()
+        pod.metadata.name = "jetbrains-teamcity-agent-1";
+        img.addStartedInstance(KubeCloudInstanceImpl(img, pod))
+        img.populateInstances()
+        then(img.instances).hasSize(1)
+        then(img.instances.first().name).isEqualTo("jetbrains-teamcity-agent-1")
+    }
+
+    public fun drop_non_existing(){
+        val img = createImage(createMap(
+                CloudImageParameters.SOURCE_ID_FIELD, "image1",
+                CloudKeys.PROFILE_ID, "kube-1",
+                KubeParametersConstants.DOCKER_IMAGE, "jetbrains/teamcity-agent"))
+        val pod = Pod()
+        pod.metadata = ObjectMeta()
+        pod.metadata.name = "jetbrains-teamcity-agent-1";
+        val instance = KubeCloudInstanceImpl(img, pod)
+        img.addStartedInstance(instance)
+        instance.status = InstanceStatus.RUNNING
+        img.populateInstances()
+        then(img.instances).isEmpty()
     }
 
     private fun createImage(imageData: Map<String, String> = emptyMap()): KubeCloudImage {
