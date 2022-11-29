@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
+import jetbrains.buildServer.clouds.InstanceStatus;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.util.CollectionsUtil;
@@ -228,7 +229,12 @@ public class KubeCloudImageImpl implements KubeCloudImage {
               KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId(),
               KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, myImageData.getProfileId()
                                                                  ));
-            final Set<String> keys = new HashSet<>(myIdToInstanceMap.keySet());
+            final Set<String> keys = new HashSet<>();
+            myIdToInstanceMap.forEach((id, inst)->{
+                if (inst.getStatus() != InstanceStatus.SCHEDULED_TO_START) {
+                    keys.add(id);
+                }
+            });
             final List<Pod> newPods = new ArrayList<>();
             for (Pod pod : pods){
                 if (pod.getMetadata() == null){
