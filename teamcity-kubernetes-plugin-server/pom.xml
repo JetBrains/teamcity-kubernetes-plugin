@@ -41,6 +41,12 @@
       <version>${teamcity-version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>jetbrains.buildServer.util</groupId>
+      <artifactId>amazon-util</artifactId>
+      <version>2022.10-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

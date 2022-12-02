@@ -34,6 +34,7 @@ import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy.*
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.TimeService
+import jetbrains.buildServer.util.amazon.AWSCommonParams
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
@@ -46,6 +47,7 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
                 .standard()
                 .withRegion(Regions.EU_WEST_1)
                 .withCredentials(credentials)
+                .withClientConfiguration(AWSCommonParams.createClientConfigurationEx("eks"))
                 .build() as AWSSecurityTokenServiceClient
 
         val token = generateToken(dataHolder.clusterName, Date(), tokenService, credentials, "https", "sts.amazonaws.com")
@@ -70,12 +72,12 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
         return if (!dataHolder.iamRoleArn.isNullOrEmpty()) {
             val stsClient = AWSSecurityTokenServiceClientBuilder
                     .standard()
-                    .withRegion(Regions.EU_WEST_1)
+                    .withClientConfiguration(AWSCommonParams.createClientConfigurationEx("eks"))
                     .withCredentials(baseCreds)
                     .build() as AWSSecurityTokenServiceClient
             STSAssumeRoleSessionCredentialsProvider.Builder(dataHolder.iamRoleArn, "teamcity-kubernetes-plugin-session")
                     .withStsClient(stsClient)
-                    .withRoleSessionDurationSeconds(60 * 15)
+                    .withClientConfiguration(AWSCommonParams.createClientConfigurationEx("eks"))
                     .build() as STSAssumeRoleSessionCredentialsProvider
         } else {
             baseCreds
