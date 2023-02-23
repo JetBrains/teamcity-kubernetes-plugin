@@ -31,6 +31,7 @@
     <orderEntry type="module" module-name="cloud-server" />
     <orderEntry type="module" module-name="cloud-shared" />
     <orderEntry type="module" module-name="common" />
+    <orderEntry type="module" module-name="migration" />
     <orderEntry type="module" module-name="common-impl" />
     <orderEntry type="module" module-name="server" />
     <orderEntry type="module" module-name="server-openapi" />

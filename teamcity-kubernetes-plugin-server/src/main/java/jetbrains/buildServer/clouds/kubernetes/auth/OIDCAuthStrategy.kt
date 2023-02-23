@@ -32,7 +32,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.message.BasicNameValuePair
-import org.springframework.security.crypto.codec.Base64
 import java.io.InputStream
 import java.net.URI
 import java.util.*
@@ -57,7 +56,7 @@ class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCDat
             request.entity = UrlEncodedFormEntity(Arrays.asList(BasicNameValuePair("refresh_token", dataHolder.myRefreshToken),
                     BasicNameValuePair("grant_type", "refresh_token")))
 
-            request.setHeader("Authorization", "Basic " + String(Base64.encode((dataHolder.myClientId + ":" + dataHolder.myClientSecret).toByteArray())))
+            request.setHeader("Authorization", "Basic " + String(Base64.getEncoder().encode((dataHolder.myClientId + ":" + dataHolder.myClientSecret).toByteArray())))
             val response = build.execute(request)
             if (response.statusLine != null && response.statusLine.statusCode == 200) {
                 val tokenData = StreamUtil.readText(response.entity.content)
