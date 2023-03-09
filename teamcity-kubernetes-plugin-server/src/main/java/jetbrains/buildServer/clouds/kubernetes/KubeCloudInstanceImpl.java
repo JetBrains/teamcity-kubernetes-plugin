@@ -135,8 +135,8 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
 
     @Override
     public boolean containsAgent(@NotNull AgentDescription agentDescription) {
-        final Map<String, String> agentParams = agentDescription.getConfigurationParameters();
-        return getName().equals(agentParams.get(INSTANCE_NAME));
+        final Map<String, String> buildParams = agentDescription.getBuildParameters();
+        return getName().equals(buildParams.get("env."+INSTANCE_NAME));
     }
 
     public void updateState(@NotNull Pod actualPod){
