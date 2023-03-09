@@ -229,12 +229,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
               KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId(),
               KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, myImageData.getProfileId()
                                                                  ));
-            final Set<String> keys = new HashSet<>();
-            myIdToInstanceMap.forEach((id, inst)->{
-                if (inst.getStatus() != InstanceStatus.SCHEDULED_TO_START) {
-                    keys.add(id);
-                }
-            });
+            final Set<String> keys = new HashSet<>(myIdToInstanceMap.keySet());
             final List<Pod> newPods = new ArrayList<>();
             for (Pod pod : pods){
                 if (pod.getMetadata() == null){
@@ -255,6 +250,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
                     newPods.add(pod);
                 }
             }
+            keys.removeIf(instanceId->{
+                KubeCloudInstance instance = myIdToInstanceMap.get(instanceId);
+                return  instance != null && instance.getStatus() ==InstanceStatus.SCHEDULED_TO_START;
+            });
             if (keys.size() > 0) {
                 LOG.info(String.format("The following %d %s %s deleted: %s",
                                        keys.size(), StringUtil.pluralize( "pod",keys.size()),
