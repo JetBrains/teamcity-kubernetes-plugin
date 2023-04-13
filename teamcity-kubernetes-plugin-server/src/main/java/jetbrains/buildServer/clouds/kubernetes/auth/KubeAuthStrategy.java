@@ -42,6 +42,10 @@ public interface KubeAuthStrategy extends PropertiesProcessor {
         return false;
     }
 
+    default boolean requiresServerUrl() {
+        return true;
+    }
+
     default void invalidate(@NotNull final KubeApiConnection connection){}
 
     default boolean isAvailable(@Nullable String projectId){

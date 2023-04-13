@@ -76,11 +76,14 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     protected Config createConfig(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy){
         ConfigBuilder configBuilder = new ConfigBuilder()
-          .withMasterUrl(connectionSettings.getApiServerUrl())
           .withNamespace(connectionSettings.getNamespace())
           .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
           .withHttp2Disable(true)
           .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
+
+        if (authStrategy.requiresServerUrl()) {
+            configBuilder.withMasterUrl(connectionSettings.getApiServerUrl());
+        }
         final String caCertData = connectionSettings.getCACertData();
         if(StringUtil.isEmptyOrSpaces(caCertData)){
             configBuilder.withTrustCerts(true);

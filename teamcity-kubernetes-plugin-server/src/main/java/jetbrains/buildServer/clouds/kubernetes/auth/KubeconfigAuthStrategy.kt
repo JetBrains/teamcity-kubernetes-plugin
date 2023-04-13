@@ -67,6 +67,8 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
         }
     }
 
+    override fun requiresServerUrl() = false
+
     override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty>  = mutableListOf()
 
     override fun isAvailable(projectId: String?): Boolean {

@@ -200,7 +200,6 @@
         <td>
             <c:set var="currentContext"><c:out value="${additionalSettings.get('currentContext')}"/></c:set>
             <c:if test="${currentContext != null}">
-                <c:set var="contextNames"><c:out value="${additionalSettings.get('contextNames')}"/></c:set>
                 <c:set var="selectedContext"
                 ><c:if test="${not empty propertiesBean.properties[cons.kubeconfigContext]}"
                 ><c:out value="${propertiesBean.properties[cons.kubeconfigContext]}" /></c:if
@@ -208,7 +207,7 @@
                 ><c:out value="" /></c:if></c:set>
                 <props:selectProperty name="${cons.kubeconfigContext}" id="${cons.kubeconfigContext}" enableFilter="${true}">
                     <props:option value="" selected="${'' eq selectedContext}"><c:out value="Current context (${currentContext})"/></props:option>
-                    <c:forEach var="context" items="${contextNames}">
+                    <c:forEach var="context" items="${additionalSettings.get('contextNames')}">
                         <props:option value="${context}" selected="${context eq selectedContext}"
                         ><c:out value="${context}"/></props:option>
                     </c:forEach>

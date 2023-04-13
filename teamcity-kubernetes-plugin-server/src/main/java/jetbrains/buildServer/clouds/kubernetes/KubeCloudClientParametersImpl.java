@@ -41,9 +41,10 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
         return new KubeCloudClientParametersImpl(genericCloudClientParameters);
     }
 
-    @NotNull
+    @Nullable
     @Override
     public String getApiServerUrl() {
+        // can be null only if KubeAuthStrategy.requiresServerUrl is false
         return myParameters.getParameter(API_SERVER_URL);
     }
 

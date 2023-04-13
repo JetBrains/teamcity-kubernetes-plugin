@@ -44,7 +44,6 @@ public class KubeProfilePropertiesProcessor implements PropertiesProcessor {
     @Override
     public Collection<InvalidProperty> process(Map<String, String> map) {
         Collection<InvalidProperty> invalids = new ArrayList<>();
-        if(StringUtil.isEmptyOrSpaces(map.get(API_SERVER_URL))) invalids.add(new InvalidProperty(API_SERVER_URL, "Kubernetes API server URL must not be empty"));
         final String authStrategy = map.get(AUTH_STRATEGY);
         if (StringUtil.isEmptyOrSpaces(authStrategy)) {
             invalids.add(new InvalidProperty(AUTH_STRATEGY, "Authentication strategy must be selected"));
@@ -52,6 +51,9 @@ public class KubeProfilePropertiesProcessor implements PropertiesProcessor {
         }
         KubeAuthStrategy strategy = myKubeAuthStrategyProvider.find(authStrategy);
         if (strategy != null) {
+            if(strategy.requiresServerUrl() && StringUtil.isEmptyOrSpaces(map.get(API_SERVER_URL))) {
+                invalids.add(new InvalidProperty(API_SERVER_URL, "Kubernetes API server URL must not be empty"));
+            }
             Collection<InvalidProperty> strategyCollection = strategy.process(map);
             if (strategyCollection != null && !strategyCollection.isEmpty()){
                 invalids.addAll(strategyCollection);
