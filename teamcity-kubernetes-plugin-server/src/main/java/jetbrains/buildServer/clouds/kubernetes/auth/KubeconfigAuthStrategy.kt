@@ -73,7 +73,13 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
 
     override fun requiresServerUrl() = false
 
-    override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty>  = mutableListOf()
+    override fun process(properties: Map<String, String>): Collection<InvalidProperty> {
+        val invalidProps = mutableListOf<InvalidProperty>()
+        if (properties[KubeParametersConstants.KUBECONFIG_CONTEXT] == "EMPTY_VALUE") {
+            invalidProps.add(InvalidProperty(KubeParametersConstants.KUBECONFIG_CONTEXT, "Please select a context"))
+        }
+        return invalidProps
+    }
 
     override fun isAvailable(projectId: String?): Boolean {
         if (BuildProject.ROOT_PROJECT_ID != projectId) {

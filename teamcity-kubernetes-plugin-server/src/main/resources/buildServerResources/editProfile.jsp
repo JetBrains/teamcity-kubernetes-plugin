@@ -202,17 +202,25 @@
             <c:if test="${currentContext != null}">
                 <c:set var="selectedContext"
                 ><c:if test="${not empty propertiesBean.properties[cons.kubeconfigContext]}"
+                ><c:forEach var="ctx" items="${additionalSettings.get('contextNames')}"
+                ><c:if test="${ctx eq propertiesBean.properties[cons.kubeconfigContext]}"
                 ><c:out value="${propertiesBean.properties[cons.kubeconfigContext]}" /></c:if
+                ></c:forEach></c:if
                 ><c:if test="${empty propertiesBean.properties[cons.kubeconfigContext]}"
                 ><c:out value="" /></c:if></c:set>
-                <props:selectProperty name="${cons.kubeconfigContext}" id="${cons.kubeconfigContext}" enableFilter="${true}">
+                <c:if test="${(not empty propertiesBean.properties[cons.kubeconfigContext]) and (empty selectedContext)}"
+                ><c:set var="selectedContext" value="EMPTY_VALUE"/></c:if>
+                    <props:selectProperty name="${cons.kubeconfigContext}" id="${cons.kubeconfigContext}" enableFilter="${true}">
+                        <c:if test="${selectedContext eq 'EMPTY_VALUE'}">
+                            <props:option value="EMPTY_VALUE" selected="${true}">&lt;Please select&gt;</props:option>
+                        </c:if>
                     <props:option value="" selected="${'' eq selectedContext}"><c:out value="Current context (${currentContext})"/></props:option>
                     <c:forEach var="context" items="${additionalSettings.get('contextNames')}">
                         <props:option value="${context}" selected="${context eq selectedContext}"
                         ><c:out value="${context}"/></props:option>
                     </c:forEach>
                 </props:selectProperty>
-                <span id="error_${cons.eksClusterName}" class="error"></span>
+                <span id="error_${cons.kubeconfigContext}" class="error"></span>
             </c:if>
         </td>
     </tr>
