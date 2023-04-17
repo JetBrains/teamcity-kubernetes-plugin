@@ -49,7 +49,7 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
         return ConfigBuilder(conf)
     }
 
-    private fun readKubeconfigContent(): String? {
+    private fun kubeConfigFile(): File?{
         val kubeconfigFilename: String?
         try {
             kubeconfigFilename = Config.getKubeconfigFilename()
@@ -59,7 +59,11 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
         if (kubeconfigFilename.isNullOrEmpty()) {
             return null
         }
-        val file = File(kubeconfigFilename)
+        return File(kubeconfigFilename)
+    }
+
+    private fun readKubeconfigContent(): String? {
+        val file = kubeConfigFile() ?: return null
         return if (file.exists()) {
             FileUtil.readText(file)
         } else {
@@ -72,7 +76,10 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
     override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty>  = mutableListOf()
 
     override fun isAvailable(projectId: String?): Boolean {
-        return BuildProject.ROOT_PROJECT_ID == projectId;
+        if (BuildProject.ROOT_PROJECT_ID != projectId) {
+            return false
+        }
+        return kubeConfigFile()?.exists() ?: false
     }
 
     override fun fillAdditionalSettings(additionalSettings: MutableMap<String, Any>, isAvailable: Boolean) {
