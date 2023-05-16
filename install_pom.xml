@@ -169,10 +169,10 @@
             <configuration>
               <artifactId>kubernetes-client</artifactId>
               <groupId>io.fabric8</groupId>
-              <version>5.12.1-teamcity-patched</version>
+              <version>5.12.4-teamcity-patched</version>
               <packaging>jar</packaging>
               <createChecksum>true</createChecksum>
-              <file>${kubernetes-client-lib}/kubernetes-client-5.12.1-teamcity-patched.jar</file>
+              <file>${kubernetes-client-lib}/kubernetes-client-5.12.4-teamcity-patched.jar</file>
             </configuration>
           </execution>
         </executions>
