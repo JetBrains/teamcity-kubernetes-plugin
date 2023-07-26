@@ -30,13 +30,16 @@
     <orderEntry type="module" module-name="cloud-api" />
     <orderEntry type="module" module-name="cloud-server" />
     <orderEntry type="module" module-name="cloud-shared" />
+    <orderEntry type="module" module-name="cloud-shared-core" />
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="migration" />
     <orderEntry type="module" module-name="common-impl" />
     <orderEntry type="module" module-name="server" />
+    <orderEntry type="module" module-name="server-core" />
     <orderEntry type="module" module-name="server-openapi" />
     <orderEntry type="module" module-name="test-api" scope="TEST" />
     <orderEntry type="module" module-name="web" />
+    <orderEntry type="module" module-name="web-core" />
     <orderEntry type="module" module-name="web-openapi" />
     <orderEntry type="library" name="commons-codec" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="kotlin" level="project" />

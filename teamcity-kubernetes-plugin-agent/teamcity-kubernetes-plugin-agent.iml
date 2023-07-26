@@ -17,6 +17,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-common" />
     <orderEntry type="module" module-name="agent" />
+    <orderEntry type="module" module-name="agent-core" />
     <orderEntry type="module" module-name="migration" />
   </component>
 </module>
