@@ -50,5 +50,12 @@
     <orderEntry type="module" module-name="teamcity-kubernetes-plugin-common" />
     <orderEntry type="library" name="kubernetes-client-patched-lib" level="project" />
     <orderEntry type="library" name="kubernetes-lib-deps-5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-core:1.12.122" level="project" />
+    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-eks:1.12.122" level="project" />
+    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-sts:1.12.122" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.22" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.22" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.22" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.7.22" level="project" />
   </component>
 </module>
