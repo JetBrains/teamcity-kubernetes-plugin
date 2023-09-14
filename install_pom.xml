@@ -20,11 +20,7 @@
   <artifactId>local-artifact-installer</artifactId>
   <version>${TeamCityVersion}</version>
   <properties>
-    <teamcity-lib-path>${TeamCityDist}/webapps/ROOT/WEB-INF/lib/</teamcity-lib-path>
-    <teamcity-devpackage-path>${TeamCityDist}/devPackage/</teamcity-devpackage-path>
-    <open-api-path>open-api</open-api-path>
     <kubernetes-client-lib>kubernetes-client-lib</kubernetes-client-lib>
-    <teamcity-agent-lib-path>${TeamCityDist}/buildAgent/lib/</teamcity-agent-lib-path>
   </properties>
   <build>
     <plugins>
@@ -32,134 +28,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
         <executions>
-          <execution>
-            <id>install-cloud-server</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>cloud-server</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-lib-path}/cloud-server.jar</file>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>install-cloud-server-api</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>cloud-server-api</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-lib-path}/cloud-server-api.jar</file>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>install-cloud-interface</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>cloud-interface</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-lib-path}/cloud-interface.jar</file>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>install-server</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>server</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-lib-path}/server.jar</file>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>install-web</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>web</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-lib-path}/web.jar</file>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>install-common-impl</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>common-impl</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-lib-path}/common-impl.jar</file>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>install-tests-integration</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>tests-integration</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-devpackage-path}/tests/tests-integration.jar</file>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>install-agent</id>
-            <phase>package</phase>
-            <goals>
-              <goal>install-file</goal>
-            </goals>
-            <configuration>
-              <artifactId>agent</artifactId>
-              <groupId>org.jetbrains.teamcity</groupId>
-              <version>${TeamCityVersion}</version>
-              <packaging>jar</packaging>
-              <createChecksum>true</createChecksum>
-              <file>${teamcity-agent-lib-path}/agent.jar</file>
-            </configuration>
-          </execution>
-
           <execution>
             <id>install-kubernetes-client</id>
             <phase>package</phase>

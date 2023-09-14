@@ -56,6 +56,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>2.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>server-web-api</artifactId>
       <version>${teamcity-version}</version>
@@ -73,6 +79,12 @@
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>tests-support</artifactId>
+      <version>${teamcity-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.teamcity.internal</groupId>
+      <artifactId>integration-test</artifactId>
       <version>${teamcity-version}</version>
       <scope>test</scope>
     </dependency>
@@ -99,10 +111,28 @@
     </dependency>
 
     <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>2.14.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.14.3</version>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>cloud-server</artifactId>
       <version>${teamcity-version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jetbrains.teamcity.jetps</groupId>
+          <artifactId>jetps</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -110,13 +140,12 @@
       <artifactId>common-impl</artifactId>
       <version>${teamcity-version}</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>tests-integration</artifactId>
-      <version>${teamcity-version}</version>
-      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jetbrains.teamcity.jetps</groupId>
+          <artifactId>jetps</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -174,9 +203,6 @@
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
         <version>${kotlin.version}</version>
-        <configuration>
-          <testFailureIgnore>true</testFailureIgnore>
-        </configuration>
         <executions>
           <execution>
             <id>compile</id>
