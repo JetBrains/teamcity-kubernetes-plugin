@@ -24,8 +24,16 @@
   <properties>
       <teamcity-version>2021.2</teamcity-version>
       <kotlin.version>1.5.32</kotlin.version>
+      <local.repo.path>local-repo</local.repo.path>
   </properties>
   <repositories>
+    <repository>
+      <id>local-teamcity-artifacts</id>
+      <url>file://${local.repo.path}</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
     <repository>
         <id>TeamCity</id>
         <url>https://download.jetbrains.com/teamcity-repository/</url>
