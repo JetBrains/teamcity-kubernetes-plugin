@@ -102,7 +102,7 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
             final List<PodCondition> podConditions = podStatus.getConditions();
             if (podConditions != null && !podConditions.isEmpty()) {
                 for (PodCondition podCondition : podConditions) {
-                    if (PodConditionType.valueOf(podCondition.getType()) == PodConditionType.Ready)
+                    if (PodConditionType.fromString(podCondition.getType()) == PodConditionType.Ready)
                         return myPodTransitionTimeFormat.parse(podCondition.getLastTransitionTime());
                 }
             }
