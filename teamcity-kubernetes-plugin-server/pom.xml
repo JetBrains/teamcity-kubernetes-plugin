@@ -127,12 +127,6 @@
       <artifactId>cloud-server</artifactId>
       <version>${teamcity-version}</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jetbrains.teamcity.jetps</groupId>
-          <artifactId>jetps</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
