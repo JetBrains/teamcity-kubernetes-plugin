@@ -22,7 +22,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-      <teamcity-version>2021.2</teamcity-version>
+      <teamcity-version>LOCAL-SNAPSHOT</teamcity-version>
       <kotlin.version>1.5.32</kotlin.version>
       <local.repo.path>local-repo</local.repo.path>
   </properties>
@@ -31,7 +31,7 @@
       <id>local-teamcity-artifacts</id>
       <url>file://${local.repo.path}</url>
       <snapshots>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
       </snapshots>
     </repository>
     <repository>

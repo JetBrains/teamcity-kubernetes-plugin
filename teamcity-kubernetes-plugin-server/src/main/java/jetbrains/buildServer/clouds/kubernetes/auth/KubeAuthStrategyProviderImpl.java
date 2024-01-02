@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * Created by ekoshkin (koshkinev@gmail.com) on 14.06.17.
  */
 public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
-    private final Map<String, KubeAuthStrategy> myIdToStrategyMap = new HashMap<>();
+    private static final Map<String, KubeAuthStrategy> myIdToStrategyMap = new HashMap<>();
 
     public KubeAuthStrategyProviderImpl(@NotNull TimeService timeService) {
         registerStrategy(new UserPasswdAuthStrategy());
@@ -46,12 +46,19 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
     }
 
     @NotNull
-    @Override
-    public Collection<KubeAuthStrategy> getAll(@NotNull String projectId) {
+    public static Collection<KubeAuthStrategy> getAll(@NotNull String projectId) {
         return myIdToStrategyMap.values()
                                 .stream()
                                 .filter(strategy -> strategy.isAvailable(projectId))
                                 .collect(Collectors.toList());
+    }
+
+    public static Map<String, Object> getAdditionalSettings(@NotNull String projectId){
+        final HashMap<String, Object> additionalSettings = new HashMap<>();
+        getAll(projectId).forEach(auth -> {
+            auth.fillAdditionalSettings(additionalSettings, auth.isAvailable(projectId));
+        });
+        return additionalSettings;
     }
 
     @Nullable

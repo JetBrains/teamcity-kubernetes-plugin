@@ -29,6 +29,7 @@
     <bean id="kubeNamespaces" class="jetbrains.buildServer.clouds.kubernetes.web.ChooserController$Namespaces" />
     <bean id="kubeDeployments" class="jetbrains.buildServer.clouds.kubernetes.web.ChooserController$Deployments" />
     <bean id="kubeDeleteImageDialogController" class="jetbrains.buildServer.clouds.kubernetes.web.KubeDeleteImageDialogController" />
+    <bean class="jetbrains.buildServer.clouds.kubernetes.connection.KubernetesConnectionProvider" />
 <!--    <bean class="jetbrains.buildServer.clouds.kubernetes.buildFeature.RunInKubeFeature" />-->
 <!--    <bean class="jetbrains.buildServer.clouds.kubernetes.buildFeature.RunInKubeAgentsFilter" />-->
 </beans>

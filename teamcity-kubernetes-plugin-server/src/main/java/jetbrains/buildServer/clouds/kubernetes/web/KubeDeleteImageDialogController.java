@@ -46,17 +46,12 @@ public class KubeDeleteImageDialogController extends BaseController {
                                            CloudManagerBase cloudManager) {
         myPluginDescriptor = pluginDescriptor;
         myCloudManager = cloudManager;
-        web.registerController(getUrl(), this);
-    }
-
-    @NotNull
-    public String getUrl() {
-        return myPluginDescriptor.getPluginResourcesPath(URL);
+        web.registerController(myPluginDescriptor.getPluginResourcesPath(URL), this);
     }
 
     @Nullable
     @Override
-    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) throws Exception {
+    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
         String projectId = httpServletRequest.getParameter("projectId");
         String profileId = httpServletRequest.getParameter("profileId");
         String imageId = httpServletRequest.getParameter("imageId");
