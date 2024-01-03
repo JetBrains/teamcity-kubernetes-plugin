@@ -98,14 +98,7 @@
 
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>oauth-integration</artifactId>
-      <version>${teamcity-version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>oauth-integration-web</artifactId>
+      <artifactId>oauth</artifactId>
       <version>${teamcity-version}</version>
       <scope>provided</scope>
     </dependency>
