@@ -23,13 +23,16 @@ import io.fabric8.kubernetes.client.*
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
+import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl
 import jetbrains.buildServer.clouds.kubernetes.auth.RefreshableStrategy
+import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactoryImpl
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
+
 
 @Test
 class KubeApiConnectorImplTest : BaseTestCase() {
@@ -51,7 +54,7 @@ class KubeApiConnectorImplTest : BaseTestCase() {
 
             override fun getCACertData() = null
 
-
+            override fun getAuthStrategy() = AUTH_STRAGEGY
         }
 
     }
@@ -66,7 +69,9 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         val timeService = MockTimeService()
         val strategy = FakeAuthStrategy(timeService)
         var clientsCreated = 0
-        val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", "dummy", apiConnection, strategy){
+        val authStrategyProvider = KubeAuthStrategyProviderImpl(timeService)
+        authStrategyProvider.registerStrategy(strategy)
+        val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", apiConnection, strategy, KubernetesCredentialsFactoryImpl(authStrategyProvider)){
             override fun createClient(config: Config): KubernetesClient {
                 clientsCreated++
                 if (clientsCreated == 2){
@@ -96,7 +101,7 @@ class KubeApiConnectorImplTest : BaseTestCase() {
             return DummyData(connection.getCustomParameter("DummyData")!!)
         }
 
-        override fun getId() = "dummy"
+        override fun getId() = AUTH_STRAGEGY
 
         override fun getDisplayName() = "Dummy Display Name"
 
@@ -118,6 +123,10 @@ class KubeApiConnectorImplTest : BaseTestCase() {
     override fun tearDown() {
         RefreshableStrategy.invalidateAll()
         super.tearDown()
+    }
+
+    companion object {
+        private const val AUTH_STRAGEGY = "dummy"
     }
 }
 

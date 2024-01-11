@@ -17,28 +17,22 @@
 package jetbrains.buildServer.clouds.kubernetes.web;
 
 import java.util.Collection;
+import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import jetbrains.buildServer.clouds.kubernetes.RequestKubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
+import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactory;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.controllers.BaseController;
-import jetbrains.buildServer.controllers.BasePropertiesBean;
-import jetbrains.buildServer.internal.PluginPropertiesUtil;
 import jetbrains.buildServer.serverSide.IOGuard;
-import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
-import java.util.Map;
-
-import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
-import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 05.10.17.
@@ -47,12 +41,15 @@ public abstract class ChooserController extends BaseController {
 
     private final PluginDescriptor myPluginDescriptor;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
+    private final KubernetesCredentialsFactory myCredentialsFactory;
 
     public ChooserController(WebControllerManager web,
                              PluginDescriptor pluginDescriptor,
-                             KubeAuthStrategyProvider authStrategyProvider) {
+                             KubeAuthStrategyProvider authStrategyProvider,
+                             KubernetesCredentialsFactory credentialsFactory) {
         myPluginDescriptor = pluginDescriptor;
         myAuthStrategyProvider = authStrategyProvider;
+        myCredentialsFactory = credentialsFactory;
         web.registerController(getUrl(), this);
     }
 
@@ -64,41 +61,10 @@ public abstract class ChooserController extends BaseController {
     @Nullable
     @Override
     protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) throws Exception {
-        BasePropertiesBean propsBean = new BasePropertiesBean(null);
-        PluginPropertiesUtil.bindPropertiesFromRequest(httpServletRequest, propsBean, true);
-        Map<String, String> props = propsBean.getProperties();
-
-        KubeApiConnection apiConnection = new KubeApiConnection() {
-            @NotNull
-            @Override
-            public String getApiServerUrl() {
-                return props.get(API_SERVER_URL);
-            }
-
-            @NotNull
-            @Override
-            public String getNamespace() {
-                String explicitNameSpace = props.get(KUBERNETES_NAMESPACE);
-                return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;
-            }
-
-            @Nullable
-            @Override
-            public String getCustomParameter(@NotNull String parameterName) {
-                return props.containsKey(parameterName) ? props.get(parameterName) : props.get(SECURE_PROPERTY_PREFIX + parameterName);
-            }
-
-            @Nullable
-            @Override
-            public String getCACertData() {
-                return props.get(SECURE_PROPERTY_PREFIX + CA_CERT_DATA);
-            }
-        };
-        String authStrategy = props.get(AUTH_STRATEGY);
-
+        KubeApiConnection apiConnection = new RequestKubeApiConnection(httpServletRequest);
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath(getJspName()));
         try (KubeApiConnector apiConnector
-               = new KubeApiConnectorImpl("editProfile", "dummy", apiConnection, myAuthStrategyProvider.get(authStrategy))){
+               = new KubeApiConnectorImpl("editProfile", apiConnection, myAuthStrategyProvider.get(apiConnection.getAuthStrategy()), myCredentialsFactory)){
             Collection<String> items = IOGuard.allowNetworkCall(() -> getItems(apiConnector));
             modelAndView.getModelMap().put(getItemsName(), items);
             modelAndView.getModelMap().put("error","");
@@ -127,8 +93,9 @@ public abstract class ChooserController extends BaseController {
 
         public Deployments(final WebControllerManager web,
                            final PluginDescriptor pluginDescriptor,
-                           final KubeAuthStrategyProvider authStrategyProvider) {
-            super(web, pluginDescriptor, authStrategyProvider);
+                           final KubeAuthStrategyProvider authStrategyProvider,
+                           final KubernetesCredentialsFactory kubernetesCredentialsFactory) {
+            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory);
         }
 
         @Override
@@ -155,8 +122,9 @@ public abstract class ChooserController extends BaseController {
 
         public Namespaces(final WebControllerManager web,
                           final PluginDescriptor pluginDescriptor,
-                          final KubeAuthStrategyProvider authStrategyProvider) {
-            super(web, pluginDescriptor, authStrategyProvider);
+                          final KubeAuthStrategyProvider authStrategyProvider,
+                          final KubernetesCredentialsFactory kubernetesCredentialsFactory)  {
+            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory);
         }
 
         @Override

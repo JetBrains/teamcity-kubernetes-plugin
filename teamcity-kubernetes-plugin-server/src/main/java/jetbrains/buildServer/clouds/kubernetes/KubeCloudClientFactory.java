@@ -17,11 +17,14 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
+import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactory;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
@@ -34,10 +37,6 @@ import jetbrains.buildServer.util.executors.ExecutorsFactory;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 27.05.17.
@@ -53,6 +52,7 @@ public class KubeCloudClientFactory implements CloudClientFactory {
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
     @NotNull private final KubePodNameGenerator myKubePodNameGenerator;
     private final KubeBackgroundUpdater myUpdater;
+    private final KubernetesCredentialsFactory myCredentialsFactory;
 
     public KubeCloudClientFactory(@NotNull final CloudRegistrar registrar,
                                   @NotNull final PluginDescriptor pluginDescriptor,
@@ -60,13 +60,15 @@ public class KubeCloudClientFactory implements CloudClientFactory {
                                   @NotNull final KubeAuthStrategyProvider authStrategies,
                                   @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
                                   @NotNull final KubePodNameGenerator kubePodNameGenerator,
-                                  @NotNull final KubeBackgroundUpdater updater) {
+                                  @NotNull final KubeBackgroundUpdater updater,
+                                  @NotNull KubernetesCredentialsFactory credentialsFactory) {
         myPluginDescriptor = pluginDescriptor;
         myServerSettings = serverSettings;
         myAuthStrategies = authStrategies;
         myPodTemplateProviders = podTemplateProviders;
         myKubePodNameGenerator = kubePodNameGenerator;
         myUpdater = updater;
+        myCredentialsFactory = credentialsFactory;
         registrar.registerCloudFactory(this);
     }
 
@@ -115,7 +117,10 @@ public class KubeCloudClientFactory implements CloudClientFactory {
         try {
             final KubeCloudClientParametersImpl kubeClientParams = KubeCloudClientParametersImpl.create(cloudClientParameters);
             final ExecutorService executorService = ExecutorsFactory.newFixedScheduledDaemonExecutor("Async cloud tasks for " + cloudState.getProfileId(), 2);
-            final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudState.getProfileId(), cloudState.getProjectId(), kubeClientParams, myAuthStrategies.get(kubeClientParams.getAuthStrategy()));
+            final KubeApiConnector apiConnector = new KubeApiConnectorImpl(cloudState.getProfileId(),
+                                                                           kubeClientParams,
+                                                                           myAuthStrategies.get(kubeClientParams.getAuthStrategy()),
+                                                                           myCredentialsFactory);
             List<KubeCloudImage> images = CollectionsUtil.convertCollection(kubeClientParams.getImages(), kubeCloudImageData -> {
                 final KubeCloudImageImpl kubeCloudImage =
                     new KubeCloudImageImpl(kubeCloudImageData, apiConnector);

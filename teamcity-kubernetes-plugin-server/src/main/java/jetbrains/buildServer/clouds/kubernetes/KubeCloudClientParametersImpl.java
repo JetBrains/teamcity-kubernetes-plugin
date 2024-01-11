@@ -16,24 +16,24 @@
 
 package jetbrains.buildServer.clouds.kubernetes;
 
+import java.util.Collection;
 import jetbrains.buildServer.clouds.CloudClientParameters;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 29.05.17.
  */
-public class KubeCloudClientParametersImpl implements KubeCloudClientParameters {
-    private final CloudClientParameters myParameters;
+public class KubeCloudClientParametersImpl extends ParametersKubeApiConnection implements KubeCloudClientParameters {
 
-    public KubeCloudClientParametersImpl(CloudClientParameters parameters) {
-        myParameters = parameters;
+    @NotNull private final CloudClientParameters myCloudClientParameters;
+
+    public KubeCloudClientParametersImpl(@NotNull CloudClientParameters parameters) {
+        super(parameters.getParameters());
+        myCloudClientParameters = parameters;
     }
 
     @NotNull
@@ -41,47 +41,15 @@ public class KubeCloudClientParametersImpl implements KubeCloudClientParameters 
         return new KubeCloudClientParametersImpl(genericCloudClientParameters);
     }
 
-    @Nullable
-    @Override
-    public String getApiServerUrl() {
-        // can be null only if KubeAuthStrategy.requiresServerUrl is false
-        return myParameters.getParameter(API_SERVER_URL);
-    }
-
-    @NotNull
-    @Override
-    public String getNamespace(){
-        String explicitNameSpace = myParameters.getParameter(KUBERNETES_NAMESPACE);
-        return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;
-    }
-
-    @Nullable
-    @Override
-    public String getCustomParameter(@NotNull String parameterName) {
-        return myParameters.getParameter(parameterName);
-    }
-
-    @Nullable
-    @Override
-    public String getCACertData() {
-        return myParameters.getParameter(CA_CERT_DATA);
-    }
-
     @NotNull
     @Override
     public Collection<KubeCloudImageData> getImages(){
-        return CollectionsUtil.convertCollection(myParameters.getCloudImages(), KubeCloudImageData::new);
-    }
-
-    @Override
-    @NotNull
-    public String getAuthStrategy() {
-        return myParameters.getParameter(AUTH_STRATEGY);
+        return CollectionsUtil.convertCollection(myCloudClientParameters.getCloudImages(), KubeCloudImageData::new);
     }
 
     @Override
     public int getInstanceLimit() {
-        String parameter = myParameters.getParameter(PROFILE_INSTANCE_LIMIT);
+        String parameter = myParameters.get(PROFILE_INSTANCE_LIMIT);
         return StringUtil.isEmpty(parameter) ? -1 : Integer.valueOf(parameter);
     }
 }

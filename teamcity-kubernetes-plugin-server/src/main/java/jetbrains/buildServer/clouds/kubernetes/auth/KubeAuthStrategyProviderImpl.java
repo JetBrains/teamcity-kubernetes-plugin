@@ -16,6 +16,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes.auth;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +76,8 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
         return authStrategy;
     }
 
-    private void registerStrategy(KubeAuthStrategy authStrategy){
+    @VisibleForTesting
+    public void registerStrategy(KubeAuthStrategy authStrategy){
         myIdToStrategyMap.put(authStrategy.getId(), authStrategy);
     }
 }

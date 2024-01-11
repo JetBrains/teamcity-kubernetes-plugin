@@ -34,4 +34,7 @@ public interface KubeApiConnection {
 
     @Nullable
     String getCACertData();
+
+    @NotNull
+    String getAuthStrategy();
 }

@@ -23,32 +23,26 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.BuildProject;
-import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants;
+import jetbrains.buildServer.clouds.kubernetes.RequestKubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
+import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactory;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectionCheckResult;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
-import jetbrains.buildServer.controllers.BasePropertiesBean;
-import jetbrains.buildServer.internal.PluginPropertiesUtil;
 import jetbrains.buildServer.serverSide.IOGuard;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil;
-import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.web.servlet.ModelAndView;
-
-import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
-import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
@@ -58,7 +52,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
 
     public static final String EDIT_KUBE_HTML = "editKube.html";
 
-  private final PluginDescriptor myPluginDescriptor;
+    private final PluginDescriptor myPluginDescriptor;
+    @NotNull private final KubernetesCredentialsFactory myCredentialsFactory;
     private final AgentPoolManager myAgentPoolManager;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
@@ -80,9 +75,11 @@ public class KubeProfileEditController extends BaseFormXmlController {
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
                                      @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
                                      @NotNull final ChooserController.Namespaces namespacesChooser,
-                                     @NotNull final ChooserController.Deployments deploymentsChooser) {
+                                     @NotNull final ChooserController.Deployments deploymentsChooser,
+                                     @NotNull final KubernetesCredentialsFactory credentialsFactory) {
         super(server);
         myPluginDescriptor = pluginDescriptor;
+        myCredentialsFactory = credentialsFactory;
         String path = pluginDescriptor.getPluginResourcesPath(EDIT_KUBE_HTML);
         myAgentPoolManager = agentPoolManager;
         myAuthStrategyProvider = authStrategyProvider;
@@ -114,41 +111,12 @@ public class KubeProfileEditController extends BaseFormXmlController {
 
     @Override
     protected void doPost(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Element xmlResponse) {
-        BasePropertiesBean propsBean =  new BasePropertiesBean(null);
-        PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true);
-        final Map<String, String> props = propsBean.getProperties();
+
         if(Boolean.parseBoolean(request.getParameter("testConnection"))){
-            KubeApiConnection connectionSettings = new KubeApiConnection() {
-                @NotNull
-                @Override
-                public String getApiServerUrl() {
-                    return props.get(KubeParametersConstants.API_SERVER_URL);
-                }
+            final KubeApiConnection connectionSettings = new RequestKubeApiConnection(request);
 
-                @NotNull
-                @Override
-                public String getNamespace() {
-                    String explicitNameSpace = props.get(KUBERNETES_NAMESPACE);
-                    return StringUtil.isEmpty(explicitNameSpace) ? DEFAULT_NAMESPACE : explicitNameSpace;
-                }
-
-                @Nullable
-                @Override
-                public String getCustomParameter(@NotNull String parameterName) {
-                    return props.containsKey(parameterName) ? props.get(parameterName) : props.get(SECURE_PROPERTY_PREFIX + parameterName);
-                }
-
-                @Nullable
-                @Override
-                public String getCACertData() {
-                    return props.get(SECURE_PROPERTY_PREFIX + CA_CERT_DATA);
-                }
-            };
-            final String projectId = request.getParameter("projectId");
-            final String authStrategyName = props.get(KubeParametersConstants.AUTH_STRATEGY);
-
-            final KubeAuthStrategy strategy = myAuthStrategyProvider.get(authStrategyName);
-            try (final KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", projectId, connectionSettings, strategy)) {
+            final KubeAuthStrategy strategy = myAuthStrategyProvider.get(connectionSettings.getAuthStrategy());
+            try (final KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", connectionSettings, strategy, myCredentialsFactory)) {
                 KubeApiConnectionCheckResult connectionCheckResult = IOGuard.allowNetworkCall(()->apiConnector.testConnection());
                 if(!connectionCheckResult.isSuccess()){
                     if (strategy.isRefreshable() && connectionCheckResult.isNeedRefresh()){

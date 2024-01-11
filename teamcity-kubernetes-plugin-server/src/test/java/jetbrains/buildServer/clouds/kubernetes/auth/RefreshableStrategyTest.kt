@@ -21,6 +21,7 @@ import io.fabric8.kubernetes.client.ConfigBuilder
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
+import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.AUTH_STRATEGY
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.TimeService
@@ -50,7 +51,7 @@ class RefreshableStrategyTest : BaseTestCase() {
 
             override fun getCACertData() = null
 
-
+            override fun getAuthStrategy() = AUTH_STRATEGY
         }
     }
 
@@ -88,7 +89,12 @@ class RefreshableStrategyTest : BaseTestCase() {
         RefreshableStrategy.invalidateAll()
         super.tearDown()
     }
+
+    companion object {
+        private const val AUTH_STRATEGY = "dummy"
+    }
 }
+
 
 abstract class DummyRefreshableStrategy(myTimeService: TimeService) : RefreshableStrategy<DummyData>(myTimeService) {
 
@@ -99,7 +105,7 @@ abstract class DummyRefreshableStrategy(myTimeService: TimeService) : Refreshabl
         return DummyData(data)
     }
 
-    override fun getId() = "dummy"
+    override fun getId() = AUTH_STRATEGY
 
     override fun getDisplayName() = "Dummy"
 

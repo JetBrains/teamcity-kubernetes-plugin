@@ -28,8 +28,5 @@ public interface KubeCloudClientParameters extends KubeApiConnection {
     @NotNull
     Collection<KubeCloudImageData> getImages();
 
-    @NotNull
-    String getAuthStrategy();
-
     int getInstanceLimit();
 }

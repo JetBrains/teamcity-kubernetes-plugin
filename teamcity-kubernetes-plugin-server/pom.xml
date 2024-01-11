@@ -17,9 +17,6 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <properties>
-    <kubernetes-client.version>5.12.4</kubernetes-client.version>
-  </properties>
   <parent>
     <artifactId>teamcity-kubernetes-plugin</artifactId>
     <groupId>org.jetbrains.teamcity</groupId>
@@ -153,24 +150,6 @@
           <artifactId>jetps</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>io.fabric8</groupId>
-      <artifactId>kubernetes-client</artifactId>
-      <version>${kubernetes-client.version}-teamcity-patched</version>
-      <exclusions>
-        <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>io.fabric8</groupId>
-      <artifactId>kubernetes-client</artifactId>
-      <version>${kubernetes-client.version}</version>
-      <type>pom</type>
     </dependency>
 
     <dependency>

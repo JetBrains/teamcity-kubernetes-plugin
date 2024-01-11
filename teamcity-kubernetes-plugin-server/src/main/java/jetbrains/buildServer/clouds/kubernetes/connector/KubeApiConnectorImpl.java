@@ -22,20 +22,22 @@ import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.client.*;
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 import jetbrains.buildServer.clouds.CloudException;
-import jetbrains.buildServer.clouds.kubernetes.KubeUtils;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
+import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactory;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 28.05.17.
@@ -43,24 +45,22 @@ import java.util.Map;
 public class KubeApiConnectorImpl implements KubeApiConnector {
     private static final Logger LOG = Logger.getInstance(KubeApiConnectorImpl.class.getName());
 
-    private static final int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
-    private static final int DEFAULT_REQUEST_TIMEOUT_MS = 15 * 1000;
-
     @NotNull private final String myProfileId;
-    @NotNull private final String myProjectId;
-    @NotNull private final KubeApiConnection myConnectionSettings;
+  @NotNull private final KubeApiConnection myConnectionSettings;
     @NotNull private final KubeAuthStrategy myAuthStrategy;
+    @NotNull private final KubernetesCredentialsFactory myCredentialsFactory;
 
     private volatile Config myConfig;
     private volatile KubernetesClient myKubernetesClient;
     private volatile boolean myCloseInitiated = false;
 
-    public KubeApiConnectorImpl(@NotNull String profileId, @NotNull String projectId,  @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy) {
+    public KubeApiConnectorImpl(@NotNull String profileId, @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy, @NotNull
+                                KubernetesCredentialsFactory kubernetesCredentialsFactory) {
         myProfileId = profileId;
-        myProjectId = projectId;
         myConnectionSettings = connectionSettings;
         myAuthStrategy = authStrategy;
-        myConfig = createConfig(myConnectionSettings, myAuthStrategy);
+        myCredentialsFactory = kubernetesCredentialsFactory;
+        myConfig = myCredentialsFactory.createConfig(myConnectionSettings, myAuthStrategy);
         myKubernetesClient = createClient(myConfig);
     }
 
@@ -71,27 +71,6 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
         }
         LOG.info("Creating new client with config" + getConfigDescription(config));
         return new DefaultKubernetesClient(config);
-    }
-
-
-    protected Config createConfig(@NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy){
-        ConfigBuilder configBuilder = new ConfigBuilder()
-          .withNamespace(connectionSettings.getNamespace())
-          .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
-          .withHttp2Disable(true)
-          .withConnectionTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
-
-        if (authStrategy.requiresServerUrl()) {
-            configBuilder.withMasterUrl(connectionSettings.getApiServerUrl());
-        }
-        final String caCertData = connectionSettings.getCACertData();
-        if(StringUtil.isEmptyOrSpaces(caCertData)){
-            configBuilder.withTrustCerts(true);
-        } else {
-            configBuilder.withCaCertData(KubeUtils.encodeBase64IfNecessary(caCertData));
-        }
-        configBuilder = authStrategy.apply(configBuilder, connectionSettings);
-        return configBuilder.build();
     }
 
     @NotNull
@@ -201,7 +180,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                     LOG.info("Will now invalidate and recreate client for " + myProfileId);
                     invalidate();
                     KubernetesClient oldClient = myKubernetesClient;
-                    myConfig = createConfig(myConnectionSettings, myAuthStrategy);
+                    myConfig = myCredentialsFactory.createConfig(myConnectionSettings, myAuthStrategy);
                     myKubernetesClient = createClient(myConfig);
                     FileUtil.close(oldClient);
                 }
