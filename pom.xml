@@ -31,6 +31,14 @@
           <url>https://download.jetbrains.com/teamcity-repository</url>
       </pluginRepository>
   </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>teamcity-space</id>
+      <url>file:///home/andrefmrocha/Projects/Teamcity-2/local-repo</url>
+    </repository>
+  </distributionManagement>
+
   <build>
       <pluginManagement>
           <plugins>
@@ -51,6 +59,23 @@
                       <serverDebugStr>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10111</serverDebugStr>
                   </configuration>
               </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-deploy-plugin</artifactId>
+              <version>3.1.1</version>
+              <executions>
+                <execution>
+                  <id>deploy-to-local-k8s-repo</id>
+                  <goals>
+                    <goal>deploy</goal>
+                  </goals>
+                  <phase>deploy</phase>
+                  <configuration>
+                    <altDeploymentRepository>local-repo::file://local-k8s-repo</altDeploymentRepository>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
           </plugins>
       </pluginManagement>
   </build>

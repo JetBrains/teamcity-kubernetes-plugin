@@ -25,7 +25,7 @@
 
 
 <table class="runnerFormTable">
-    <jsp:include page="editConnection.jsp"/>
+    <jsp:include page="connection/connectionParams.jsp"/>
     <tr>
         <th><label for="${cons.profileInstanceLimit}">Maximum instances count:</label></th>
         <td>
