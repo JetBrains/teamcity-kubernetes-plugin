@@ -11,6 +11,7 @@
       <teamcity-version>LOCAL-SNAPSHOT</teamcity-version>
       <kotlin.version>1.5.32</kotlin.version>
       <local.repo.path>local-repo</local.repo.path>
+      <kubernetes-client.version>5.12.4</kubernetes-client.version>
   </properties>
   <repositories>
     <repository>
