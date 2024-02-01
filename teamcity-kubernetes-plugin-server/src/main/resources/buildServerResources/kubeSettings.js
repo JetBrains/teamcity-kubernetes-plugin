@@ -2,7 +2,12 @@
 if (!BS) BS = {};
 if (!BS.Kube) BS.Kube = {
     serializeParameters: function() {
-        var parameters = BS.Clouds.Admin.CreateProfileForm.serializeParameters();
+        let parameters;
+        if (BS.Clouds){
+            parameters = BS.Clouds.Admin.CreateProfileForm.serializeParameters();
+        } else {
+            parameters = BS.OAuthConnectionDialog.serializeParameters();
+        }
         var split = parameters.split('&');
         var result = '';
         for (var i = 0; i < split.length; i++) {
@@ -109,7 +114,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 
         this._resetDataAndDialog();
 
-        BS.Clouds.Admin.CreateProfileForm.checkIfModified();
+        BS.Clouds?.Admin?.CreateProfileForm?.checkIfModified();
     },
 
     _bindHandlers: function () {
@@ -310,7 +315,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         }
 
         this._toggleImagesTable();
-        BS.Clouds.Admin.CreateProfileForm.checkIfModified();
+        BS.Clouds?.Admin?.CreateProfileForm?.checkIfModified();
     },
 
     _renderImageRow: function (props, id) {
