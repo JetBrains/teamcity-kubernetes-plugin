@@ -5,12 +5,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jetbrains.teamcity</groupId>
   <artifactId>teamcity-kubernetes-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
   <properties>
       <teamcity-version>LOCAL-SNAPSHOT</teamcity-version>
       <kotlin.version>1.5.32</kotlin.version>
       <local.repo.path>local-repo</local.repo.path>
+      <revision>1.0-SNAPSHOT</revision>
   </properties>
   <repositories>
     <repository>
@@ -35,7 +36,7 @@
   <distributionManagement>
     <repository>
       <id>teamcity-space</id>
-      <url>file:///home/andrefmrocha/Projects/Teamcity-2/local-repo</url>
+      <url>https://packages.jetbrains.team/maven/p/tc/maven</url>
     </repository>
   </distributionManagement>
 
@@ -70,9 +71,6 @@
                     <goal>deploy</goal>
                   </goals>
                   <phase>deploy</phase>
-                  <configuration>
-                    <altDeploymentRepository>local-repo::file://local-k8s-repo</altDeploymentRepository>
-                  </configuration>
                 </execution>
               </executions>
             </plugin>

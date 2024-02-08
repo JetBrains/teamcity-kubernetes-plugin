@@ -9,7 +9,7 @@
   <parent>
     <artifactId>teamcity-kubernetes-plugin</artifactId>
     <groupId>org.jetbrains.teamcity</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
   <artifactId>teamcity-kubernetes-plugin-common</artifactId>
   <packaging>jar</packaging>
