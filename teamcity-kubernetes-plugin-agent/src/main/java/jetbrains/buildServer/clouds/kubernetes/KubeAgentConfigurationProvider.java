@@ -2,21 +2,15 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import com.intellij.openapi.diagnostic.Logger;
-import java.io.File;
-import java.io.IOException;
-import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
-import jetbrains.buildServer.agent.AgentLifeCycleListener;
-import jetbrains.buildServer.agent.BuildAgent;
-import jetbrains.buildServer.agent.BuildAgentConfigurationEx;
-import jetbrains.buildServer.log.Loggers;
+import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.agent.impl.parameters.resolve.BuildRunnerEnvironmentPreprocessor;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
-import org.jetbrains.annotations.Nullable;
 
-import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX;
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
@@ -55,7 +49,14 @@ public class KubeAgentConfigurationProvider {
                     LOG.info("Setting instance name to " + instanceName);
                     agentConfigurationEx.setName(instanceName);
                 } else {
-                    LOG.warn("Couldn't find 'env." + KubeContainerEnvironment.INSTANCE_NAME + "' property" );
+                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.INSTANCE_NAME);
+                }
+
+                final String cloudInstanceHash = env.get(KubeContainerEnvironment.STARTING_INSTANCE_ID);
+                if (StringUtil.isNotEmpty(cloudInstanceHash)) {
+                    agentConfigurationEx.addConfigurationParameter(STARTING_INSTANCE_ID_PARAM, cloudInstanceHash);
+                } else {
+                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.STARTING_INSTANCE_ID + ", the server may not be able to authorize this agent" );
                 }
 
                 for (Map.Entry<String, String> entry : env.entrySet()){
@@ -67,7 +68,15 @@ public class KubeAgentConfigurationProvider {
                     }
                 }
             }
+
+            @Override
+            public void buildStarted(@NotNull AgentRunningBuild runningBuild) {
+                final String instanceId = runningBuild.getSharedBuildParameters().getEnvironmentVariables().get(KubeContainerEnvironment.STARTING_INSTANCE_ID);
+                if (instanceId != null) {
+                    // mark instance id as password to avoid showing it in plain text on the build parameters tab and in the build log
+                    runningBuild.getPasswordReplacer().addPassword(instanceId);
+                }
+            }
         });
     }
-
 }

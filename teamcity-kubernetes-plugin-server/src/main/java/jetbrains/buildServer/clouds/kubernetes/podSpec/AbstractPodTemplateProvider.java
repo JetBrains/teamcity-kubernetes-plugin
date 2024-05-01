@@ -9,6 +9,7 @@ import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.*;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.util.CollectionsUtil;
+import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,6 +79,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
     for (Pair<String, String> env : Arrays.asList(
       new Pair<>(SERVER_UUID, serverUUID),
+      new Pair<>(STARTING_INSTANCE_ID, StringUtil.emptyIfNull(cloudInstanceUserData.getCustomAgentConfigurationParameters().get(STARTING_INSTANCE_ID_PARAM))),
       new Pair<>(PROFILE_ID, cloudInstanceUserData.getProfileId()),
       new Pair<>(IMAGE_NAME, imageId),
       new Pair<>(INSTANCE_NAME, instanceName))
