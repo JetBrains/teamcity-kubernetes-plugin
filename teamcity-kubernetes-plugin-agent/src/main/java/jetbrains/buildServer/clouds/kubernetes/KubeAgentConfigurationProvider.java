@@ -55,7 +55,14 @@ public class KubeAgentConfigurationProvider {
                     LOG.info("Setting instance name to " + instanceName);
                     agentConfigurationEx.setName(instanceName);
                 } else {
-                    LOG.warn("Couldn't find 'env." + KubeContainerEnvironment.INSTANCE_NAME + "' property" );
+                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.INSTANCE_NAME);
+                }
+
+                final String cloudInstanceHash = env.get(KubeContainerEnvironment.CLOUD_INSTANCE_HASH);
+                if (StringUtil.isNotEmpty(cloudInstanceHash)) {
+                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.CLOUD_INSTANCE_HASH_PROP, cloudInstanceHash);
+                } else {
+                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.CLOUD_INSTANCE_HASH + ", the server may not be able to authorize this agent" );
                 }
 
                 for (Map.Entry<String, String> entry : env.entrySet()){
