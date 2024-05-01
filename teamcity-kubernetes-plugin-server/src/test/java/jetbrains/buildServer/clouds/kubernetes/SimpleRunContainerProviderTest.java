@@ -105,7 +105,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
       new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, "server address", null),
       new EnvVar(KubeContainerEnvironment.IMAGE_NAME, "image1", null),
       new EnvVar(KubeContainerEnvironment.PROFILE_ID, "profile id", null),
-      new EnvVar(KubeContainerEnvironment.CLOUD_INSTANCE_HASH, "", null),
+      new EnvVar(KubeContainerEnvironment.CLOUD_INSTANCE_HASH, "token", null),
       new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, "prefix-1", null)
     );
   }
@@ -185,7 +185,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   }
 
   private CloudInstanceUserData createInstanceTag() {
-    return new CloudInstanceUserData("agent name", "auth token", "server address", null, "profile id", "profile description", Collections.emptyMap());
+    return new CloudInstanceUserData("agent name", "auth token", "server address", null, "profile id", "profile description", Collections.singletonMap(KubeContainerEnvironment.CLOUD_INSTANCE_HASH_PROP, "token"));
   }
 
 }
