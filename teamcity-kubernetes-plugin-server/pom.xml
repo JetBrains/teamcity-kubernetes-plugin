@@ -21,7 +21,7 @@
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>server-api</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>server-web-api</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
@@ -55,48 +55,48 @@
     <dependency>
       <groupId>org.jetbrains.teamcity.internal</groupId>
       <artifactId>server</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>tests-support</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.teamcity.internal</groupId>
       <artifactId>integration-test</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>cloud-interface</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>oauth</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>cloud-shared</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>cloud-server-api</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -156,7 +156,7 @@
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>cloud-server</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -169,7 +169,7 @@
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>common-impl</artifactId>
-      <version>${teamcity-version}</version>
+      <version>${teamcity.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>

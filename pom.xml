@@ -8,7 +8,7 @@
   <version>${revision}</version>
   <packaging>pom</packaging>
   <properties>
-      <teamcity-version>LOCAL-SNAPSHOT</teamcity-version>
+      <teamcity.version>LOCAL-SNAPSHOT</teamcity.version>
       <kotlin.version>1.5.32</kotlin.version>
       <local.repo.path>local-repo</local.repo.path>
       <revision>1.0-SNAPSHOT</revision>
