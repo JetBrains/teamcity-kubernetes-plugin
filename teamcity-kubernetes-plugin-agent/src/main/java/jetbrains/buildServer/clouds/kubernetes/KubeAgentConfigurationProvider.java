@@ -2,10 +2,8 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import com.intellij.openapi.diagnostic.Logger;
-import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
-import jetbrains.buildServer.agent.AgentLifeCycleListener;
-import jetbrains.buildServer.agent.BuildAgent;
-import jetbrains.buildServer.agent.BuildAgentConfigurationEx;
+import jetbrains.buildServer.agent.*;
+import jetbrains.buildServer.agent.impl.parameters.resolve.BuildRunnerEnvironmentPreprocessor;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +15,7 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.T
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
  */
-public class KubeAgentConfigurationProvider {
+public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPreprocessor {
     private static final Logger LOG = Logger.getInstance(KubeAgentConfigurationProvider.class.getName());
 
     public KubeAgentConfigurationProvider(@NotNull EventDispatcher<AgentLifeCycleListener> agentEvents,
@@ -73,4 +71,8 @@ public class KubeAgentConfigurationProvider {
         });
     }
 
+    @Override
+    public void preprocessBuildRunnerEnvironment(@NotNull BuildRunnerSettings buildRunnerSettings, @NotNull Map<String, String> map) {
+        map.remove(KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
+    }
 }
