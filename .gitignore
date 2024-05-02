@@ -5,3 +5,5 @@ teamcity-kubernetes-plugin-agent/target/*
 .idea
 TeamCityDist
 open-api
+target
+.flattened-pom.xml
