@@ -9,15 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.TempFiles;
-import jetbrains.buildServer.clouds.CloudClientParameters;
 import jetbrains.buildServer.clouds.CloudImageParameters;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
 import jetbrains.buildServer.clouds.kubernetes.connector.FakeKubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
-import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvidersImpl;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.SimpleRunContainerProvider;
-import jetbrains.buildServer.clouds.server.impl.profile.CloudClientParametersImpl;
 import jetbrains.buildServer.clouds.server.impl.profile.CloudImageDataImpl;
 import jetbrains.buildServer.clouds.server.impl.profile.CloudImageParametersImpl;
 import jetbrains.buildServer.serverSide.BuildServerListener;
@@ -105,7 +102,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
       new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, "server address", null),
       new EnvVar(KubeContainerEnvironment.IMAGE_NAME, "image1", null),
       new EnvVar(KubeContainerEnvironment.PROFILE_ID, "profile id", null),
-      new EnvVar(KubeContainerEnvironment.CLOUD_INSTANCE_HASH, "token", null),
+      new EnvVar(KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN, "token", null),
       new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, "prefix-1", null)
     );
   }
@@ -185,7 +182,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   }
 
   private CloudInstanceUserData createInstanceTag() {
-    return new CloudInstanceUserData("agent name", "auth token", "server address", null, "profile id", "profile description", Collections.singletonMap(KubeContainerEnvironment.CLOUD_INSTANCE_HASH_PROP, "token"));
+    return new CloudInstanceUserData("agent name", "auth token", "server address", null, "profile id", "profile description", Collections.singletonMap(KubeContainerEnvironment.TEMPORARY_AUTHORIZATION_TOKEN_PARAM, "token"));
   }
 
 }

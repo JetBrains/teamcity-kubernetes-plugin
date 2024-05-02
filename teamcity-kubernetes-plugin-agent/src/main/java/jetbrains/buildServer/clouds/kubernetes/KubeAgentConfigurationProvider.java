@@ -2,19 +2,15 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import com.intellij.openapi.diagnostic.Logger;
-import java.io.File;
-import java.io.IOException;
 import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
 import jetbrains.buildServer.agent.AgentLifeCycleListener;
 import jetbrains.buildServer.agent.BuildAgent;
 import jetbrains.buildServer.agent.BuildAgentConfigurationEx;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
-import org.jetbrains.annotations.Nullable;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX;
 
@@ -58,11 +54,11 @@ public class KubeAgentConfigurationProvider {
                     LOG.warn("Could not find environment variable " + KubeContainerEnvironment.INSTANCE_NAME);
                 }
 
-                final String cloudInstanceHash = env.get(KubeContainerEnvironment.CLOUD_INSTANCE_HASH);
+                final String cloudInstanceHash = env.get(KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
                 if (StringUtil.isNotEmpty(cloudInstanceHash)) {
-                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.CLOUD_INSTANCE_HASH_PROP, cloudInstanceHash);
+                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.TEMPORARY_AUTHORIZATION_TOKEN_PARAM, cloudInstanceHash);
                 } else {
-                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.CLOUD_INSTANCE_HASH + ", the server may not be able to authorize this agent" );
+                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN + ", the server may not be able to authorize this agent" );
                 }
 
                 for (Map.Entry<String, String> entry : env.entrySet()){
