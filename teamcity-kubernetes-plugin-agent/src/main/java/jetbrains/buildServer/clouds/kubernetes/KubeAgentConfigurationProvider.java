@@ -73,6 +73,6 @@ public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPre
 
     @Override
     public void preprocessBuildRunnerEnvironment(@NotNull BuildRunnerSettings buildRunnerSettings, @NotNull Map<String, String> map) {
-        map.remove(KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
+        map.remove(Constants.ENV_PREFIX + KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
     }
 }
