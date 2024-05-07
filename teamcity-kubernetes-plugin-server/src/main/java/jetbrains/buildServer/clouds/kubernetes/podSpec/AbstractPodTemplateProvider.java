@@ -79,7 +79,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
     for (Pair<String, String> env : Arrays.asList(
       new Pair<>(SERVER_UUID, serverUUID),
-      new Pair<>(TEMPORARY_AUTH_TOKEN, StringUtil.emptyIfNull(cloudInstanceUserData.getCustomAgentConfigurationParameters().get(TEMPORARY_AUTHORIZATION_TOKEN_PARAM))),
+      new Pair<>(STARTING_INSTANCE_ID, StringUtil.emptyIfNull(cloudInstanceUserData.getCustomAgentConfigurationParameters().get(STARTING_INSTANCE_ID_PARAM))),
       new Pair<>(PROFILE_ID, cloudInstanceUserData.getProfileId()),
       new Pair<>(IMAGE_NAME, imageId),
       new Pair<>(INSTANCE_NAME, instanceName))
