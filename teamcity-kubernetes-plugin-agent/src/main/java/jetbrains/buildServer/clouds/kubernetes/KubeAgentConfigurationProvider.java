@@ -15,7 +15,7 @@ import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.T
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
  */
-public class KubeAgentConfigurationProvider {
+public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPreprocessor {
     private static final Logger LOG = Logger.getInstance(KubeAgentConfigurationProvider.class.getName());
 
     public KubeAgentConfigurationProvider(@NotNull EventDispatcher<AgentLifeCycleListener> agentEvents,
@@ -52,6 +52,13 @@ public class KubeAgentConfigurationProvider {
                     LOG.warn("Could not find environment variable " + KubeContainerEnvironment.INSTANCE_NAME);
                 }
 
+                final String cloudInstanceHash = env.get(KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
+                if (StringUtil.isNotEmpty(cloudInstanceHash)) {
+                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.TEMPORARY_AUTHORIZATION_TOKEN_PARAM, cloudInstanceHash);
+                } else {
+                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN + ", the server may not be able to authorize this agent" );
+                }
+
                 for (Map.Entry<String, String> entry : env.entrySet()){
                     final String key = entry.getKey();
                     final String value = entry.getValue();
@@ -62,5 +69,10 @@ public class KubeAgentConfigurationProvider {
                 }
             }
         });
+    }
+
+    @Override
+    public void preprocessBuildRunnerEnvironment(@NotNull BuildRunnerSettings buildRunnerSettings, @NotNull Map<String, String> map) {
+        map.remove(Constants.ENV_PREFIX + KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
     }
 }
