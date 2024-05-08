@@ -52,11 +52,11 @@ public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPre
                     LOG.warn("Could not find environment variable " + KubeContainerEnvironment.INSTANCE_NAME);
                 }
 
-                final String cloudInstanceHash = env.get(KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
+                final String cloudInstanceHash = env.get(KubeContainerEnvironment.STARTING_INSTANCE_ID);
                 if (StringUtil.isNotEmpty(cloudInstanceHash)) {
-                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.TEMPORARY_AUTHORIZATION_TOKEN_PARAM, cloudInstanceHash);
+                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.STARTING_INSTANCE_ID_PARAM, cloudInstanceHash);
                 } else {
-                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN + ", the server may not be able to authorize this agent" );
+                    LOG.warn("Could not find environment variable " + KubeContainerEnvironment.STARTING_INSTANCE_ID + ", the server may not be able to authorize this agent" );
                 }
 
                 for (Map.Entry<String, String> entry : env.entrySet()){
@@ -73,6 +73,6 @@ public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPre
 
     @Override
     public void preprocessBuildRunnerEnvironment(@NotNull BuildRunnerSettings buildRunnerSettings, @NotNull Map<String, String> map) {
-        map.remove(Constants.ENV_PREFIX + KubeContainerEnvironment.TEMPORARY_AUTH_TOKEN);
+        map.remove(Constants.ENV_PREFIX + KubeContainerEnvironment.STARTING_INSTANCE_ID);
     }
 }
