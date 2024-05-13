@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX;
+import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.*;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 07.06.17.
  */
-public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPreprocessor {
+public class KubeAgentConfigurationProvider {
     private static final Logger LOG = Logger.getInstance(KubeAgentConfigurationProvider.class.getName());
 
     public KubeAgentConfigurationProvider(@NotNull EventDispatcher<AgentLifeCycleListener> agentEvents,
@@ -54,7 +54,7 @@ public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPre
 
                 final String cloudInstanceHash = env.get(KubeContainerEnvironment.STARTING_INSTANCE_ID);
                 if (StringUtil.isNotEmpty(cloudInstanceHash)) {
-                    agentConfigurationEx.addConfigurationParameter(KubeContainerEnvironment.STARTING_INSTANCE_ID_PARAM, cloudInstanceHash);
+                    agentConfigurationEx.addConfigurationParameter(STARTING_INSTANCE_ID_PARAM, cloudInstanceHash);
                 } else {
                     LOG.warn("Could not find environment variable " + KubeContainerEnvironment.STARTING_INSTANCE_ID + ", the server may not be able to authorize this agent" );
                 }
@@ -68,11 +68,15 @@ public class KubeAgentConfigurationProvider implements BuildRunnerEnvironmentPre
                     }
                 }
             }
-        });
-    }
 
-    @Override
-    public void preprocessBuildRunnerEnvironment(@NotNull BuildRunnerSettings buildRunnerSettings, @NotNull Map<String, String> map) {
-        map.remove(Constants.ENV_PREFIX + KubeContainerEnvironment.STARTING_INSTANCE_ID);
+            @Override
+            public void buildStarted(@NotNull AgentRunningBuild runningBuild) {
+                final String instanceId = runningBuild.getSharedBuildParameters().getEnvironmentVariables().get(STARTING_INSTANCE_ID_PARAM);
+                if (instanceId != null) {
+                    // mark instance id as password to avoid showing it in plain text on the build parameters tab and in the build log
+                    runningBuild.getPasswordReplacer().addPassword(instanceId);
+                }
+            }
+        });
     }
 }
