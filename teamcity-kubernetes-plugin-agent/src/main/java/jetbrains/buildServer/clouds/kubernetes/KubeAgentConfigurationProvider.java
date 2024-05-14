@@ -71,7 +71,7 @@ public class KubeAgentConfigurationProvider {
 
             @Override
             public void buildStarted(@NotNull AgentRunningBuild runningBuild) {
-                final String instanceId = runningBuild.getSharedBuildParameters().getEnvironmentVariables().get(STARTING_INSTANCE_ID_PARAM);
+                final String instanceId = runningBuild.getSharedBuildParameters().getEnvironmentVariables().get(KubeContainerEnvironment.STARTING_INSTANCE_ID);
                 if (instanceId != null) {
                     // mark instance id as password to avoid showing it in plain text on the build parameters tab and in the build log
                     runningBuild.getPasswordReplacer().addPassword(instanceId);
