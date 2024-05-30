@@ -23,12 +23,14 @@ public class DeploymentContentProviderImpl implements DeploymentContentProvider 
     @Nullable
     @Override
     public Deployment findDeployment(@NotNull String name, @NotNull KubeCloudClientParameters kubeClientParams) {
-      KubeApiConnectorImpl kubeApiConnector = new KubeApiConnectorImpl("findDeployment",
-                                                                       kubeClientParams,
-                                                                       myAuthStrategies.get(kubeClientParams.getAuthStrategy()),
-                                                                       myCredentialsFactory
-                                                                       );
+      try(        KubeApiConnectorImpl kubeApiConnector = new KubeApiConnectorImpl("findDeployment",
+                                                                                   kubeClientParams,
+                                                                                   myAuthStrategies.get(kubeClientParams.getAuthStrategy()),
+                                                                                   myCredentialsFactory
+      )
+      ) {
         //TODO:cache api call result
         return kubeApiConnector.getDeployment(name);
+      }
     }
 }
