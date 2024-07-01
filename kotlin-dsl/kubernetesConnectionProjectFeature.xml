@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dsl-extension kind="projectFeature" type="OAuthProvider" generateDslJar="true" applicable="params['providerType'] == 'KubernetesConnection'">
+  <class name="KubernetesConnection">
+    <description>
+      Stores information and configuration for the access to a Kubernetes cluster.
+    </description>
+  </class>
+
+  <init>
+    <param name="providerType" value="KubernetesConnection" />
+  </init>
+
+  <function name="kubernetesConnection">
+    <description>
+      @see KubernetesConnection
+    </description>
+  </function>
+
+  <params>
+    <param name="displayName" dslName="name">
+      <description>
+        Kubernetes connection display name
+      </description>
+    </param>
+    <param name="apiServerUrl" dslName="apiServerUrl" type="string" mandatory="true">
+      <description>
+        Target Kubernetes API server URL
+      </description>
+    </param>
+    <param name="secure:caCertData" dslName="caCertificate" type="string">
+      <description>
+        The CA Certificate to connect to the cluster. Leave empty to skip TLS verification (insecure option)
+      </description>
+    </param>
+    <param name="namespace" dslName="namespace" type="string">
+      <description>
+        The Kubernetes namespace to use. Leave empty to use the default namespace.
+      </description>
+    </param>
+    <param name="authStrategy" dslName="authStrategy" type="compound" mandatory="true">
+      <description>
+        The way how to obtain credentials
+      </description>
+      <option name="eks" value="eks">
+        <description>
+          Connecting to an AWS EKS (Elastic Kubernetes Service)
+        </description>
+        <param name="eksUseInstanceProfile" dslName="eksUseInstanceProfile" type="boolean">
+          <description>
+            Uses the AWS credentials provided in the TeamCity Instance. Should be available under `~/.aws`
+          </description>
+        </param>
+        <param name="eksAccessId" dslName="accessId" type="string">
+          <description>
+            AWS Access Key ID
+          </description>
+        </param>
+        <param name="secure:eksSecretKey" dslName="secretKey" type="string">
+          <description>
+            AWS Secret Access Key
+          </description>
+        </param>
+        <param name="eksAssumeIAMRole" dslName="assumeIamRole" type="boolean">
+          <description>
+            If assuming an IAM role is required to access the cluster. Must fill [iamRoleArn]
+          </description>
+        </param>
+        <param name="eksIAMRoleArn" dslName="iamRoleArn" type="string">
+          <description>
+            The IAM Role ARN needed to access the cluster
+          </description>
+        </param>
+        <param name="eksClusterName" dslName="clusterName" type="string" mandatory="true">
+          <description>
+            The name of the EKS cluster
+          </description>
+        </param>
+      </option>
+      <option name="usernameAndPassword" value="user-passwd">
+        <description>
+          Connecting to a Kubernetes cluster using a username and password
+        </description>
+        <param name="username" dslName="username" type="string" mandatory="true">
+          <description>
+            Username
+          </description>
+        </param>
+        <param name="secure:password" dslName="password" type="string" mandatory="true">
+          <description>
+            Password
+          </description>
+        </param>
+      </option>
+      <option name="openId" value="oidc">
+        <description>
+          Connecting to a Kubernetes cluster using the OpenID Connect (OIDC) protocol
+        </description>
+        <param name="idpIssuerUrl" dslName="idpIssuerUrl" type="string" mandatory="true">
+          <description>
+            The IdP Issuer URL
+          </description>
+        </param>
+        <param name="oidcClientId" dslName="clientId" type="string" mandatory="true">
+          <description>
+            The Client ID
+          </description>
+        </param>
+        <param name="secure:oidcClientSecret" dslName="clientSecret" type="string" mandatory="true">
+          <description>
+            The Client Secret
+          </description>
+        </param>
+        <param name="secure:oidcRefreshToken" dslName="refreshToken" type="string" mandatory="true">
+          <description>
+            The Refresh Token
+          </description>
+        </param>
+      </option>
+      <option name="clientCertificateAndKey" value="client-cert">
+        <description>
+          Connecting to a Kubernetes cluster using a client certificate and key
+        </description>
+        <param name="secure:clientKeyData" dslName="clientKey" type="string" mandatory="true">
+          <description>
+            The Client Key
+          </description>
+        </param>
+        <param name="secure:clientCertData" dslName="clientCertificate" type="string" mandatory="true">
+          <description>
+            The Client Certificate
+          </description>
+        </param>
+      </option>
+      <option name="token" value="token">
+        <description>
+          Connecting to a Kubernetes cluster using a Bearer Token
+        </description>
+        <param name="secure:authToken" dslName="token" type="string" mandatory="true">
+          <description>
+            The Bearer Token
+          </description>
+        </param>
+      </option>
+      <option name="unauthorized" value="unauthorized">
+        <description>
+          Use unauthorized access to the Kubernetes API server
+        </description>
+      </option>
+      <option name="serviceAccount" value="service-account">
+        <description>
+          Uses the Kubernetes credentials provided in the TeamCity Instance. Should be available under `/var/run/secrets/kubernetes.io/serviceaccount/token`
+        </description>
+      </option>
+    </param>
+  </params>
+
+  <examples>
+    <example>
+      <description>
+        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster using a Bearer Token
+      </description>
+      <code>
+          kubernetesConnection {
+              id = "PROJECT_EXT_3"
+              name = "Connection"
+              apiServerUrl = "http://cluster.com"
+              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
+              namespace = "namespace"
+              authStrategy = token {
+                token = "credentialsJSON:fa92592e-ec16-4543-add0-1cdd4de87e5e"
+              }
+          }
+      </code>
+    </example>
+    <example>
+      <description>
+        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster using a username and password
+      </description>
+      <code>
+          kubernetesConnection {
+              id = "PROJECT_EXT_3"
+              name = "Connection"
+              apiServerUrl = "http://cluster.com"
+              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
+              namespace = "namespace"
+              authStrategy = usernameAndPassword {
+                username = "username"
+                password = "credentialsJSON:aaef5e7e-5a51-427c-b0ea-3af364cacedd"
+              }
+          }
+      </code>
+    </example>
+    <example>
+      <description>
+        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster using the OpenID Connect (OIDC) protocol
+      </description>
+      <code>
+          kubernetesConnection {
+              id = "PROJECT_EXT_3"
+              name = "Connection"
+              apiServerUrl = "http://cluster.com"
+              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
+              namespace = "namespace"
+              authStrategy = openId {
+                idpIssuerUrl = "idpurl"
+                clientId = "clientId"
+                clientSecret = "credentialsJSON:612f3414-2b25-41ec-9520-12c9669d1f85"
+                refreshToken = "credentialsJSON:0bb3f85a-7ff4-474e-9c14-8da47099595a"
+              }
+          }
+      </code>
+    </example>
+    <example>
+      <description>
+        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster using a Client Certificate and Key
+      </description>
+      <code>
+          kubernetesConnection {
+              id = "PROJECT_EXT_3"
+              name = "Connection"
+              apiServerUrl = "http://cluster.com"
+              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
+              namespace = "namespace"
+              authStrategy = clientCertificateAndKey {
+                clientKey = "credentialsJSON:43b46ece-15a7-4621-a271-7d2b33e9e356"
+                clientCertificate = "credentialsJSON:87a6537c-cb8f-4684-b44d-e0ea183e9fa1"
+              }
+          }
+      </code>
+    </example>
+    <example>
+      <description>
+        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster in AWS EKS using an access key and secret key
+      </description>
+      <code>
+          kubernetesConnection {
+              id = "PROJECT_EXT_3"
+              name = "Connection"
+              apiServerUrl = "http://cluster.com"
+              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
+              namespace = "namespace"
+              authStrategy = eks {
+                accessId = "accessId"
+                secretKey = "credentialsJSON:3507800f-ae64-49f1-bbb5-0a4deec5c7b3"
+                clusterName = "cluster-name"
+              }
+          }
+      </code>
+    </example>
+    <example>
+      <description>
+        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster using the service account present in the TeamCity instance.
+      </description>
+      <code>
+          kubernetesConnection {
+              id = "PROJECT_EXT_3"
+              name = "Connection"
+              apiServerUrl = "http://cluster.com"
+              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
+              namespace = "namespace"
+              authStrategy = serviceAccount()
+          }
+      </code>
+    </example>
+    <example>
+      <description>
+        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster.
+      </description>
+      <code>
+          kubernetesConnection {
+              id = "PROJECT_EXT_3"
+              name = "Connection"
+              apiServerUrl = "http://cluster.com"
+              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
+              namespace = "namespace"
+              authStrategy = unauthorized()
+          }
+      </code>
+    </example>
+  </examples>
+</dsl-extension>
