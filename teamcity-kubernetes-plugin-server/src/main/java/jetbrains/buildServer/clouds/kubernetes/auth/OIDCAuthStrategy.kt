@@ -13,6 +13,7 @@ import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.FileUtil
 import jetbrains.buildServer.util.StringUtil
 import jetbrains.buildServer.util.TimeService
+import jetbrains.buildServer.vcshostings.http.HttpHelper
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.impl.client.HttpClientBuilder
@@ -21,12 +22,14 @@ import java.io.InputStream
 import java.net.URI
 import java.util.*
 
+private fun String.ensureTrailingSlash(): String = if (this.endsWith("/")) this else "$this/"
+
 class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCData>(myTimeService) {
 
     override fun retrieveNewToken(dataHolder: OIDCData): Pair<String, Long>? {
         var stream: InputStream? = null
         try {
-            val providerConfigurationURL = URI(dataHolder.myIssuerUrl).resolve("/.well-known/openid-configuration").toURL()
+            val providerConfigurationURL = URI(dataHolder.myIssuerUrl).resolve(".well-known/openid-configuration").toURL()
             stream = providerConfigurationURL.openStream()
 
             val text = StreamUtil.readText(stream!!)
@@ -75,7 +78,7 @@ class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCDat
         val issuerUrl = connection.getCustomParameter(OIDC_ISSUER_URL) ?: throw KubeCloudException("Issuer URL is empty for connection to " + connection.apiServerUrl)
         val refreshToken = connection.getCustomParameter(SECURE_PREFIX + OIDC_REFRESH_TOKEN) ?: throw KubeCloudException("Refresh token is empty for connection to " + connection.apiServerUrl)
 
-        return OIDCData(clientId, clientSecret, issuerUrl, refreshToken)
+        return OIDCData(clientId, clientSecret, issuerUrl.ensureTrailingSlash(), refreshToken)
     }
 
     override fun getId() = "oidc"
