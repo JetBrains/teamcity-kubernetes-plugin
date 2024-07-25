@@ -194,7 +194,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-sts</artifactId>
-      <version>1.12.122</version>
+      <version>1.12.763</version>
       <exclusions>
         <exclusion>
           <groupId>com.fasterxml.jackson.core</groupId>
@@ -214,7 +214,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-eks</artifactId>
-      <version>1.12.122</version>
+      <version>1.12.763</version>
     </dependency>
   </dependencies>
   <build>
