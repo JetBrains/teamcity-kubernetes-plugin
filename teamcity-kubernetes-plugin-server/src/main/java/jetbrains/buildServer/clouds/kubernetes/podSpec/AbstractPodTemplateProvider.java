@@ -65,6 +65,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
         }
       }
     });
+    retval.addAll(BuildAgentPodTemplateProvider.generateCustomAgentEnvVars(cloudInstanceUserData));
 
     // check for run in Kubernetes:
     if ("true".equals(customParams.get(RUN_IN_KUBE_FEATURE))){
