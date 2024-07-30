@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.api.model.Pod
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage
+import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector
 import jetbrains.buildServer.util.TestFor
 import org.assertj.core.api.BDDAssertions.then
@@ -60,5 +61,16 @@ class AbstractPodTemplateProviderTest : BaseTestCase() {
         then(patchedRefVar!!.valueFrom).isNotNull()
         then(patchedRefVar.valueFrom.fieldRef.fieldPath).isEqualTo("metadata.namespace")
 
+    }
+
+    @TestFor(issues = ["TW-80794"])
+    fun env_vars_are_added_from_custom_properties(){
+        val userData = CloudInstanceUserData("", "", "http://127.0.0.1:9999", null, "kube-321",
+            "Test Profile", mapOf("key1.test" to "value1", "${KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX}key2" to "value2")
+        )
+
+        val patchedEnvVars = provider.getPatchedEnvVars("inst", "serverUUID", "imgId", userData, emptyList())
+
+        then(patchedEnvVars).contains(EnvVar("${KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX}key1_test", "value1", null))
     }
 }
