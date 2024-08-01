@@ -29,7 +29,7 @@ class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCDat
     override fun retrieveNewToken(dataHolder: OIDCData): Pair<String, Long>? {
         var stream: InputStream? = null
         try {
-            val providerConfigurationURL = URI(dataHolder.myIssuerUrl).resolve(".well-known/openid-configuration").toURL()
+            val providerConfigurationURL = URI(dataHolder.myIssuerUrl).resolve("v2.0/.well-known/openid-configuration").toURL()
             stream = providerConfigurationURL.openStream()
 
             val text = StreamUtil.readText(stream!!)
