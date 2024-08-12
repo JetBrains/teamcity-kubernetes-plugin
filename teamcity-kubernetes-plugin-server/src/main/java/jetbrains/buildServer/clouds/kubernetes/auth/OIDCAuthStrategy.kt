@@ -2,7 +2,6 @@
 package jetbrains.buildServer.clouds.kubernetes.auth
 
 import com.google.gson.JsonParser
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.util.io.StreamUtil
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException
@@ -11,9 +10,7 @@ import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy.*
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.FileUtil
-import jetbrains.buildServer.util.StringUtil
 import jetbrains.buildServer.util.TimeService
-import jetbrains.buildServer.vcshostings.http.HttpHelper
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.impl.client.HttpClientBuilder
@@ -27,9 +24,19 @@ private fun String.ensureTrailingSlash(): String = if (this.endsWith("/")) this 
 class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCData>(myTimeService) {
 
     override fun retrieveNewToken(dataHolder: OIDCData): Pair<String, Long>? {
+        val authEndpoint = ".well-known/openid-configuration"
+        val tokenV2 = doRetrieveToken(dataHolder, "v2.0/$authEndpoint")
+        return if (tokenV2 != null){
+            tokenV2
+        } else {
+            doRetrieveToken(dataHolder, authEndpoint)
+        }
+    }
+
+    private fun doRetrieveToken(dataHolder: OIDCData, authorizationEndpoint: String): Pair<String, Long>? {
         var stream: InputStream? = null
         try {
-            val providerConfigurationURL = URI(dataHolder.myIssuerUrl).resolve(".well-known/openid-configuration").toURL()
+            val providerConfigurationURL = URI(dataHolder.myIssuerUrl).resolve(authorizationEndpoint).toURL()
             stream = providerConfigurationURL.openStream()
 
             val text = StreamUtil.readText(stream!!)
@@ -41,8 +48,12 @@ class OIDCAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<OIDCDat
             val build = clientBuilder.build()
 
             val request = HttpPost(tokenEndpoint)
-            request.entity = UrlEncodedFormEntity(Arrays.asList(BasicNameValuePair("refresh_token", dataHolder.myRefreshToken),
-                    BasicNameValuePair("grant_type", "refresh_token")))
+            request.entity = UrlEncodedFormEntity(
+                Arrays.asList(
+                    BasicNameValuePair("refresh_token", dataHolder.myRefreshToken),
+                    BasicNameValuePair("grant_type", "refresh_token")
+                )
+            )
 
             request.setHeader("Authorization", "Basic " + String(Base64.getEncoder().encode((dataHolder.myClientId + ":" + dataHolder.myClientSecret).toByteArray())))
             val response = build.execute(request)
