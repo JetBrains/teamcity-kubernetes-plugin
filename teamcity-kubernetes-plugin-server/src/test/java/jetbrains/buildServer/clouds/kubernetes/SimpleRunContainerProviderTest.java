@@ -96,14 +96,16 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     then(container.getCommand()).isEmpty();
     then(container.getImagePullPolicy()).isEqualTo(ImagePullPolicy.IfNotPresent.getName());
     then(container.getWorkingDir()).isNull();
-    then(container.getEnv()).hasSize(7).containsOnly(
+    then(container.getEnv()).hasSize(8).containsOnly(
       new EnvVar(KubeContainerEnvironment.SERVER_URL, "server address", null),
       new EnvVar(KubeContainerEnvironment.SERVER_UUID, "SERVER-UUID", null),
       new EnvVar(KubeContainerEnvironment.OFFICIAL_IMAGE_SERVER_URL, "server address", null),
       new EnvVar(KubeContainerEnvironment.IMAGE_NAME, "image1", null),
       new EnvVar(KubeContainerEnvironment.PROFILE_ID, "profile id", null),
       new EnvVar(KubeContainerEnvironment.STARTING_INSTANCE_ID, "token", null),
-      new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, "prefix-1", null)
+      new EnvVar(KubeContainerEnvironment.INSTANCE_NAME, "prefix-1", null),
+      new EnvVar(KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX +
+                 KubeContainerEnvironment.paramToEnvVar(KubeContainerEnvironment.paramToEnvVar(KubeContainerEnvironment.STARTING_INSTANCE_ID_PARAM)), "token", null)
     );
   }
 

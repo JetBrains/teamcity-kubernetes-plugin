@@ -2,13 +2,11 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import com.intellij.openapi.diagnostic.Logger;
+import java.util.Map;
 import jetbrains.buildServer.agent.*;
-import jetbrains.buildServer.agent.impl.parameters.resolve.BuildRunnerEnvironmentPreprocessor;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Map;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.*;
 
@@ -64,7 +62,9 @@ public class KubeAgentConfigurationProvider {
                     final String value = entry.getValue();
                     if (key.startsWith(TEAMCITY_KUBERNETES_PROVIDED_PREFIX)){
                         LOG.info("prop( " + key + ") : " + value);
-                        agentConfigurationEx.addConfigurationParameter(key.substring(TEAMCITY_KUBERNETES_PROVIDED_PREFIX.length()), value);
+                        final String extractedKey = key.substring(TEAMCITY_KUBERNETES_PROVIDED_PREFIX.length());
+                        agentConfigurationEx.addConfigurationParameter(extractedKey, value);
+                        agentConfigurationEx.addConfigurationParameter(envToParam(extractedKey), value);
                     }
                 }
             }
