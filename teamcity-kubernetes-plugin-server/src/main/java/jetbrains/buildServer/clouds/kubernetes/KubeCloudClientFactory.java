@@ -87,6 +87,18 @@ public class KubeCloudClientFactory implements CloudClientFactory {
         return new KubeProfilePropertiesProcessor(myAuthStrategies);
     }
 
+    @NotNull
+    @Override
+    public String getTypeDescription() {
+        return "The Kubernetes integrations with TeamCity agents running as pods. Operates primarily on Linux, but can support other clusters as well.";
+    }
+
+    @NotNull
+    @Override
+    public String getProfileIconUrl() {
+        return myPluginDescriptor.getPluginResourcesPath("k8s.svg");
+    }
+
     @Override
     public boolean canBeAgentOfType(@NotNull AgentDescription agentDescription) {
         final Map<String, String> map = agentDescription.getAvailableParameters();
