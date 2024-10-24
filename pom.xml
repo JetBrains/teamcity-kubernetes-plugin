@@ -52,6 +52,20 @@
                   </configuration>
               </plugin>
               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>license-maven-plugin</artifactId>
+                  <inherited>false</inherited>
+                  <version>2.4.0</version>
+                  <configuration>
+                      <thirdPartyFilename>third-party-libraries.json</thirdPartyFilename>
+                      <fileTemplate>${maven.multiModuleProjectDirectory}/license-third-party.ftl</fileTemplate>
+                      <excludedGroups>tc-sbt-runner.*|com.jetbrains.teamcity.*|org.jetbrains.teamcity.*|org.jetbrains.kotlin.*|org.jetbrains.kotlinx.*|org.jetbrains.intellij.*|com.jetbrains.intellij.*|jetbrains.ring.*</excludedGroups>
+                      <excludedArtifacts>jcip-annotations</excludedArtifacts>
+                      <force>true</force>
+                      <includedScopes>compile,runtime</includedScopes>
+                  </configuration>
+              </plugin>
+              <plugin>
                   <groupId>org.jetbrains.teamcity</groupId>
                   <artifactId>teamcity-sdk-maven-plugin</artifactId>
                   <version>0.2</version>
