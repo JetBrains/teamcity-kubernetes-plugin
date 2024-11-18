@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class KubeCloudClientFactory implements CloudClientFactory {
 
-    public static final String DISPLAY_NAME = "Kubernetes";
+    public static final String DISPLAY_NAME = "Kubernetes Agents";
     public static final String ID = "kube"; //should be 6 chars maximum
 
     private final PluginDescriptor myPluginDescriptor;
