@@ -60,6 +60,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jetbrains.teamcity.internal</groupId>
+      <artifactId>web</artifactId>
+      <version>${teamcity.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
       <artifactId>tests-support</artifactId>
       <version>${teamcity.version}</version>

@@ -17,12 +17,14 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectionCheckR
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.controllers.ActionErrors;
+import jetbrains.buildServer.controllers.AuthorizationInterceptor;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
-import jetbrains.buildServer.serverSide.IOGuard;
-import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.controllers.RequestPermissionsCheckerEx;
+import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil;
+import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -61,7 +63,9 @@ public class KubeProfileEditController extends BaseFormXmlController {
                                      @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
                                      @NotNull final ChooserController.Namespaces namespacesChooser,
                                      @NotNull final ChooserController.Deployments deploymentsChooser,
-                                     @NotNull final KubernetesCredentialsFactory credentialsFactory) {
+                                     @NotNull final KubernetesCredentialsFactory credentialsFactory,
+                                     @NotNull final AuthorizationInterceptor authInterceptor,
+                                     @NotNull final ProjectManager projectManager){
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myCredentialsFactory = credentialsFactory;
@@ -72,6 +76,18 @@ public class KubeProfileEditController extends BaseFormXmlController {
         myNamespacesChooser = namespacesChooser;
         myDeploymentsChooser = deploymentsChooser;
         web.registerController(path, this);
+        authInterceptor.addPathBasedPermissionsChecker(path, new RequestPermissionsCheckerEx() {
+            @Override
+            public void checkPermissions(@NotNull SecurityContextEx securityContext, @NotNull HttpServletRequest request) {
+                final String projectId = request.getParameter("projectId");
+                final SProject project = projectManager.findProjectByExternalId(projectId);
+                if (project == null) {
+                    throw new AccessDeniedException(securityContext.getAuthorityHolder(), String.format("No project with id '%s' found", projectId));
+                } else {
+                    securityContext.getAccessChecker().checkCanEditProject(project);
+                }
+            }
+        });
     }
 
     @Override
