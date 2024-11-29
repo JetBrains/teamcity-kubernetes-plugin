@@ -12,7 +12,7 @@ class KubernetesConnectionProvider(private val myPluginDescriptor: PluginDescrip
 
     public override fun getDisplayName(): String = "Kubernetes Connection"
 
-    public override fun isAvailable(): Boolean = TeamCityProperties.getBoolean(KubernetesConnectionConstants.KUBERNETES_CONNECTION_FEATURE_FLAG)
+    public override fun isAvailable(): Boolean = TeamCityProperties.getBooleanOrTrue(KubernetesConnectionConstants.KUBERNETES_CONNECTION_FEATURE_FLAG)
 
     public override fun getPropertiesProcessor(): PropertiesProcessor = KubeProfilePropertiesProcessor(myStrategyProvider)
 
