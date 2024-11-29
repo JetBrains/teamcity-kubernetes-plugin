@@ -8,6 +8,7 @@ import jetbrains.buildServer.clouds.kubernetes.KubeUtils
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.serverSide.ProjectManager
 import jetbrains.buildServer.serverSide.connections.ConnectionDescriptor
 import jetbrains.buildServer.serverSide.connections.credentials.ConnectionCredentialsException
 import jetbrains.buildServer.util.StringUtil
@@ -29,7 +30,7 @@ class KubernetesCredentialsFactoryImplTest : BaseTestCase() {
         authStrategy = Mockito.mock(KubeAuthStrategy::class.java)
         Mockito.`when`(authStrategy.id).thenReturn(STRAGEGY_NAME)
         Mockito.`when`(authStrategy.apply(Mockito.any(), Mockito.any())).then { it.arguments.first() }
-        kubeAuthStrategyProvider = KubeAuthStrategyProviderImpl(MockTimeService())
+        kubeAuthStrategyProvider = KubeAuthStrategyProviderImpl(MockTimeService(), Mockito.mock(ProjectManager::class.java))
         kubeAuthStrategyProvider.registerStrategy(authStrategy)
 
         credentialsFactoryImpl = KubernetesCredentialsFactoryImpl(kubeAuthStrategyProvider)
