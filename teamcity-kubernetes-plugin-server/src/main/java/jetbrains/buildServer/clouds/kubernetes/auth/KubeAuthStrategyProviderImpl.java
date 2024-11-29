@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException;
+import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.TimeService;
 import org.jetbrains.annotations.NotNull;
@@ -18,9 +19,10 @@ import org.jetbrains.annotations.Nullable;
 public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
     private static final Map<String, KubeAuthStrategy> myIdToStrategyMap = new HashMap<>();
 
-    public KubeAuthStrategyProviderImpl(@NotNull TimeService timeService) {
+    public KubeAuthStrategyProviderImpl(@NotNull TimeService timeService,
+                                        @NotNull ProjectManager projectManager) {
         registerStrategy(new UserPasswdAuthStrategy());
-        registerStrategy(new DefaultServiceAccountAuthStrategy());
+        registerStrategy(new DefaultServiceAccountAuthStrategy(projectManager));
         registerStrategy(new UnauthorizedAccessStrategy());
         registerStrategy(new ClientCertificateAuthStrategy());
         registerStrategy(new TokenAuthStrategy());

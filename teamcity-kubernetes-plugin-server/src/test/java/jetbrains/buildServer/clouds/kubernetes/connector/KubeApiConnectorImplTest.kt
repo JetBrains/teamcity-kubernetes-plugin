@@ -12,8 +12,10 @@ import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl
 import jetbrains.buildServer.clouds.kubernetes.auth.RefreshableStrategy
 import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactoryImpl
 import jetbrains.buildServer.serverSide.InvalidProperty
+import jetbrains.buildServer.serverSide.ProjectManager
 import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
+import org.mockito.Mockito
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
@@ -54,7 +56,8 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         val timeService = MockTimeService()
         val strategy = FakeAuthStrategy(timeService)
         var clientsCreated = 0
-        val authStrategyProvider = KubeAuthStrategyProviderImpl(timeService)
+        val authStrategyProvider = KubeAuthStrategyProviderImpl(
+            timeService, Mockito.mock(ProjectManager::class.java))
         authStrategyProvider.registerStrategy(strategy)
         val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", apiConnection, strategy, KubernetesCredentialsFactoryImpl(authStrategyProvider)){
             override fun createClient(config: Config): KubernetesClient {
