@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl" %>
 <%@ page import="jetbrains.buildServer.clouds.kubernetes.web.KubeDeleteImageDialogController" %>
 <%@ page import="jetbrains.buildServer.clouds.kubernetes.web.KubeProfileEditController" %>
@@ -148,12 +149,16 @@
     <span id="error_secure:${cons.oidcRefreshToken}" class="error"></span>
   </td>
 </tr>
-<tr class="hidden eks auth-ui">
-  <th><label for="${cons.eksUseInstanceProfile}">Use server instance profile: </label></th>
-  <td><props:checkboxProperty name="${cons.eksUseInstanceProfile}"/>
-    <span id="error_${cons.eksUseInstanceProfile}" class="error"></span>
-  </td>
-</tr>
+
+<c:if test="${isInstanceProfileEnabled}">
+  <tr class="hidden eks auth-ui">
+    <th><label for="${cons.eksUseInstanceProfile}">Use server instance profile: </label></th>
+    <td><props:checkboxProperty name="${cons.eksUseInstanceProfile}"/>
+      <span id="error_${cons.eksUseInstanceProfile}" class="error"></span>
+    </td>
+  </tr>
+</c:if>
+
 <tr class="hidden eks auth-ui aws-credential">
   <th><label for="${cons.eksAccessId}">Access ID:<l:star/></label></th>
   <td><props:textProperty name="${cons.eksAccessId}" className="longField"/>

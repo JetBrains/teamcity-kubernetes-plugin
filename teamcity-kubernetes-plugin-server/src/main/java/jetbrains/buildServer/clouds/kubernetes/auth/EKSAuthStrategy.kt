@@ -138,6 +138,10 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
         }
         return retval;
     }
+
+    companion object {
+        const val ENABLE_LOCAL_AWS_ACCOUNT = "teamcity.kubernetes.localAwsAccount.enable"
+    }
 }
 
 data class EKSData(val useInstanceProfile: Boolean,
