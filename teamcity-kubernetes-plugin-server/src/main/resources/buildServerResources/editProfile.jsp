@@ -18,6 +18,7 @@
 
 <jsp:useBean id="namespaceChooserUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="deploymentChooserUrl" class="java.lang.String" scope="request"/>
+<c:set var="isInstanceProfileEnabled" value="<%=true%>" scope="request"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
