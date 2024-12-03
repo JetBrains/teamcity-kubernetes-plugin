@@ -72,9 +72,10 @@
       <version>${teamcity.version}</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
-      <groupId>org.jetbrains.teamcity.internal</groupId>
-      <artifactId>integration-test</artifactId>
+      <groupId>org.jetbrains.teamcity</groupId>
+      <artifactId>server-test-core</artifactId>
       <version>${teamcity.version}</version>
       <scope>test</scope>
     </dependency>

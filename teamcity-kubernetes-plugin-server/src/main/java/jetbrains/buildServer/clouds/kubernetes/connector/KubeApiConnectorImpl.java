@@ -172,6 +172,10 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                 return withKubernetesClient(true, function);
             }
             throw kce;
+        } catch (IllegalArgumentException illegalArgumentException){
+          LOG.warnAndDebugDetails(String.format("Failed to access the Kubernetes cluster: credentials are invalid or lack required permissions for %s", myProfileId),
+                                  illegalArgumentException);
+          throw new CloudException("Failed to access the Kubernetes cluster: credentials are invalid or lack required permissions. Please check server logs for more information", illegalArgumentException);
         }
     }
 
