@@ -46,6 +46,9 @@
           Connecting to an AWS EKS (Elastic Kubernetes Service)
         </description>
         <param name="eksUseInstanceProfile" dslName="eksUseInstanceProfile" type="boolean">
+          <deprecated strict="false">
+            Using the AWS credentials provided in the instance is not recommended, as it increases the risk of leaks.
+          </deprecated>
           <description>
             Uses the AWS credentials provided in the TeamCity Instance. Should be available under `~/.aws`
           </description>
@@ -147,6 +150,9 @@
         </description>
       </option>
       <option name="serviceAccount" value="service-account">
+        <deprecated strict="false">
+          Using the Kubernetes credentials provided in the instance is not recommended, as it increases the risk of leaks.
+        </deprecated>
         <description>
           Uses the Kubernetes credentials provided in the TeamCity Instance. Should be available under `/var/run/secrets/kubernetes.io/serviceaccount/token`
         </description>
@@ -244,21 +250,6 @@
                 secretKey = "credentialsJSON:3507800f-ae64-49f1-bbb5-0a4deec5c7b3"
                 clusterName = "cluster-name"
               }
-          }
-      </code>
-    </example>
-    <example>
-      <description>
-        Adds a new Connection that allows TeamCity to store and manage a Kubernetes Cluster using the service account present in the TeamCity instance.
-      </description>
-      <code>
-          kubernetesConnection {
-              id = "PROJECT_EXT_3"
-              name = "Connection"
-              apiServerUrl = "http://cluster.com"
-              caCertificate = "credentialsJSON:c77bc0a7-f461-4ca8-959b-ef5c8f6359b2"
-              namespace = "namespace"
-              authStrategy = serviceAccount()
           }
       </code>
     </example>
