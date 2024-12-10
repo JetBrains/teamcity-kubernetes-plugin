@@ -79,6 +79,10 @@ public class KubeProfileEditController extends BaseFormXmlController {
         authInterceptor.addPathBasedPermissionsChecker(path, new RequestPermissionsCheckerEx() {
             @Override
             public void checkPermissions(@NotNull SecurityContextEx securityContext, @NotNull HttpServletRequest request) {
+                if (!isTestConnection(request)) {
+                    return;
+                }
+
                 final String projectId = request.getParameter("projectId");
                 final SProject project = projectManager.findProjectByExternalId(projectId);
                 if (project == null) {
@@ -113,7 +117,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
     @Override
     protected void doPost(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Element xmlResponse) {
 
-        if(Boolean.parseBoolean(request.getParameter("testConnection"))){
+        if(isTestConnection(request)){
             final KubeApiConnection connectionSettings = new RequestKubeApiConnection(request);
 
             final KubeAuthStrategy strategy = myAuthStrategyProvider.get(connectionSettings.getAuthStrategy());
@@ -148,5 +152,9 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 writeErrors(xmlResponse, errors);
             }
         }
+    }
+
+    private static boolean isTestConnection(@NotNull HttpServletRequest request) {
+        return Boolean.parseBoolean(request.getParameter("testConnection"));
     }
 }
