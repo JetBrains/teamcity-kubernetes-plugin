@@ -30,7 +30,7 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
             registerStrategy(new KubeconfigAuthStrategy());
         }
         registerStrategy(new OIDCAuthStrategy(timeService));
-        registerStrategy(new EKSAuthStrategy(timeService));
+        registerStrategy(new EKSAuthStrategy(timeService, projectManager));
     }
 
     @NotNull
@@ -44,7 +44,7 @@ public class KubeAuthStrategyProviderImpl implements KubeAuthStrategyProvider {
     public static Map<String, Object> getAdditionalSettings(@NotNull String projectId){
         final HashMap<String, Object> additionalSettings = new HashMap<>();
         getAll(projectId).forEach(auth -> {
-            auth.fillAdditionalSettings(additionalSettings, auth.isAvailable(projectId));
+            auth.fillAdditionalSettings(additionalSettings, projectId, auth.isAvailable(projectId));
         });
         return additionalSettings;
     }

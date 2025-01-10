@@ -88,7 +88,7 @@ class KubeconfigAuthStrategy() : KubeAuthStrategy {
         return kubeConfigFile()?.exists() ?: false
     }
 
-    override fun fillAdditionalSettings(additionalSettings: MutableMap<String, Any>, isAvailable: Boolean) {
+    override fun fillAdditionalSettings(additionalSettings: MutableMap<String, Any>, projectId: String, isAvailable: Boolean) {
         if (!isAvailable) {
             additionalSettings.put("contextNames", emptyList<String>())
             additionalSettings.put("currentContext", "")
