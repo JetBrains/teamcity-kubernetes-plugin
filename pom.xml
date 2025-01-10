@@ -9,7 +9,7 @@
   <packaging>pom</packaging>
   <properties>
       <teamcity.version>LOCAL-SNAPSHOT</teamcity.version>
-      <kotlin.version>1.5.32</kotlin.version>
+      <kotlin.version>1.9.22</kotlin.version>
       <local.repo.path>local-repo</local.repo.path>
       <revision>1.0-SNAPSHOT</revision>
   </properties>
