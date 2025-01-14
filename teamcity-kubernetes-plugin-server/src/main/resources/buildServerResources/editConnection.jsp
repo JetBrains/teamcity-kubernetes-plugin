@@ -1,6 +1,4 @@
 <%@ page import="jetbrains.buildServer.clouds.kubernetes.connection.KubernetesConnectionConstants" %>
-<%@ page import="jetbrains.buildServer.serverSide.TeamCityProperties" %>
-<%@ page import="jetbrains.buildServer.clouds.kubernetes.auth.EKSAuthStrategy" %>
 
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -11,7 +9,6 @@
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
 <c:set var="display_name_param" value="<%=KubernetesConnectionConstants.DISPLAY_NAME_PARAM%>"/>
-<c:set var="isInstanceProfileEnabled" value="<%=TeamCityProperties.getBoolean(EKSAuthStrategy.ENABLE_LOCAL_AWS_ACCOUNT)%>" scope="request"/>
 
 
 <tr>

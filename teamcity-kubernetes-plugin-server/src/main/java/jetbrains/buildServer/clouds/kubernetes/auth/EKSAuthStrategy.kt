@@ -12,18 +12,20 @@ import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import com.intellij.openapi.util.Pair
+import jetbrains.buildServer.clouds.CloudConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudException
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy.*
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
-import jetbrains.buildServer.serverSide.InvalidProperty
+import jetbrains.buildServer.serverSide.*
+import jetbrains.buildServer.serverSide.oauth.OAuthConstants
 import jetbrains.buildServer.util.TimeService
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
 
-class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>(myTimeService) {
+class EKSAuthStrategy(myTimeService: TimeService, private val projectManager: ProjectManager) : RefreshableStrategy<EKSData>(myTimeService) {
 
     override fun retrieveNewToken(dataHolder: EKSData): Pair<String, Long>? {
         val credentials = getAwsCredentialProvider(dataHolder)
@@ -138,6 +140,32 @@ class EKSAuthStrategy(myTimeService: TimeService) : RefreshableStrategy<EKSData>
         }
         return retval;
     }
+
+    override fun fillAdditionalSettings(mv: MutableMap<String, Any>, projectId: String, isAvailable: Boolean) {
+        mv.put(EKS_USE_INSTANCE_PROFILE_ENABLED, isEksLocalAvailable(projectId))
+    }
+
+    private fun isEksLocalAvailable(projectId: String): Boolean {
+        if (TeamCityProperties.getBoolean(EKSAuthStrategy.ENABLE_LOCAL_AWS_ACCOUNT)){
+            return true
+        }
+        val project = projectManager.findProjectById(projectId)
+        if (project == null){
+            return false
+        }
+
+        return isAuthStrategyUsed(project)
+    }
+
+    private fun isAuthStrategyUsed(project: SProject): Boolean {
+        //TW-91106 The local instance profile strategy is disabled by default but enabled for whoever was already using it
+        return (
+            project.getOwnFeaturesOfType(CloudConstants.CLOUD_PROFILE_FEATURE_TYPE) +
+            project.getOwnFeaturesOfType(OAuthConstants.FEATURE_TYPE))
+            .filter { features: SProjectFeatureDescriptor -> id == features.parameters[AUTH_STRATEGY] }
+            .any { features ->  features.parameters[KubeParametersConstants.EKS_USE_INSTANCE_PROFILE].toBoolean()}
+    }
+
 
     companion object {
         const val ENABLE_LOCAL_AWS_ACCOUNT = "teamcity.kubernetes.localAwsAccount.enable"
