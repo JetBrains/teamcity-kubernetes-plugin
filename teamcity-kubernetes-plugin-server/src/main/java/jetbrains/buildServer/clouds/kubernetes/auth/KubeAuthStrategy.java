@@ -37,5 +37,5 @@ public interface KubeAuthStrategy extends PropertiesProcessor {
         return true;
     }
 
-    default void fillAdditionalSettings(@NotNull Map<String, Object> mv, boolean isAvailable){}
+    default void fillAdditionalSettings(@NotNull Map<String, Object> mv, @NotNull String projectId, boolean isAvailable){}
 }

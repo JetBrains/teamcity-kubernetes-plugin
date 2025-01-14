@@ -150,7 +150,7 @@
   </td>
 </tr>
 
-<c:if test="${isInstanceProfileEnabled}">
+<c:if test="${additionalSettings[cons.eksUseInstanceProfileEnabled]}">
   <tr class="hidden eks auth-ui">
     <th><label for="${cons.eksUseInstanceProfile}">Use server instance profile: </label></th>
     <td><props:checkboxProperty name="${cons.eksUseInstanceProfile}"/>

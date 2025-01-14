@@ -37,6 +37,7 @@ public class KubeParametersConstants {
     public static final String EKS_ACCESS_ID = "eksAccessId";
     public static final String EKS_SECRET_KEY = "eksSecretKey";
     public static final String EKS_USE_INSTANCE_PROFILE = "eksUseInstanceProfile";
+    public static final String EKS_USE_INSTANCE_PROFILE_ENABLED = "eksUseInstanceProfileEnabled";
     public static final String EKS_ASSUME_IAM_ROLE = "eksAssumeIAMRole";
     public static final String EKS_IAM_ROLE_ARN = "eksIAMRoleArn";
     public static final String EKS_REGION = "eksRegion";
@@ -154,6 +155,8 @@ public class KubeParametersConstants {
     }
 
     public String getEksUseInstanceProfile() { return EKS_USE_INSTANCE_PROFILE; }
+
+    public String getEksUseInstanceProfileEnabled() { return EKS_USE_INSTANCE_PROFILE_ENABLED; }
 
     public String getEksAssumeIamRole() { return EKS_ASSUME_IAM_ROLE; }
 
