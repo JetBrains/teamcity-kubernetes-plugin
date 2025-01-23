@@ -1,9 +1,11 @@
 package jetbrains.buildServer.clouds.kubernetes.connection
 
+import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeProfilePropertiesProcessor
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 import jetbrains.buildServer.serverSide.TeamCityProperties
+import jetbrains.buildServer.serverSide.oauth.OAuthConnectionDescriptor
 import jetbrains.buildServer.serverSide.oauth.OAuthProvider
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 
@@ -16,7 +18,18 @@ class KubernetesConnectionProvider(private val myPluginDescriptor: PluginDescrip
 
     public override fun getPropertiesProcessor(): PropertiesProcessor = KubeProfilePropertiesProcessor(myStrategyProvider)
 
-    public override fun describeConnection(connectionProperties: Map<String, String>): String = super.describeConnection(connectionProperties)
+    override fun describeConnection(descriptor: OAuthConnectionDescriptor): String {
+        val connectionProperties = descriptor.parameters
+        val authStrategy =
+            myStrategyProvider.find(connectionProperties[KubeParametersConstants.AUTH_STRATEGY])?.displayName ?: connectionProperties[KubeParametersConstants.AUTH_STRATEGY]
+                ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                ?.replace('-', ' ')
+        return """
+            Authentication Type: ${authStrategy}
+            URL: ${connectionProperties[KubeParametersConstants.API_SERVER_URL]}
+            Namespace: ${connectionProperties[KubeParametersConstants.KUBERNETES_NAMESPACE]}
+        """.trimIndent()
+    }
 
     public override fun getEditParametersUrl(): String = myPluginDescriptor.getPluginResourcesPath("editConnection.jsp")
 
