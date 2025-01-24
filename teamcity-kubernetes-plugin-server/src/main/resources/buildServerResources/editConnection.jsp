@@ -1,4 +1,5 @@
 <%@ page import="jetbrains.buildServer.clouds.kubernetes.connection.KubernetesConnectionConstants" %>
+<%@ page import="jetbrains.buildServer.clouds.kubernetes.web.ChooserController" %>
 
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -9,6 +10,8 @@
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
 <c:set var="display_name_param" value="<%=KubernetesConnectionConstants.DISPLAY_NAME_PARAM%>"/>
+<c:set var="namespaceChooserUrl" value="<%=ChooserController.Namespaces.getControllerUrl()%>" scope="request"/>
+<c:set var="deploymentChooserUrl" value="<%=ChooserController.Deployments.getControllerUrl()%>" scope="request"/>
 
 
 <tr>

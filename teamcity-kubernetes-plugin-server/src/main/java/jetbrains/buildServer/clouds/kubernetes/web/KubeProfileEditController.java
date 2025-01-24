@@ -44,8 +44,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final AgentPoolManager myAgentPoolManager;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
-    private final ChooserController.Namespaces myNamespacesChooser;
-    private final ChooserController.Deployments myDeploymentsChooser;
 
   static {
         try {
@@ -61,8 +59,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
                                      @NotNull final AgentPoolManager agentPoolManager,
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
                                      @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
-                                     @NotNull final ChooserController.Namespaces namespacesChooser,
-                                     @NotNull final ChooserController.Deployments deploymentsChooser,
                                      @NotNull final KubernetesCredentialsFactory credentialsFactory,
                                      @NotNull final AuthorizationInterceptor authInterceptor,
                                      @NotNull final ProjectManager projectManager){
@@ -73,8 +69,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
         myAgentPoolManager = agentPoolManager;
         myAuthStrategyProvider = authStrategyProvider;
         myPodTemplateProviders = podTemplateProviders;
-        myNamespacesChooser = namespacesChooser;
-        myDeploymentsChooser = deploymentsChooser;
         web.registerController(path, this);
         authInterceptor.addPathBasedPermissionsChecker(path, new RequestPermissionsCheckerEx() {
             @Override
@@ -98,8 +92,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
     protected ModelAndView doGet(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
         ModelAndView modelAndView = new ModelAndView(myPluginDescriptor.getPluginResourcesPath("editProfile.jsp"));
         Map<String, Object> model = modelAndView.getModel();
-        model.put("namespaceChooserUrl", myNamespacesChooser.getUrl());
-        model.put("deploymentChooserUrl", myDeploymentsChooser.getUrl());
+        model.put("namespaceChooserUrl", ChooserController.Namespaces.getControllerUrl());
+        model.put("deploymentChooserUrl", ChooserController.Deployments.getControllerUrl());
         final String projectId = httpServletRequest.getParameter("projectId");
 
         final List<AgentPool> pools = new ArrayList<>();
