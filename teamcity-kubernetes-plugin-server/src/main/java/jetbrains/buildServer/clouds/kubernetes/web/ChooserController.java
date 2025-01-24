@@ -24,23 +24,21 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public abstract class ChooserController extends BaseController {
 
+    private static String URL;
     private final PluginDescriptor myPluginDescriptor;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final KubernetesCredentialsFactory myCredentialsFactory;
 
-    public ChooserController(WebControllerManager web,
-                             PluginDescriptor pluginDescriptor,
-                             KubeAuthStrategyProvider authStrategyProvider,
-                             KubernetesCredentialsFactory credentialsFactory) {
+    public ChooserController(@NotNull WebControllerManager web,
+                             @NotNull PluginDescriptor pluginDescriptor,
+                             @NotNull KubeAuthStrategyProvider authStrategyProvider,
+                             @NotNull KubernetesCredentialsFactory credentialsFactory,
+                             @NotNull String pluginResourcesPath) {
         myPluginDescriptor = pluginDescriptor;
         myAuthStrategyProvider = authStrategyProvider;
         myCredentialsFactory = credentialsFactory;
-        web.registerController(getUrl(), this);
-    }
-
-    @NotNull
-    public String getUrl() {
-        return myPluginDescriptor.getPluginResourcesPath(getHtmlName());
+        URL = pluginDescriptor.getPluginResourcesPath(pluginResourcesPath);
+        web.registerController(URL, this);
     }
 
     @Nullable
@@ -64,14 +62,16 @@ public abstract class ChooserController extends BaseController {
         return modelAndView;
     }
 
+    public static String getControllerUrl() {
+        return URL;
+    }
+
     @NotNull
     protected abstract Collection<String> getItems(KubeApiConnector apiConnector);
 
     @NotNull
     protected abstract String getItemsName();
 
-    @NotNull
-    protected abstract String getHtmlName();
     protected abstract String getJspName();
 
     public static class Deployments extends ChooserController{
@@ -80,7 +80,7 @@ public abstract class ChooserController extends BaseController {
                            final PluginDescriptor pluginDescriptor,
                            final KubeAuthStrategyProvider authStrategyProvider,
                            final KubernetesCredentialsFactory kubernetesCredentialsFactory) {
-            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory);
+            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory, "kubeDeployments.html");
         }
 
         @Override
@@ -91,11 +91,6 @@ public abstract class ChooserController extends BaseController {
         @Override
         protected String getItemsName() {
             return "deployments";
-        }
-
-        @Override
-        protected String getHtmlName() {
-            return "kubeDeployments.html";
         }
 
         protected String getJspName() {
@@ -109,7 +104,7 @@ public abstract class ChooserController extends BaseController {
                           final PluginDescriptor pluginDescriptor,
                           final KubeAuthStrategyProvider authStrategyProvider,
                           final KubernetesCredentialsFactory kubernetesCredentialsFactory)  {
-            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory);
+            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory, "kubeNamespaces.html");
         }
 
         @Override
@@ -120,11 +115,6 @@ public abstract class ChooserController extends BaseController {
         @Override
         protected String getItemsName() {
             return "namespaces";
-        }
-
-        @Override
-        protected String getHtmlName() {
-            return "kubeNamespaces.html";
         }
 
         @Override
