@@ -12,6 +12,7 @@
       <kotlin.version>1.9.22</kotlin.version>
       <local.repo.path>local-repo</local.repo.path>
       <revision>1.0-SNAPSHOT</revision>
+      <aws.java.sdk.version>2.31.63</aws.java.sdk.version>
   </properties>
   <repositories>
     <repository>
