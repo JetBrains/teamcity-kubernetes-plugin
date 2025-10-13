@@ -104,7 +104,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
             this.imagesData = {};
             BS.Log.error('bad images data: ' + rawImagesData);
         }
-
+        this._nextImageId = this._imagesDataLength ? this._imagesDataLength : 1;
         this._bindHandlers();
         this._renderImagesTable();
         this.$addImageButton.removeAttr('disabled');
@@ -153,6 +153,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
                 this.$podSpecModeSelector.val(value);
             }
             this._togglePodSpecMode();
+            this._resetCodeMirrorValues();
         }.bind(this));
 
         ///// Change handlers
@@ -530,6 +531,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this._image = {};
 
         BS.Kube.ImageDialog.showCentered();
+        this._resetCodeMirrorValues();
     },
 
     showEditImageDialog: function ($elem) {
@@ -556,9 +558,9 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$imageInstanceLimit.trigger('change', image['imageInstanceLimit'] || '');
         this.$agentPoolSelector.trigger('change', image['agent_pool_id'] || '');
-        this.$customPodTemplate.trigger('change', image['customPodTemplate'] || '');
 
         BS.Kube.ImageDialog.showCentered();
+        this._resetCodeMirrorValues();
     },
 
     showDeleteImageDialog: function ($elem) {
@@ -605,10 +607,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     generateNewImageId: function () {
-        if($j.isEmptyObject(this.imagesData)) return 1;
-        return Math.max.apply(Math, $j.map(this.imagesData, function callback(currentValue) {
-            return currentValue['source-id'];
-        })) + 1;
+      return this._nextImageId++;
     },
 
     editImage: function (id) {
@@ -652,6 +651,14 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         this.$imageInstanceLimit.trigger('change', '');
         this.$agentPoolSelector.trigger('change', '');
         this.$customPodTemplate.trigger('change', '');
+    },
+
+    _resetCodeMirrorValues: function () {
+      BS.MultilineProperties.updateVisible();
+      // waiting for CodeMirror to be attached
+      setTimeout(() => {
+        this.$customPodTemplate.trigger('change', this._image['customPodTemplate'] || '');
+      }, 0);
     }
 });
 
