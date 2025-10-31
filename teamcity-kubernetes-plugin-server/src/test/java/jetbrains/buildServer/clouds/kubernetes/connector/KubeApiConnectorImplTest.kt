@@ -7,7 +7,6 @@ import io.fabric8.kubernetes.api.model.Status
 import io.fabric8.kubernetes.client.*
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
-import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl
 import jetbrains.buildServer.clouds.kubernetes.auth.RefreshableStrategy
 import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactoryImpl
@@ -59,7 +58,8 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         val authStrategyProvider = KubeAuthStrategyProviderImpl(
             timeService, Mockito.mock(ProjectManager::class.java))
         authStrategyProvider.registerStrategy(strategy)
-        val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", apiConnection, strategy, KubernetesCredentialsFactoryImpl(authStrategyProvider)){
+        val kubernetesCredentialsFactory = KubernetesCredentialsFactoryImpl(authStrategyProvider, Mockito.mock(ProjectManager::class.java))
+        val kubeApiConnector = object: KubeApiConnectorImpl("testProject", "kube-111", apiConnection, strategy, kubernetesCredentialsFactory){
             override fun createClient(config: Config): KubernetesClient {
                 clientsCreated++
                 if (clientsCreated == 2){

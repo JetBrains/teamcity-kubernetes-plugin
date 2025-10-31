@@ -2,19 +2,21 @@ package jetbrains.buildServer.clouds.kubernetes.connection
 
 import io.fabric8.kubernetes.client.Config
 import io.fabric8.kubernetes.client.ConfigBuilder
-import jetbrains.buildServer.clouds.kubernetes.ParametersKubeApiConnection
 import jetbrains.buildServer.clouds.kubernetes.KubeUtils
+import jetbrains.buildServer.clouds.kubernetes.ParametersKubeApiConnection
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.serverSide.ProjectManager
 import jetbrains.buildServer.serverSide.SProject
 import jetbrains.buildServer.serverSide.connections.ConnectionDescriptor
 import jetbrains.buildServer.serverSide.connections.credentials.ConnectionCredentials
 import jetbrains.buildServer.serverSide.connections.credentials.ConnectionCredentialsException
 import jetbrains.buildServer.util.StringUtil
+import java.net.URL
 
-class KubernetesCredentialsFactoryImpl(private val myAuthStrategyProvider: KubeAuthStrategyProvider) : KubernetesCredentialsFactory {
-    public override fun createConfig(connectionSettings: KubeApiConnection, authStrategy: KubeAuthStrategy): Config {
+class KubernetesCredentialsFactoryImpl(private val myAuthStrategyProvider: KubeAuthStrategyProvider, private val projectManager: ProjectManager) : KubernetesCredentialsFactory {
+    public override fun createConfig(connectionSettings: KubeApiConnection, authStrategy: KubeAuthStrategy, projectId: String, profileId: String): Config {
         var configBuilder = ConfigBuilder()
             .withNamespace(connectionSettings.namespace)
             .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
@@ -32,6 +34,9 @@ class KubernetesCredentialsFactoryImpl(private val myAuthStrategyProvider: KubeA
             configBuilder.withCaCertData(KubeUtils.encodeBase64IfNecessary(caCertData!!))
         }
         configBuilder = authStrategy.apply(configBuilder, connectionSettings)
+
+        configureProxy(configBuilder, projectId, profileId)
+
         return configBuilder.build()
     }
 
@@ -43,7 +48,7 @@ class KubernetesCredentialsFactoryImpl(private val myAuthStrategyProvider: KubeA
         val authStrategy =
             myAuthStrategyProvider.find(kubeApiConnection.authStrategy) ?: throw ConnectionCredentialsException("Received unknown auth strategy " + kubeApiConnection.authStrategy)
 
-        return KubernetesConnectionCredentialsImpl(createConfig(kubeApiConnection, authStrategy), connectionDescriptor.parameters)
+        return KubernetesConnectionCredentialsImpl(createConfig(kubeApiConnection, authStrategy, connectionDescriptor.projectId, connectionDescriptor.id), connectionDescriptor.parameters)
     }
 
     @Throws(ConnectionCredentialsException::class)
@@ -52,6 +57,30 @@ class KubernetesCredentialsFactoryImpl(private val myAuthStrategyProvider: KubeA
     }
 
     public override fun getType(): String = KubernetesConnectionConstants.CONNECTION_TYPE
+
+    private fun configureProxy(configBuilder: ConfigBuilder, projectId: String, profileId: String) {
+        var project = projectManager.findProjectById(projectId)
+        var schema = URL(configBuilder.masterUrl).protocol
+        var paramPrefix = "teamcity.internal.kubernetes.$profileId.$schema"
+        var proxyServer = project?.getParameterValue("$paramPrefix.proxyServer")
+        if (proxyServer == null) {
+            return
+        }
+        if ("https".equals(schema, ignoreCase = true)) {
+            configBuilder.withHttpsProxy(proxyServer)
+        } else {
+            configBuilder.withHttpProxy(proxyServer)
+        }
+        project?.getParameterValue("$paramPrefix.proxyLogin")?.let {
+            configBuilder.withProxyUsername(it)
+        }
+        project?.getParameterValue("$paramPrefix.proxyPassword")?.let {
+            configBuilder.withProxyPassword(it)
+        }
+        project?.getParameterValue("$paramPrefix.nonProxyHosts")?.let {
+            configBuilder.withNoProxy(*it.split(",").toTypedArray())
+        }
+    }
 
     companion object {
         private val DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000

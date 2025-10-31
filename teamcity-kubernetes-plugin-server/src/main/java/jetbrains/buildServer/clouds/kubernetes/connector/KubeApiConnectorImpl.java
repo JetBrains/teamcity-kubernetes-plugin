@@ -30,8 +30,9 @@ import org.jetbrains.annotations.Nullable;
 public class KubeApiConnectorImpl implements KubeApiConnector {
     private static final Logger LOG = Logger.getInstance(KubeApiConnectorImpl.class.getName());
 
+    @NotNull private final String myProjectId;
     @NotNull private final String myProfileId;
-  @NotNull private final KubeApiConnection myConnectionSettings;
+    @NotNull private final KubeApiConnection myConnectionSettings;
     @NotNull private final KubeAuthStrategy myAuthStrategy;
     @NotNull private final KubernetesCredentialsFactory myCredentialsFactory;
 
@@ -39,13 +40,14 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private volatile KubernetesClient myKubernetesClient;
     private volatile boolean myCloseInitiated = false;
 
-    public KubeApiConnectorImpl(@NotNull String profileId, @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy, @NotNull
+    public KubeApiConnectorImpl(@NotNull String projectId, @NotNull String profileId, @NotNull KubeApiConnection connectionSettings, @NotNull KubeAuthStrategy authStrategy, @NotNull
                                 KubernetesCredentialsFactory kubernetesCredentialsFactory) {
+        myProjectId = projectId;
         myProfileId = profileId;
         myConnectionSettings = connectionSettings;
         myAuthStrategy = authStrategy;
         myCredentialsFactory = kubernetesCredentialsFactory;
-        myConfig = myCredentialsFactory.createConfig(myConnectionSettings, myAuthStrategy);
+        myConfig = myCredentialsFactory.createConfig(myConnectionSettings, myAuthStrategy, myProjectId, myProfileId);
         myKubernetesClient = createClient(myConfig);
     }
 
@@ -165,7 +167,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
                     LOG.info("Will now invalidate and recreate client for " + myProfileId);
                     invalidate();
                     KubernetesClient oldClient = myKubernetesClient;
-                    myConfig = myCredentialsFactory.createConfig(myConnectionSettings, myAuthStrategy);
+                    myConfig = myCredentialsFactory.createConfig(myConnectionSettings, myAuthStrategy, myProjectId, myProfileId);
                     myKubernetesClient = createClient(myConfig);
                     FileUtil.close(oldClient);
                 }

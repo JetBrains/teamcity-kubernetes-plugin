@@ -6,5 +6,5 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
 import jetbrains.buildServer.serverSide.connections.credentials.ConnectionCredentialsFactory
 
 interface KubernetesCredentialsFactory : ConnectionCredentialsFactory {
-    fun createConfig(connectionSettings: KubeApiConnection, authStrategy: KubeAuthStrategy): Config
+    fun createConfig(connectionSettings: KubeApiConnection, authStrategy: KubeAuthStrategy, projectId: String, profileId: String): Config
 }
