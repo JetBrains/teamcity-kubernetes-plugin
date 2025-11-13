@@ -1,28 +1,25 @@
 package jetbrains.buildServer.clouds.kubernetes.connection
 
 import io.fabric8.kubernetes.client.Config
+import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeUtils
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
-import jetbrains.buildServer.serverSide.MockParameter
 import jetbrains.buildServer.serverSide.ProjectManager
-import jetbrains.buildServer.serverSide.SimpleParameter
 import jetbrains.buildServer.serverSide.connections.ConnectionDescriptor
 import jetbrains.buildServer.serverSide.connections.credentials.ConnectionCredentialsException
-import jetbrains.buildServer.serverSide.impl.BaseServerTestCase
 import jetbrains.buildServer.util.StringUtil
-import org.assertj.core.api.BDDAssertions.then
-import org.junit.Assert
 import org.mockito.Mockito
-import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
+import org.assertj.core.api.BDDAssertions.then
+import org.testng.annotations.AfterMethod
 
-class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
+class KubernetesCredentialsFactoryImplTest : BaseTestCase() {
     private lateinit var authStrategy: KubeAuthStrategy
     private lateinit var kubeAuthStrategyProvider: KubeAuthStrategyProviderImpl
     private lateinit var credentialsFactoryImpl: KubernetesCredentialsFactoryImpl
@@ -36,7 +33,7 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
         kubeAuthStrategyProvider = KubeAuthStrategyProviderImpl(MockTimeService(), Mockito.mock(ProjectManager::class.java))
         kubeAuthStrategyProvider.registerStrategy(authStrategy)
 
-        credentialsFactoryImpl = KubernetesCredentialsFactoryImpl(kubeAuthStrategyProvider, myProjectManager)
+        credentialsFactoryImpl = KubernetesCredentialsFactoryImpl(kubeAuthStrategyProvider)
     }
 
     @AfterMethod
@@ -65,8 +62,6 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
             KubeParametersConstants.AUTH_STRATEGY to authStrategy,
         )
         Mockito.`when`(connection.parameters).thenReturn(parameters)
-        Mockito.`when`(connection.projectId).thenReturn(myProject.projectId)
-        Mockito.`when`(connection.id).thenReturn(PROFILE_ID)
         return connection
     }
 
@@ -80,7 +75,7 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
     fun testCreateConfig(apiServerUrl: String?, caCertData: String?) {
         test(apiServerUrl, caCertData) {
             val connectionSettings = getConnectionSettings(apiServerUrl = apiServerUrl, caCertData = caCertData)
-            credentialsFactoryImpl.createConfig(connectionSettings, authStrategy, myProject.projectId, PROFILE_ID)
+            credentialsFactoryImpl.createConfig(connectionSettings, authStrategy)
         }
     }
 
@@ -97,35 +92,6 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
     fun `testRequestCredentials with no auth strategy`(){
         val descriptor = getConnectionDescriptor(authStrategy = "fake one")
         credentialsFactoryImpl.requestCredentials(descriptor)
-    }
-
-    @Test
-    fun testCreateConfigWithHttpProxy() {
-        testCreateConfigWithProxy("http")
-    }
-
-    @Test
-    fun testCreateConfigWithHttpsProxy() {
-        testCreateConfigWithProxy("https")
-    }
-
-    fun testCreateConfigWithProxy(schema: String) {
-        setProxyProjectParameters(schema, PROFILE_ID)
-        Mockito.`when`(authStrategy.requiresServerUrl()).thenReturn(true)
-        val httpApiServerUrl = API_SERVER_URL.replace("https", schema)
-        val connectionSettings = getConnectionSettings(apiServerUrl = httpApiServerUrl, caCertData = CA_CERT_DATA)
-        val config = credentialsFactoryImpl.createConfig(connectionSettings, authStrategy, myProject.projectId, PROFILE_ID)
-        if ("http".equals(schema, ignoreCase = true)) {
-            assertEquals(PROXY_SERVER, config.httpProxy)
-            assertNull(config.httpsProxy)
-        } else {
-            assertEquals(PROXY_SERVER, config.httpsProxy)
-            assertNull(config.httpProxy)
-        }
-        assertEquals(PROXY_LOGIN, config.proxyUsername)
-        assertEquals(PROXY_PASSWORD, config.proxyPassword)
-        Assert.assertArrayEquals(NON_PROXY_HOSTS.split(",").toTypedArray(), config.noProxy)
-        removeProxyProjectParameters(schema, PROFILE_ID)
     }
 
     private fun test(apiServerUrl: String?, caCertData: String?, getConfig : () -> Config) {
@@ -148,29 +114,10 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
         }
     }
 
-    private fun setProxyProjectParameters(schema: String, profileId: String) {
-        myProject.addParameter(MockParameter("teamcity.internal.kubernetes.$profileId.$schema.proxyServer", PROXY_SERVER))
-        myProject.addParameter(MockParameter("teamcity.internal.kubernetes.$profileId.$schema.proxyLogin", PROXY_LOGIN))
-        myProject.addParameter(MockParameter("teamcity.internal.kubernetes.$profileId.$schema.proxyPassword", PROXY_PASSWORD))
-        myProject.addParameter(MockParameter("teamcity.internal.kubernetes.$profileId.$schema.nonProxyHosts", NON_PROXY_HOSTS))
-    }
-
-    private fun removeProxyProjectParameters(schema: String, profileId: String) {
-        myProject.removeParameter("teamcity.internal.kubernetes.$profileId.$schema.proxyServer")
-        myProject.removeParameter("teamcity.internal.kubernetes.$profileId.$schema.proxyLogin")
-        myProject.removeParameter("teamcity.internal.kubernetes.$profileId.$schema.proxyPassword")
-        myProject.removeParameter("teamcity.internal.kubernetes.$profileId.$schema.nonProxyHosts")
-    }
-
     companion object {
-        private const val PROFILE_ID = "testProfile"
         private const val STRAGEGY_NAME = "authStrategy"
         private const val NAMESPACE = "namespace"
         private const val API_SERVER_URL = "https://apiServerUrl.com"
         private const val CA_CERT_DATA = "CA_CERT_DATA"
-        private const val PROXY_SERVER = "schema://host:8088"
-        private const val PROXY_LOGIN = "login"
-        private const val PROXY_PASSWORD = "password"
-        private const val NON_PROXY_HOSTS = "host1,host2"
     }
 }

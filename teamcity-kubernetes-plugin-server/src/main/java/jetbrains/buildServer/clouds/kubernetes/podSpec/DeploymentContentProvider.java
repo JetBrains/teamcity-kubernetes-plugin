@@ -11,5 +11,5 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface DeploymentContentProvider {
     @Nullable
-    Deployment findDeployment(@NotNull String projectId, @NotNull String profileId, @NotNull String name, @NotNull KubeCloudClientParameters kubeClientParams);
+    Deployment findDeployment(@NotNull String name, @NotNull KubeCloudClientParameters kubeClientParams);
 }

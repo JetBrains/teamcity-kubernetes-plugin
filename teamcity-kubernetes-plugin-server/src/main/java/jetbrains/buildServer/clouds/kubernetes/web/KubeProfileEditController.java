@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.BuildProject;
@@ -26,7 +25,6 @@ import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil;
 import jetbrains.buildServer.serverSide.auth.AccessDeniedException;
-import jetbrains.buildServer.serverSide.identifiers.ProjectIdentifiersManager;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -46,9 +44,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final AgentPoolManager myAgentPoolManager;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
-    private final ProjectIdentifiersManager myIdentifiersManager;
 
-    static {
+  static {
         try {
             Class.forName("io.fabric8.kubernetes.client.Config");
         } catch (Throwable e) {
@@ -64,8 +61,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
                                      @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
                                      @NotNull final KubernetesCredentialsFactory credentialsFactory,
                                      @NotNull final AuthorizationInterceptor authInterceptor,
-                                     @NotNull final ProjectManager projectManager,
-                                     @NotNull final ProjectIdentifiersManager identifiersManager){
+                                     @NotNull final ProjectManager projectManager){
         super(server);
         myPluginDescriptor = pluginDescriptor;
         myCredentialsFactory = credentialsFactory;
@@ -73,7 +69,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
         myAgentPoolManager = agentPoolManager;
         myAuthStrategyProvider = authStrategyProvider;
         myPodTemplateProviders = podTemplateProviders;
-        myIdentifiersManager = identifiersManager;
         web.registerController(path, this);
         authInterceptor.addPathBasedPermissionsChecker(path, new RequestPermissionsCheckerEx() {
             @Override
@@ -120,7 +115,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
             final KubeApiConnection connectionSettings = new RequestKubeApiConnection(request);
 
             final KubeAuthStrategy strategy = myAuthStrategyProvider.get(connectionSettings.getAuthStrategy());
-            try (final KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl(getProjectId(request), getProfileId(request), connectionSettings, strategy, myCredentialsFactory)) {
+            try (final KubeApiConnectorImpl apiConnector = new KubeApiConnectorImpl("editProfile", connectionSettings, strategy, myCredentialsFactory)) {
                 KubeApiConnectionCheckResult connectionCheckResult = IOGuard.allowNetworkCall(()->apiConnector.testConnection());
                 if(!connectionCheckResult.isSuccess()){
                     if (strategy.isRefreshable() && connectionCheckResult.isNeedRefresh()){
@@ -151,15 +146,6 @@ public class KubeProfileEditController extends BaseFormXmlController {
                 writeErrors(xmlResponse, errors);
             }
         }
-    }
-
-    private String getProfileId(@NotNull HttpServletRequest request) {
-      return request.getParameter("profileId");
-    }
-
-    private String getProjectId(@NotNull HttpServletRequest request) {
-      String profileExtId = request.getParameter("projectId");
-      return Objects.requireNonNull(myIdentifiersManager.externalToInternal(profileExtId), "Project identifier is missing");
     }
 
     private static boolean isTestConnection(@NotNull HttpServletRequest request) {

@@ -22,9 +22,8 @@ public class DeploymentContentProviderImpl implements DeploymentContentProvider 
 
     @Nullable
     @Override
-    public Deployment findDeployment(@NotNull String projectId, @NotNull String profileId, @NotNull String name, @NotNull KubeCloudClientParameters kubeClientParams) {
-      try(        KubeApiConnectorImpl kubeApiConnector = new KubeApiConnectorImpl(projectId,
-                                                                                   profileId,
+    public Deployment findDeployment(@NotNull String name, @NotNull KubeCloudClientParameters kubeClientParams) {
+      try(        KubeApiConnectorImpl kubeApiConnector = new KubeApiConnectorImpl("findDeployment",
                                                                                    kubeClientParams,
                                                                                    myAuthStrategies.get(kubeClientParams.getAuthStrategy()),
                                                                                    myCredentialsFactory
