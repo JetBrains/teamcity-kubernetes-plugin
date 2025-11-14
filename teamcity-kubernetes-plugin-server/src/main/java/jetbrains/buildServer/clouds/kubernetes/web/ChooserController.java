@@ -24,7 +24,6 @@ import org.springframework.web.servlet.ModelAndView;
  */
 public abstract class ChooserController extends BaseController {
 
-    private static String URL;
     private final PluginDescriptor myPluginDescriptor;
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final KubernetesCredentialsFactory myCredentialsFactory;
@@ -37,8 +36,7 @@ public abstract class ChooserController extends BaseController {
         myPluginDescriptor = pluginDescriptor;
         myAuthStrategyProvider = authStrategyProvider;
         myCredentialsFactory = credentialsFactory;
-        URL = pluginDescriptor.getPluginResourcesPath(pluginResourcesPath);
-        web.registerController(URL, this);
+        web.registerController(pluginDescriptor.getPluginResourcesPath(pluginResourcesPath), this);
     }
 
     @Nullable
@@ -62,10 +60,6 @@ public abstract class ChooserController extends BaseController {
         return modelAndView;
     }
 
-    public static String getControllerUrl() {
-        return URL;
-    }
-
     @NotNull
     protected abstract Collection<String> getItems(KubeApiConnector apiConnector);
 
@@ -76,11 +70,15 @@ public abstract class ChooserController extends BaseController {
 
     public static class Deployments extends ChooserController{
 
-        public Deployments(final WebControllerManager web,
-                           final PluginDescriptor pluginDescriptor,
-                           final KubeAuthStrategyProvider authStrategyProvider,
-                           final KubernetesCredentialsFactory kubernetesCredentialsFactory) {
-            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory, "kubeDeployments.html");
+      public static final String KUBE_DEPLOYMENTS_HTML = "kubeDeployments.html";
+      private static String controllerUrl;
+
+      public Deployments(final WebControllerManager web,
+                         final PluginDescriptor pluginDescriptor,
+                         final KubeAuthStrategyProvider authStrategyProvider,
+                         final KubernetesCredentialsFactory kubernetesCredentialsFactory) {
+            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory, KUBE_DEPLOYMENTS_HTML);
+            controllerUrl = pluginDescriptor.getPluginResourcesPath(KUBE_DEPLOYMENTS_HTML);
         }
 
         @Override
@@ -96,15 +94,23 @@ public abstract class ChooserController extends BaseController {
         protected String getJspName() {
             return "kubeDeployments.jsp";
         }
+
+        public static String getControllerUrl() {
+          return controllerUrl;
+        }
     }
 
     public static class Namespaces extends ChooserController{
 
-        public Namespaces(final WebControllerManager web,
-                          final PluginDescriptor pluginDescriptor,
-                          final KubeAuthStrategyProvider authStrategyProvider,
-                          final KubernetesCredentialsFactory kubernetesCredentialsFactory)  {
-            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory, "kubeNamespaces.html");
+      public static final String KUBE_NAMESPACES_HTML = "kubeNamespaces.html";
+      private static String controllerUrl;
+
+      public Namespaces(final WebControllerManager web,
+                        final PluginDescriptor pluginDescriptor,
+                        final KubeAuthStrategyProvider authStrategyProvider,
+                        final KubernetesCredentialsFactory kubernetesCredentialsFactory) {
+            super(web, pluginDescriptor, authStrategyProvider, kubernetesCredentialsFactory, KUBE_NAMESPACES_HTML);
+            controllerUrl = pluginDescriptor.getPluginResourcesPath(KUBE_NAMESPACES_HTML);
         }
 
         @Override
@@ -120,6 +126,10 @@ public abstract class ChooserController extends BaseController {
         @Override
         protected String getJspName() {
             return "kubeNamespaces.jsp";
+        }
+
+        public static String getControllerUrl() {
+          return controllerUrl;
         }
     }
 }

@@ -3,10 +3,10 @@ if (!BS) BS = {};
 if (!BS.Kube) BS.Kube = {
     serializeParameters: function() {
         let parameters;
-        if (BS.Clouds){
-            parameters = BS.Clouds.Admin.CreateProfileForm.serializeParameters();
-        } else {
+        if (BS.OAuthConnectionDialog){
             parameters = BS.OAuthConnectionDialog.serializeParameters();
+        } else {
+            parameters = BS.Clouds.Admin.CreateProfileForm.serializeParameters();
         }
         var split = parameters.split('&');
         var result = '';
@@ -700,7 +700,7 @@ if(!BS.Kube.NamespaceChooser){
     };
 
     BS.Kube.NamespaceChooser.selectNamespace = function (namespace) {
-        $j("#kubernetes-namespace").val(namespace || '');
+        $j("#namespace").val(namespace || '');
         this.hidePopup();
     };
 }

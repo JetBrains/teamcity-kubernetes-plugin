@@ -57,7 +57,9 @@
   <td>
     <div style="white-space: nowrap">
       <props:textProperty name="${cons.kubernetesNamespace}" className="longField">
-        <jsp:attribute name="afterTextField"><i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i></jsp:attribute>
+        <jsp:attribute name="afterTextField">
+          <i class="icon-magic" style="cursor:pointer;" title="Choose namespace" onclick="BS.Kube.NamespaceChooser.showPopup(this, '<c:url value="${namespaceChooserUrl}"/>')"></i>
+        </jsp:attribute>
       </props:textProperty>
     </div>
     <span id="error_${cons.kubernetesNamespace}" class="error"></span>
