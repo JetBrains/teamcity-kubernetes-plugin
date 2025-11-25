@@ -25,10 +25,12 @@
 <jsp:useBean id="project" type="jetbrains.buildServer.serverSide.SProject" scope="request"/>
 <%@ page import="jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl" %>
 <c:set var="editKubeHtml" value="<%=KubeProfileEditController.EDIT_KUBE_HTML%>"/>
+<c:set var="editKubeHtml" value="<%=KubeProfileEditController.EDIT_KUBE_HTML%>"/>
 <c:set var="testConnectionUrl" value="/plugins/teamcity-kubernetes-plugin/${editKubeHtml}?testConnection=true"/>
 <c:set var="deleteImageUrl" value="/plugins/teamcity-kubernetes-plugin/<%=KubeDeleteImageDialogController.URL%>"/>
 <c:set var="authStrategies" value="<%=KubeAuthStrategyProviderImpl.getAll(project.getProjectId())%>"/>
 <c:set var="additionalSettings" value="<%=KubeAuthStrategyProviderImpl.getAdditionalSettings(project.getProjectId())%>"/>
+<c:set var="showProxySettings" value="${project.getBooleanInternalParameter('teamcity.internal.kubernetes.enableProxySettings')}"/>
 
 <script type="text/javascript">
   BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
@@ -219,6 +221,40 @@
     </c:if>
   </td>
 </tr>
+
+<c:if test="${showProxySettings}">
+  <l:settingsGroup title="Kubernetes Proxy To Cluster Settings">
+    <tr class="common-settings hide-kubeconfig">
+      <th><label for="${cons.proxyServer}">Proxy server URL:<l:star/></label></th>
+      <td><props:textProperty name="${cons.proxyServer}" className="longField"/>
+        <span id="error_${cons.apiServerUrl}" class="error"></span>
+        <span class="smallNote">Target Kubernetes Proxy server URL</span>
+      </td>
+    </tr>
+    <tr class="common-settings hide-kubeconfig">
+      <th><label for="${cons.proxyLogin}">Proxy server login:<l:star/></label></th>
+      <td><props:textProperty name="${cons.proxyLogin}" className="longField"/>
+        <span id="error_${cons.proxyLogin}" class="error"></span>
+        <span class="smallNote">Proxy Server Login</span>
+      </td>
+    </tr>
+    <tr class="common-settings hide-kubeconfig">
+      <th><label for="${cons.proxyPassword}">Proxy server password:<l:star/></label></th>
+      <td><props:textProperty name="${cons.proxyPassword}" className="longField"/>
+        <span id="error_${cons.proxyPassword}" class="error"></span>
+        <span class="smallNote">Proxy Server Password</span>
+      </td>
+    </tr>
+    <tr class="common-settings hide-kubeconfig">
+      <th><label for="${cons.nonProxyHosts}"> No Proxy Hosts:<l:star/></label></th>
+      <td><props:textProperty name="${cons.nonProxyHosts}" className="longField"/>
+        <span id="error_${cons.nonProxyHosts}" class="error"></span>
+        <span class="smallNote">No Proxy Hosts. Hosts should be written in a comma-separated lists. e.g. http://host1,http://host2</span>
+      </td>
+    </tr>
+  </l:settingsGroup>
+</c:if>
+
 <tr>
   <th class="noBorder"></th>
   <td class="noBorder">

@@ -31,7 +31,7 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     private static final Logger LOG = Logger.getInstance(KubeApiConnectorImpl.class.getName());
 
     @NotNull private final String myProfileId;
-  @NotNull private final KubeApiConnection myConnectionSettings;
+    @NotNull private final KubeApiConnection myConnectionSettings;
     @NotNull private final KubeAuthStrategy myAuthStrategy;
     @NotNull private final KubernetesCredentialsFactory myCredentialsFactory;
 

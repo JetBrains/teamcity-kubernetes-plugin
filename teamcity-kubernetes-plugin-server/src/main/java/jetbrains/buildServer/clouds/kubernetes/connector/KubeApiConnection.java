@@ -22,4 +22,7 @@ public interface KubeApiConnection {
 
     @NotNull
     String getAuthStrategy();
+
+    @Nullable
+    KubeApiProxySettings getProxySettings();
 }

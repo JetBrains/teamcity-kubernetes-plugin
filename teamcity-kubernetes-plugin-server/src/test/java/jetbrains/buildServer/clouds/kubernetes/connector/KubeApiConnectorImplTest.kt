@@ -7,7 +7,6 @@ import io.fabric8.kubernetes.api.model.Status
 import io.fabric8.kubernetes.client.*
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.MockTimeService
-import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl
 import jetbrains.buildServer.clouds.kubernetes.auth.RefreshableStrategy
 import jetbrains.buildServer.clouds.kubernetes.connection.KubernetesCredentialsFactoryImpl
@@ -42,10 +41,12 @@ class KubeApiConnectorImplTest : BaseTestCase() {
             override fun getCACertData() = null
 
             override fun getAuthStrategy() = AUTH_STRAGEGY
+            override fun getProxySettings() = null
         }
 
     }
 
+    @Test
     public fun check_connection_refreshed(){
         val initialClient = FakeKubeClient()
         val errorMessage = "Failure executing: GET at: https://localhost:12345/api/v1/namespaces/test-namespace/pods?labelSelector=teamcity-cloud-image%3D0,teamcity-cloud-profile%3Dkube-4. Message: Unauthorized! Token may have expired! Please log-in again. Unauthorized."
@@ -59,7 +60,8 @@ class KubeApiConnectorImplTest : BaseTestCase() {
         val authStrategyProvider = KubeAuthStrategyProviderImpl(
             timeService, Mockito.mock(ProjectManager::class.java))
         authStrategyProvider.registerStrategy(strategy)
-        val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", apiConnection, strategy, KubernetesCredentialsFactoryImpl(authStrategyProvider)){
+        val kubernetesCredentialsFactory = KubernetesCredentialsFactoryImpl(authStrategyProvider, Mockito.mock(ProjectManager::class.java))
+        val kubeApiConnector = object: KubeApiConnectorImpl("kube-111", apiConnection, strategy, kubernetesCredentialsFactory){
             override fun createClient(config: Config): KubernetesClient {
                 clientsCreated++
                 if (clientsCreated == 2){

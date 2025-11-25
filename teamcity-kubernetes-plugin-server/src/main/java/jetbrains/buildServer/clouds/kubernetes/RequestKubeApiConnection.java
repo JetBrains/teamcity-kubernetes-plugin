@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiProxySettings;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
 import jetbrains.buildServer.internal.PluginPropertiesUtil;
 import jetbrains.buildServer.util.StringUtil;
@@ -49,5 +50,29 @@ public class RequestKubeApiConnection implements KubeApiConnection {
   @Override
   public String getAuthStrategy() {
     return myProps.get(KubeParametersConstants.AUTH_STRATEGY);
+  }
+
+  @Nullable
+  @Override
+  public KubeApiProxySettings getProxySettings() {
+    final String proxyHost = myProps.get(PROXY_SERVER);
+    if (StringUtil.isEmpty(proxyHost)) {
+      return null;
+    }
+
+    final String[] nonProxyHosts;
+    final String nonProxyHostsValue = myProps.get(NON_PROXY_HOSTS);
+    if (StringUtil.isEmpty(nonProxyHostsValue)) {
+      nonProxyHosts = new String[0];
+    } else {
+      nonProxyHosts = nonProxyHostsValue.split(",");
+    }
+
+    return new KubeApiProxySettingsImpl(
+      proxyHost,
+      myProps.get(PROXY_LOGIN),
+      myProps.get(SECURE_PROPERTY_PREFIX + PROXY_PASSWORD),
+      nonProxyHosts
+    );
   }
 }

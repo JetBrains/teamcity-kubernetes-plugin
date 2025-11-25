@@ -13,6 +13,10 @@ public class KubeParametersConstants {
     public static final String AUTH_STRATEGY = "authStrategy";
     public static final String KUBERNETES_NAMESPACE = "namespace";
     public static final String CA_CERT_DATA = "caCertData";
+    public static final String PROXY_SERVER = "proxyServer";
+    public static final String PROXY_LOGIN = "proxyLogin";
+    public static final String PROXY_PASSWORD = "proxyPassword";
+    public static final String NON_PROXY_HOSTS = "nonProxyHosts";
     public static final String PROFILE_INSTANCE_LIMIT = "profileInstanceLimit";
     public static final String IMAGE_INSTANCE_LIMIT = "imageInstanceLimit";
     public static final String POD_TEMPLATE_MODE = "podTemplateMode";
@@ -56,6 +60,22 @@ public class KubeParametersConstants {
 
     public String getCaCertData() {
         return CA_CERT_DATA;
+    }
+
+    public String getProxyServer() {
+      return PROXY_SERVER;
+    }
+
+    public String getProxyLogin() {
+      return PROXY_LOGIN;
+    }
+
+    public String getProxyPassword() {
+      return PROXY_PASSWORD;
+    }
+
+    public String getNonProxyHosts() {
+      return NON_PROXY_HOSTS;
     }
 
     public String getKubernetesNamespace() {

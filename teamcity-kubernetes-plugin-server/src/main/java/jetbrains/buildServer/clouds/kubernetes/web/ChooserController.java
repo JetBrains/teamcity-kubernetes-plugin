@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes.web;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.clouds.kubernetes.RequestKubeApiConnection;
@@ -13,6 +14,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.serverSide.IOGuard;
+import jetbrains.buildServer.serverSide.identifiers.ProjectIdentifiersManager;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jetbrains.annotations.NotNull;

@@ -8,6 +8,7 @@ import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.AUTH_STRATEGY
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
+import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiProxySettings
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.util.TimeService
 import org.assertj.core.api.BDDAssertions.then
@@ -37,6 +38,8 @@ class RefreshableStrategyTest : BaseTestCase() {
             override fun getCACertData() = null
 
             override fun getAuthStrategy() = AUTH_STRATEGY
+
+            override fun getProxySettings() = null
         }
     }
 
