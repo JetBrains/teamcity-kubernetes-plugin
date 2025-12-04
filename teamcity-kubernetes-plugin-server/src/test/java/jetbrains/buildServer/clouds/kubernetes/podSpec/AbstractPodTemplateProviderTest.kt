@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.EnvVarSource
 import io.fabric8.kubernetes.api.model.ObjectFieldSelector
 import io.fabric8.kubernetes.api.model.Pod
 import jetbrains.buildServer.BaseTestCase
+import jetbrains.buildServer.agent.AgentRuntimeProperties
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage
 import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment
@@ -13,6 +14,7 @@ import jetbrains.buildServer.util.TestFor
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
 @author Sergey.Pak
@@ -65,12 +67,26 @@ class AbstractPodTemplateProviderTest : BaseTestCase() {
 
     @TestFor(issues = ["TW-80794"])
     fun env_vars_are_added_from_custom_properties(){
-        val userData = CloudInstanceUserData("", "", "http://127.0.0.1:9999", null, "kube-321",
-            "Test Profile", mapOf("key1.test" to "value1", "${KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX}key2" to "value2")
+        val userData = CloudInstanceUserData(
+            "", "", "http://127.0.0.1:9999", null, "kube-321",
+            "Test Profile", mapOf(
+                "key1.test" to "value1",
+                "${KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX}key2" to "value2",
+                AgentRuntimeProperties.STARTING_CLOUD_INSTANCE_ID to "some_hash"
+            )
         )
 
         val patchedEnvVars = provider.getPatchedEnvVars("inst", "serverUUID", "imgId", userData, emptyList())
 
         then(patchedEnvVars).contains(EnvVar("${KubeContainerEnvironment.TEAMCITY_KUBERNETES_PROVIDED_PREFIX}key1_test", "value1", null))
+
+        val found = AtomicBoolean(false)
+        patchedEnvVars.forEach { envVar ->
+            if ("some_hash".equals(envVar.value)) {
+                then(envVar.name).isEqualTo(KubeContainerEnvironment.STARTING_INSTANCE_ID);
+                found.set(true)
+            }
+        }
+        then(found.get()).isTrue()
     }
 }
