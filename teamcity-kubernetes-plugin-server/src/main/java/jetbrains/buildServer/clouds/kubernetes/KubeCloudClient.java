@@ -5,8 +5,11 @@ import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
@@ -19,12 +22,6 @@ import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.IMAGE_NAME;
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.INSTANCE_NAME;
@@ -163,14 +160,12 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public CloudInstance findInstanceByAgent(@NotNull AgentDescription agentDescription) {
-        Map<String, String> agentParameters = agentDescription.getAvailableParameters();
-
-        if((myServerUuid != null && !myServerUuid.equals(agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.SERVER_UUID))) ||
-                !myCloudProfileId.equals(agentParameters.get(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID)))
+        if((myServerUuid != null && !myServerUuid.equals(agentDescription.getAvailableParameterValue(Constants.ENV_PREFIX + KubeContainerEnvironment.SERVER_UUID))) ||
+                !myCloudProfileId.equals(agentDescription.getAvailableParameterValue(Constants.ENV_PREFIX + KubeContainerEnvironment.PROFILE_ID)))
             return null;
 
-        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_NAME);
-        final String instanceName = agentParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
+        final String imageId = agentDescription.getAvailableParameterValue(Constants.ENV_PREFIX + IMAGE_NAME);
+        final String instanceName = agentDescription.getAvailableParameterValue(Constants.ENV_PREFIX + INSTANCE_NAME);
         if (imageId != null) {
             final KubeCloudImage cloudImage = myImageIdToImageMap.get(imageId);
             if (cloudImage != null) {
@@ -215,9 +210,8 @@ public class KubeCloudClient implements CloudClientEx {
     @Nullable
     @Override
     public String generateAgentName(@NotNull AgentDescription agentDescription) {
-        final Map<String, String> agentParameters = agentDescription.getAvailableParameters();
-        final String imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_NAME);
-        final String instanceName = agentParameters.get(Constants.ENV_PREFIX + INSTANCE_NAME);
+        final String imageId = agentDescription.getAvailableParameterValue(Constants.ENV_PREFIX + IMAGE_NAME);
+        final String instanceName = agentDescription.getAvailableParameterValue(Constants.ENV_PREFIX + INSTANCE_NAME);
         if (!StringUtil.isNotEmpty(imageId) || !StringUtil.isNotEmpty(instanceName))
             return null;
 
