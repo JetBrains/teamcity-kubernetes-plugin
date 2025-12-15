@@ -13,10 +13,6 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="build" target="1.8" />
-      <module name="teamcity-kubernetes-plugin" target="1.8" />
-      <module name="teamcity-kubernetes-plugin-agent" target="1.6" />
-      <module name="teamcity-kubernetes-plugin-common" target="1.6" />
-      <module name="teamcity-kubernetes-plugin-server" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
