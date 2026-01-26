@@ -25,9 +25,9 @@
 <jsp:useBean id="project" type="jetbrains.buildServer.serverSide.SProject" scope="request"/>
 <%@ page import="jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl" %>
 <c:set var="editKubeHtml" value="<%=KubeProfileEditController.EDIT_KUBE_HTML%>"/>
-<c:set var="editKubeHtml" value="<%=KubeProfileEditController.EDIT_KUBE_HTML%>"/>
+<c:set var="deleteImageUrl" value="<%=KubeDeleteImageDialogController.URL%>"/>
 <c:set var="testConnectionUrl" value="/plugins/teamcity-kubernetes-plugin/${editKubeHtml}?testConnection=true"/>
-<c:set var="deleteImageUrl" value="/plugins/teamcity-kubernetes-plugin/<%=KubeDeleteImageDialogController.URL%>"/>
+<c:set var="deleteImageUrl" value="/plugins/teamcity-kubernetes-plugin/${deleteImageUrl}"/>
 <c:set var="authStrategies" value="<%=KubeAuthStrategyProviderImpl.getAll(project.getProjectId())%>"/>
 <c:set var="additionalSettings" value="<%=KubeAuthStrategyProviderImpl.getAdditionalSettings(project.getProjectId())%>"/>
 <c:set var="showProxySettings" value="${project.getBooleanInternalParameter('teamcity.internal.kubernetes.enableProxySettings')}"/>
@@ -35,7 +35,9 @@
 <script type="text/javascript">
   BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
 </script>
-
+<c:set var="canEditProject" value="${afn:permissionGrantedForProject(project, 'MANAGE_AGENT_CLOUDS')}"/>
+<c:set var="readOnly" value="${project.readOnly}"/>
+<c:set var="disabled" value="${(not canEditProject) || readOnly}"/>
 
 <tr class="common-settings hide-kubeconfig">
   <th><label for="${cons.apiServerUrl}">Kubernetes API server URL:<l:star/></label></th>
@@ -278,7 +280,7 @@
     success: function () {
       BS.Kube.ProfileSettingsForm.testConnectionUrl = '<c:url value="${testConnectionUrl}"/>';
       BS.Kube.DeleteImageDialog.url = '<c:url value="${deleteImageUrl}"/>';
-      BS.Kube.ProfileSettingsForm.initialize();
+      BS.Kube.ProfileSettingsForm.initialize(${disabled});
     }
   });
 </script>

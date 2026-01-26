@@ -19,6 +19,11 @@
 <jsp:useBean id="namespaceChooserUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="deploymentChooserUrl" class="java.lang.String" scope="request"/>
 
+<c:set var="canEditProject" value="${afn:permissionGrantedForProject(project, 'MANAGE_AGENT_CLOUDS')}"/>
+<c:set var="readOnly" value="${project.readOnly}"/>
+<c:set var="disabled" value="${(not canEditProject) || readOnly}"/>
+
+
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}kubeSettings.css'/>");
 </script>
@@ -45,7 +50,14 @@
             <tr>
                 <th class="name">Image description</th>
                 <th class="name">Max # of instances</th>
-                <th class="name" colspan="2"></th>
+                <c:choose>
+                  <c:when test="${disabled}">
+                    <th class="name" colspan="1"></th>
+                  </c:when>
+                  <c:otherwise>
+                    <th class="name" colspan="2"></th>
+                  </c:otherwise>
+                </c:choose>
             </tr>
             </tbody>
         </table>
@@ -53,7 +65,9 @@
         <input type="hidden" class="jsonParam" name="prop:source_images_json" id="source_images_json" value="<c:out value='${sourceImagesJson}'/>"/>
         <input type="hidden" id="initial_images_list"/>
     </div>
-    <forms:addButton title="Add image" id="showAddImageDialogButton">Add image</forms:addButton>
+    <c:if test="${not disabled}">
+      <forms:addButton title="Add image" id="showAddImageDialogButton">Add image</forms:addButton>
+    </c:if>
 </div>
 
 

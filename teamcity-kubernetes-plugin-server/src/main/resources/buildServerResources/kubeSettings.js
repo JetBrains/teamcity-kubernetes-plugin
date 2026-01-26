@@ -1,6 +1,6 @@
 
 if (!BS) BS = {};
-if (!BS.Kube) BS.Kube = {
+BS.Kube = {
     serializeParameters: function() {
         let parameters;
         if (BS.OAuthConnectionDialog){
@@ -28,7 +28,7 @@ if (!BS.Kube) BS.Kube = {
     }
 };
 
-if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
+BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
 
     testConnectionUrl: '',
 
@@ -38,7 +38,14 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
 <td class="imageInstanceLimit highlight"></td>\
 <td class="edit highlight"><a href="#" class="editVmImageLink">Edit</a></td>\
 <td class="remove"><a href="#" class="removeVmImageLink">Delete...</a></td>\
-        </tr>')},
+        </tr>'),
+
+        disabledImagesTableRow: $j('<tr class="imagesTableRow">\
+<td class="imageDescription highlight"></td>\
+<td class="imageInstanceLimit highlight"></td>\
+<td class="edit highlight"><a href="#" class="editVmImageLink">View</a></td>\
+        </tr>')
+    },
 
     _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
 
@@ -62,8 +69,11 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     defaults: {
         imageInstanceLimit: '<Unlimited>'
     },
+    isDisabled: false,
 
-    initialize: function(){
+    initialize: function(isDisabled){
+        this.isDisabled = isDisabled;
+
         this.$imagesTable = $j('#kubeImagesTable');
         this.$imagesTableWrapper = $j('.imagesTableWrapper');
 
@@ -135,9 +145,7 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
         var editDelegates = this.selectors.imagesTableRow + ' .highlight, ' + this.selectors.editImageLink;
         var that = this;
         this.$imagesTable.on('click', editDelegates, function () {
-            if (!that.$addImageButton.prop('disabled')) {
-                self.showEditImageDialog($j(this));
-            }
+            self.showEditImageDialog($j(this));
             return false;
         });
 
@@ -320,8 +328,13 @@ if(!BS.Kube.ProfileSettingsForm) BS.Kube.ProfileSettingsForm = OO.extend(BS.Plug
     },
 
     _renderImageRow: function (props, id) {
-        var $row = this.templates.imagesTableRow.clone().attr('data-image-id', id);
-        var defaults = this.defaults;
+        let $row;
+        if (this.isDisabled){
+          $row = this.templates.disabledImagesTableRow.clone().attr('data-image-id', id)
+        } else {
+          $row = this.templates.imagesTableRow.clone().attr('data-image-id', id)
+        }
+        const defaults = this.defaults;
 
         this._dataKeys.forEach(function (className) {
             $row.find('.' + className).text(props[className] || defaults[className]);
