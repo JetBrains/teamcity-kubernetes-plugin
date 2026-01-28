@@ -2,9 +2,9 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import io.fabric8.kubernetes.api.model.PodStatus;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.InstanceStatus;
 import jetbrains.buildServer.util.StringUtil;
@@ -72,7 +72,7 @@ public class KubeUtils {
         if (StringUtil.areEqual(dataString, Base64.encodeBase64String(decodedString)))
             return dataString;
         else
-            return Base64.encodeBase64String(dataString.getBytes());
+            return Base64.encodeBase64String(dataString.getBytes(StandardCharsets.UTF_8));
     }
 
     public static byte[] decodeBase64IfNecessary(@NotNull String dataString){
@@ -85,7 +85,7 @@ public class KubeUtils {
         if (StringUtil.areEqual(dataString, Base64.encodeBase64String(decodedString)))
             return Base64.decodeBase64(dataString);
         else
-            return dataString.getBytes();
+            return dataString.getBytes(StandardCharsets.UTF_8);
     }
 
     static {
