@@ -4,6 +4,8 @@ package jetbrains.buildServer.clouds.kubernetes;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import jetbrains.buildServer.clouds.CloudException;
 import jetbrains.buildServer.log.Loggers;
@@ -24,7 +25,6 @@ import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
-import jetbrains.buildServer.util.ThreadUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
@@ -34,71 +34,85 @@ public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
   private final File myIdxStorage;
   private final AtomicBoolean myIsAvailable;
   private final ReadWriteLock myLock = new ReentrantReadWriteLock();
+  private static final String FILE_EXTENSION = ".idx";
 
-  public KubePodNameGeneratorImpl(@NotNull ServerPaths serverPaths,
-                              @NotNull ExecutorServices executorServices,
-                              @NotNull EventDispatcher<BuildServerListener> eventDispatcher
-                              ){
+  public KubePodNameGeneratorImpl(
+          @NotNull ServerPaths serverPaths,
+          @NotNull ExecutorServices executorServices,
+          @NotNull EventDispatcher<BuildServerListener> eventDispatcher
+  ) {
     myIdxStorage = new File(serverPaths.getPluginDataDirectory(), "kubeIdx");
-    if (!myIdxStorage.exists()){
+    if (!myIdxStorage.exists()) {
       myIdxStorage.mkdirs();
     }
-    if (!myIdxStorage.isDirectory()){
+    if (!myIdxStorage.isDirectory()) {
       throw new CloudException("Unable to create a directory for kube plugin VM indexes");
     }
     myIsAvailable = new AtomicBoolean(true);
 
     loadIdxes(myIdxStorage);
 
-    eventDispatcher.addListener(new BuildServerAdapter(){
+    eventDispatcher.addListener(new BuildServerAdapter() {
       @Override
       public void serverShutdown() {
         myIsAvailable.set(false);
-        storeIdxes();
+        storeIdxes(true);
       }
     });
-    executorServices.getNormalExecutorService().scheduleWithFixedDelay(this::storeIdxes, 60, 60, TimeUnit.SECONDS);
+    executorServices.getNormalExecutorService().scheduleWithFixedDelay(() -> storeIdxes(false), 60, 60, TimeUnit.SECONDS);
   }
 
   private synchronized void loadIdxes(@NotNull final File idxStorage) {
     final File[] idxes = idxStorage.listFiles();
-    if (idxes == null){
-
+    if (idxes == null) {
+      return;
     }
     for (File idxFile : idxes) {
-      if (!idxFile.getName().endsWith(".idx"))
+      if (!idxFile.getName().endsWith(FILE_EXTENSION))
         continue;
-      String idxName = idxFile.getName().substring(0, idxFile.getName().length()-4);
+      String idxName = idxFile.getName().substring(0, idxFile.getName().length() - FILE_EXTENSION.length());
       try {
-        int val = StringUtil.parseInt(FileUtil.readText(idxFile), -1);
+        int val = StringUtil.parseInt(new String(Files.readAllBytes(idxFile.toPath()), StandardCharsets.UTF_8), -1);
         if (val > 0){
           myCounters.putIfAbsent(idxName, new AtomicInteger(0));
           myCounters.get(idxName).set(val);
         }
-      } catch (IOException e) {}
+      } catch (IOException e) {
+        Loggers.AGENT.warn("Failed to load Kube index from file " + idxFile.getName(), e);
+      }
     }
   }
 
-  private void storeIdxes() {
-    // wait for generation operations to finish:
+  private void storeIdxes(boolean force) {
+    // wait for generation operations to finish, unless we're in the server shutdown phase
+    Lock lock = myLock.writeLock();
+    boolean locked = true;
     try {
-      if (!myLock.writeLock().tryLock(100, TimeUnit.MILLISECONDS)) {
-        Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes");
+      if (!lock.tryLock(100, TimeUnit.MILLISECONDS)) {
+        if (force) {
+          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, forcing Kube indexes storage");
+          locked = false;
+        } else {
+          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, skip this time");
+          return;
+        }
       }
       for (Map.Entry<String, AtomicBoolean> entry : myIdxTouchedMaps.entrySet()) {
         if (entry.getValue().compareAndSet(true, false)) {
           final AtomicInteger counter = myCounters.get(entry.getKey());
           try {
-            final File idxFile = new File(myIdxStorage, entry.getKey() + ".idx");
-            FileUtil.writeViaTmpFile(idxFile, new ByteArrayInputStream(String.valueOf(counter.get()).getBytes()), FileUtil.IOAction.DO_NOTHING);
+            final File idxFile = new File(myIdxStorage, entry.getKey() + FILE_EXTENSION);
+            FileUtil.writeViaTmpFile(idxFile, new ByteArrayInputStream(String.valueOf(counter.get()).getBytes(StandardCharsets.UTF_8)), FileUtil.IOAction.DO_NOTHING);
           } catch (IOException ignored) {
           }
         }
       }
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      Loggers.AGENT.warn("Interrupted while waiting for Kube indexes storage lock", e);
     } finally {
-      myLock.writeLock().unlock();
+      if (locked) {
+        lock.unlock();
+      }
     }
   }
 
@@ -130,13 +144,11 @@ public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
   }
 
   private int getNextCounter(String prefix){
-    myCounters.putIfAbsent(prefix, new AtomicInteger());
-    return myCounters.get(prefix).incrementAndGet();
+    return myCounters.computeIfAbsent(prefix, k -> new AtomicInteger()).incrementAndGet();
   }
 
   private void setTouched(String prefix){
-    myIdxTouchedMaps.putIfAbsent(prefix, new AtomicBoolean());
-    myIdxTouchedMaps.get(prefix).set(true);
+    myIdxTouchedMaps.computeIfAbsent(prefix, k -> new AtomicBoolean()).set(true);
   }
 
 }
