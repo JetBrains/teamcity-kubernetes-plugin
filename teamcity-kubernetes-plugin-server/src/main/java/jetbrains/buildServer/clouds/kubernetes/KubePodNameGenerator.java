@@ -6,4 +6,6 @@ import org.jetbrains.annotations.NotNull;
 public interface KubePodNameGenerator {
 
   @NotNull String generateNewVmName(@NotNull KubeCloudImage image);
+
+  default void vmNameSaved(@NotNull String instanceName) {}
 }

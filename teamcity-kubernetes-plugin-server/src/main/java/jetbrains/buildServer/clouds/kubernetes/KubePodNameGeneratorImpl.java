@@ -21,6 +21,7 @@ import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.BuildServerAdapter;
 import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
 
+  private final ConcurrentHashMap.KeySetView<String, Boolean> myUsedReusedNames = ConcurrentHashMap.newKeySet();
   private final ConcurrentMap<String, AtomicInteger> myCounters = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, AtomicBoolean> myIdxTouchedMaps = new ConcurrentHashMap<>();
   private final File myIdxStorage;
@@ -83,15 +85,17 @@ public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
     }
   }
 
-  private void storeIdxes(boolean force) {
-    // wait for generation operations to finish, unless we're in the server shutdown phase
+  private void storeIdxes(boolean shuttingDown) {
+    // wait for generation operations to finish, unless we're in the server shutdown phase or set by internal property
     Lock lock = myLock.writeLock();
-    boolean locked = true;
+    boolean locked = false;
     try {
-      if (!lock.tryLock(100, TimeUnit.MILLISECONDS)) {
-        if (force) {
-          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, forcing Kube indexes storage");
-          locked = false;
+      locked = lock.tryLock(100, TimeUnit.MILLISECONDS);
+      if (!locked) {
+        if (shuttingDown) {
+          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, forcing Kube indexes storage due to server shutdown");
+        } else if (TeamCityProperties.getBoolean("teamcity.kube.pods.nameGenerator.periodicalPersist.force")) {
+          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, forcing Kube indexes storage due to internal property");
         } else {
           Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, skip this time");
           return;
@@ -118,29 +122,53 @@ public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
 
   @NotNull
   public String generateNewVmName(@NotNull KubeCloudImage image) {
-    try {
-      myLock.readLock().lock();
-      if (!myIsAvailable.get()){
-        throw new CloudException("Unable to generate a name for image " + image.getId() + " - server is shutting down");
-      }
-      String newVmName;
-      do {
-        String prefix = image.getAgentNamePrefix();
-        if (StringUtil.isEmptyOrSpaces(prefix)) {
-          prefix = image.getDockerImage();
-        }
-        if (StringUtil.isEmptyOrSpaces(prefix)) {
-          return UUID.randomUUID().toString();
-        }
-        prefix = StringUtil.replaceNonAlphaNumericChars(prefix.trim().toLowerCase(), '-');
-        newVmName = String.format("%s-%d", prefix, getNextCounter(prefix));
-        setTouched(prefix);
-
-      } while (image.findInstanceById(newVmName) != null);
-      return newVmName;
-    } finally {
-      myLock.readLock().unlock();
+    if (!myIsAvailable.get()) {
+      throw new CloudException("Unable to generate a name for image " + image.getId() + " - server is shutting down");
     }
+
+    String prefix = image.getAgentNamePrefix();
+    if (StringUtil.isEmptyOrSpaces(prefix)) {
+      prefix = image.getDockerImage();
+    }
+    if (StringUtil.isEmptyOrSpaces(prefix)) {
+      return UUID.randomUUID().toString();
+    }
+    prefix = StringUtil.replaceNonAlphaNumericChars(prefix.trim().toLowerCase(), '-');
+
+    String newVmName;
+    if (image.isReusingNames() && TeamCityProperties.getBooleanOrTrue("teamcity.kube.pods.nameGenerator.reuseNames")) {
+      int counter = 1;
+      while (true) {
+        newVmName = String.format("%s-%d", prefix, counter);
+        // not used by any running instance
+        if (image.findInstanceById(newVmName) == null) {
+          // ensure that another thread won't use the same name, temporarily save the name
+          // it will be unlocked shortly after by the `nameSaved` method.
+          if (myUsedReusedNames.add(newVmName)) {
+            return newVmName;
+          }
+        }
+        counter++;
+      }
+    }
+
+    do {
+      Lock lock = myLock.readLock();
+      lock.lock();
+      try {
+        int counter = getNextCounter(prefix);
+        newVmName = String.format("%s-%d", prefix, counter);
+        setTouched(prefix);
+      } finally {
+        lock.unlock();
+      }
+    } while (image.findInstanceById(newVmName) != null);
+    return newVmName;
+  }
+
+  @Override
+  public void vmNameSaved(@NotNull String instanceName) {
+    myUsedReusedNames.remove(instanceName);
   }
 
   private int getNextCounter(String prefix){

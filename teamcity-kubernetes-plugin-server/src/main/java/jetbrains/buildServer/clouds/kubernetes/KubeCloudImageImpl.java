@@ -134,6 +134,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
         return myImageData.getAgentNamePrefix();
     }
 
+    @Override
+    public boolean isReusingNames() {
+        return myImageData.isReusingNames();
+    }
 
     @Override
     public void setErrorInfo(@Nullable final CloudErrorInfo errorInfo) {
