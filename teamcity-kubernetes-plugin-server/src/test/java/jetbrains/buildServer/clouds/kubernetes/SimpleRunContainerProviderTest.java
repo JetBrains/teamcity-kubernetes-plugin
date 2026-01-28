@@ -1,9 +1,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes;
 
-import io.fabric8.kubernetes.api.model.Container;
-import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,8 +21,9 @@ import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.serverSide.impl.ServerSettingsImpl;
 import jetbrains.buildServer.serverSide.impl.executors.SimpleExecutorServices;
+import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.EventDispatcher;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.testng.annotations.BeforeMethod;
@@ -32,6 +31,7 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
+@SuppressWarnings("FieldCanBeLocal")
 @Test
 public class SimpleRunContainerProviderTest extends BaseTestCase {
 
@@ -51,7 +51,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   public void setUp() throws Exception {
     super.setUp();
     myServerSettings = new ServerSettingsImpl(){
-      @Nullable
+      @NotNull
       @Override
       public String getServerUUID() {
         return "SERVER-UUID";
@@ -120,6 +120,67 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     then(newGenerator2.generateNewVmName(image)).isEqualTo("prefix-2");
   }
 
+  public void reuse_agent_names() {
+    final Map<String, String> imageParameters = CollectionsUtil.asMap(
+            CloudImageParameters.SOURCE_ID_FIELD, "image1",
+            KubeParametersConstants.DOCKER_IMAGE, "jetbrains/teamcity-agent",
+            KubeParametersConstants.AGENT_NAME_PREFIX, "prefix",
+            KubeParametersConstants.REUSING_AGENT_NAMES, Boolean.TRUE.toString()
+    );
+
+    final Collection<Pod> pods = new ArrayList<>();
+
+    final KubeApiConnector apiConnector = m.mock(KubeApiConnector.class, "KubeApiConnector-" + idx.incrementAndGet());
+    m.checking(new Expectations() {{
+      allowing(apiConnector).getNamespace();
+      will(returnValue("unknown"));
+      //noinspection unchecked
+      allowing(apiConnector).listPods(with(any(Map.class)));
+      will(returnValue(pods));
+    }});
+
+    final KubeCloudImage image = createImage(imageParameters, apiConnector);
+
+    // Start five instances
+    for (int i = 1; i <= 5; i++) {
+      KubeCloudInstance instance = startInstance(image, apiConnector, pods);
+      then(instance.getName()).isEqualTo("prefix-" + i);
+    }
+
+    // Refresh instance states as running
+    for (Pod pod : pods) {
+      PodStatus status = new PodStatus();
+      status.setPhase("Running");
+      pod.setStatus(status);
+    }
+    image.populateInstances();
+
+    // Stop 2 and 4 and reload from the api connector
+    pods.removeIf(it -> it.getMetadata().getName().equals("prefix-2") || it.getMetadata().getName().equals("prefix-4"));
+    image.populateInstances();
+
+    // Start five more instances, the first two will reuse names
+    then(startInstance(image, apiConnector, pods).getName()).isEqualTo("prefix-2");
+    then(startInstance(image, apiConnector, pods).getName()).isEqualTo("prefix-4");
+    then(startInstance(image, apiConnector, pods).getName()).isEqualTo("prefix-6");
+    then(startInstance(image, apiConnector, pods).getName()).isEqualTo("prefix-7");
+    then(startInstance(image, apiConnector, pods).getName()).isEqualTo("prefix-8");
+
+    then(pods).extracting(Pod::getMetadata).extracting(ObjectMeta::getName).containsOnlyElementsOf(Arrays.asList(
+            "prefix-1", "prefix-2", "prefix-3", "prefix-4",
+            "prefix-5", "prefix-6", "prefix-7", "prefix-8"
+    ));
+  }
+
+  private KubeCloudInstance startInstance(KubeCloudImage image, KubeApiConnector apiConnector, Collection<Pod> pods) {
+    Pod pod = createTemplate(image, apiConnector);
+    KubeCloudInstance instance = new KubeCloudInstanceImpl(image, pod);
+    image.addStartedInstance(instance);
+    myNameGenerator.vmNameSaved(instance.getName());
+    pods.add(pod);
+    return instance;
+  }
+
 
   public void dont_generate_on_shutdown() throws InterruptedException {
     final Map<String, String> imageParameters = createMap(CloudImageParameters.SOURCE_ID_FIELD, "image1",
@@ -175,9 +236,24 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
     return myContainerProvider.getPodTemplate(newPodName, instanceTag, image, apiConnector);
   }
 
+  private Pod createTemplate(KubeCloudImage image, KubeApiConnector apiConnector) {
+    final CloudInstanceUserData instanceTag = createInstanceTag();
+
+    String newPodName = myNameGenerator.generateNewVmName(image);
+    return myContainerProvider.getPodTemplate(newPodName, instanceTag, image, apiConnector);
+  }
+
   private KubeCloudImage createImage(Map<String, String> imageParameters){
+    return createImage(imageParameters, new FakeKubeApiConnector());
+  }
+
+  private KubeCloudImage createImage(Map<String, String> imageParameters, KubeApiConnector apiConnector) {
     final CloudImageDataImpl imageData = new CloudImageDataImpl(imageParameters);
-    return new KubeCloudImageImpl(new KubeCloudImageData(new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")), new FakeKubeApiConnector()
+    return new KubeCloudImageImpl(
+            new KubeCloudImageData(
+                    new CloudImageParametersImpl(imageData, PROJECT_ID, "image1")
+            ),
+            apiConnector
     );
   }
 
