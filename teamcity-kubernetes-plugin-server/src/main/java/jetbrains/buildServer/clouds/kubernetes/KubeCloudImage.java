@@ -50,4 +50,6 @@ public interface KubeCloudImage extends CloudImage {
     String getAgentNamePrefix();
 
     void setErrorInfo(CloudErrorInfo errorInfo);
+
+    boolean isReusingNames();
 }

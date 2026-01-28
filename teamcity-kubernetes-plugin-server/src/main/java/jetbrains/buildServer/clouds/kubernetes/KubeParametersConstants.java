@@ -37,6 +37,7 @@ public class KubeParametersConstants {
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
     public static final String AGENT_NAME_PREFIX = "agentNamePrefix";
     public static final String KUBECONFIG_CONTEXT = "kubeconfigContext";
+    public static final String REUSING_AGENT_NAMES = "reusingAgentNames";
 
     public static final String EKS_ACCESS_ID = "eksAccessId";
     public static final String EKS_SECRET_KEY = "eksSecretKey";

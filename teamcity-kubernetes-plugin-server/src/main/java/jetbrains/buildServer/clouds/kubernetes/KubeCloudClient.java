@@ -95,6 +95,8 @@ public class KubeCloudClient implements CloudClientEx {
         }
         KubeCloudInstance instance = new KubeCloudInstanceImpl(kubeCloudImage, podTemplate);
         kubeCloudImage.addStartedInstance(instance);
+        // Once instance added to the kubeCloudImage, we could unlock name from name generator.
+        myNameGenerator.vmNameSaved(instanceName);
         myExecutorService.submit(() -> {
             Pod newPod = null;
             PersistentVolumeClaim newPVC = null;

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.AGENT_NAME_PREFIX;
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.REUSING_AGENT_NAMES;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 12.06.17.
@@ -69,5 +70,9 @@ public class KubeCloudImageData {
 
     public String getProfileId(){
         return myRawImageData.getProfileId();
+    }
+
+    public boolean isReusingNames() {
+        return Boolean.parseBoolean(myRawImageData.getParameter(REUSING_AGENT_NAMES));
     }
 }
