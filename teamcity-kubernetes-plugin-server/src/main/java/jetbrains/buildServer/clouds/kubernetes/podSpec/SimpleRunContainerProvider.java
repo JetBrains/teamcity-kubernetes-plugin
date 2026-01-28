@@ -1,17 +1,21 @@
 
 package jetbrains.buildServer.clouds.kubernetes.podSpec;
 
-import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.ContainerBuilder;
+import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodBuilder;
 import java.util.Collections;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
-import jetbrains.buildServer.clouds.kubernetes.*;
+import jetbrains.buildServer.clouds.kubernetes.KubeCloudImage;
+import jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment;
+import jetbrains.buildServer.clouds.kubernetes.KubeTeamCityLabels;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by ekoshkin (koshkinev@gmail.com) on 15.06.17.
@@ -34,12 +38,6 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
   @Override
   public String getDisplayName() {
     return "Run single container";
-  }
-
-  @Nullable
-  @Override
-  public String getDescription() {
-    return null;
   }
 
   @NotNull
@@ -92,11 +90,5 @@ public class SimpleRunContainerProvider implements BuildAgentPodTemplateProvider
       .withRestartPolicy(KubeApiConnector.NEVER_RESTART_POLICY)
       .endSpec()
       .build();
-  }
-
-  @Nullable
-  @Override
-  public PersistentVolumeClaim getPVC(@NotNull final String instanceName, @NotNull final KubeCloudImage kubeCloudImage) {
-    return null;
   }
 }
