@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Pod;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import jetbrains.buildServer.BaseTestCase;
 import jetbrains.buildServer.TempFiles;
@@ -142,9 +143,9 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
       th.start();
       thArray[i] = th;
     }
-    final long cur = System.currentTimeMillis();
+    final long cur = System.nanoTime();
     myEventDispatcher.getMulticaster().serverShutdown();
-    then(System.currentTimeMillis() - cur).isLessThan(500l);
+    then(System.nanoTime() - cur).isLessThan(TimeUnit.MILLISECONDS.toNanos(500));
     for (int i=0; i<10; i++){
       thArray[i].join();
     }
