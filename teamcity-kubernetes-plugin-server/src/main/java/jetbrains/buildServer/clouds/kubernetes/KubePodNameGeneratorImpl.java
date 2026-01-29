@@ -21,6 +21,7 @@ import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.BuildServerAdapter;
 import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.util.EventDispatcher;
 import jetbrains.buildServer.util.FileUtil;
@@ -84,15 +85,17 @@ public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
     }
   }
 
-  private void storeIdxes(boolean force) {
-    // wait for generation operations to finish, unless we're in the server shutdown phase
+  private void storeIdxes(boolean shuttingDown) {
+    // wait for generation operations to finish, unless we're in the server shutdown phase or set by internal property
     Lock lock = myLock.writeLock();
-    boolean locked = true;
+    boolean locked = false;
     try {
-      if (!lock.tryLock(100, TimeUnit.MILLISECONDS)) {
-        if (force) {
-          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, forcing Kube indexes storage");
-          locked = false;
+      locked = lock.tryLock(100, TimeUnit.MILLISECONDS);
+      if (!locked) {
+        if (shuttingDown) {
+          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, forcing Kube indexes storage due to server shutdown");
+        } else if (TeamCityProperties.getBoolean("teamcity.kube.pods.nameGenerator.periodicalPersist.force")) {
+          Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, forcing Kube indexes storage due to internal property");
         } else {
           Loggers.AGENT.warn("Waited more than 100ms to store Kube indexes, skip this time");
           return;
