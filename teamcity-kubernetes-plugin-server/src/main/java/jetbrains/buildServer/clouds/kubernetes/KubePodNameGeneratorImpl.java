@@ -136,7 +136,7 @@ public class KubePodNameGeneratorImpl implements KubePodNameGenerator {
     prefix = StringUtil.replaceNonAlphaNumericChars(prefix.trim().toLowerCase(), '-');
 
     String newVmName;
-    if (image.isReusingNames()) {
+    if (image.isReusingNames() && TeamCityProperties.getBooleanOrTrue("teamcity.kube.pods.nameGenerator.reuseNames")) {
       int counter = 1;
       while (true) {
         newVmName = String.format("%s-%d", prefix, counter);
