@@ -6,6 +6,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -197,12 +198,12 @@ public class KubeCloudClient implements CloudClientEx {
         }
         int profileInstanceLimit = myKubeClientParams.getInstanceLimit();
         if(profileInstanceLimit >= 0 && myImageIdToImageMap.values().stream().mapToInt(KubeCloudImage::getRunningInstanceCount).sum() >= profileInstanceLimit) {
-            return CanStartNewInstanceResult.no("Profile instance limit reached");
+            return CanStartNewInstanceResult.no(MessageFormat.format("The limit of {0} instance(s) per profile is reached.", String.valueOf(profileInstanceLimit)), CanStartNewInstanceResult.ReasonType.QUOTA_LIMIT_REACHED);
         }
 
         int imageLimit = kubeCloudImage.getInstanceLimit();
         if (imageLimit >= 0 && kubeCloudImage.getRunningInstanceCount() >= imageLimit){
-            return CanStartNewInstanceResult.no("Image instance limit reached");
+            return CanStartNewInstanceResult.no(MessageFormat.format("The limit of {0} instance(s) per image is reached.", String.valueOf(imageLimit)), CanStartNewInstanceResult.ReasonType.QUOTA_LIMIT_REACHED);
         }
         return CanStartNewInstanceResult.yes();
     }
