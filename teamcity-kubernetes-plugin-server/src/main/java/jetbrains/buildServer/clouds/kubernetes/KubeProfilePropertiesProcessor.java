@@ -1,10 +1,15 @@
 
 package jetbrains.buildServer.clouds.kubernetes;
 
+import java.util.Collections;
+import jetbrains.buildServer.clouds.CloudImageData;
+import jetbrains.buildServer.clouds.CloudImageParameters;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy;
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProvider;
+import jetbrains.buildServer.clouds.server.impl.profile.CloudProfileUtil;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
+import jetbrains.buildServer.serverSide.agentTypes.AgentTypeConsts;
 import jetbrains.buildServer.util.StringUtil;
 
 import java.util.ArrayList;
@@ -45,6 +50,18 @@ public class KubeProfilePropertiesProcessor implements PropertiesProcessor {
             }
         }
 
+        getCloudImages(map).forEach(image -> {
+          final String agentNamePrefix = image.getParameter(KubeParametersConstants.AGENT_NAME_PREFIX);
+          if (!StringUtil.isEmpty(agentNamePrefix) && agentNamePrefix.length() > AgentTypeConsts.IMAGE_ID_LENGTH){
+            invalids.add(new InvalidProperty(KubeParametersConstants.AGENT_NAME_PREFIX, "Agent name prefix must not be longer than " + AgentTypeConsts.IMAGE_ID_LENGTH + " characters"));
+          }
+        });
+
         return invalids;
     }
+
+  private Collection<CloudImageData> getCloudImages(Map<String, String> map) {
+    final String imagesJson = map.get(CloudImageParameters.SOURCE_IMAGES_JSON);
+    return StringUtil.isNotEmpty(imagesJson) ? CloudProfileUtil.parseImagesData(imagesJson) : Collections.emptyList();
+  }
 }
