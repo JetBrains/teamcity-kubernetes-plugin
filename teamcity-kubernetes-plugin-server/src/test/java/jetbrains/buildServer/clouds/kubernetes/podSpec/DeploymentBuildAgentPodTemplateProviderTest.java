@@ -36,8 +36,7 @@ import java.util.Collections;
 public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
     private Mockery m;
     private BuildAgentPodTemplateProvider myPodTemplateProvider;
-    private UnauthorizedAccessStrategy myAuthStrategy = new UnauthorizedAccessStrategy();
-    private DeploymentContentProvider myDeploymentContentProvider;
+    private final UnauthorizedAccessStrategy myAuthStrategy = new UnauthorizedAccessStrategy();
     private KubePodNameGenerator myNameGenerator;
 
     @BeforeMethod
@@ -47,7 +46,6 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         m = new Mockery();
         ServerSettings serverSettings = m.mock(ServerSettings.class);
         KubeAuthStrategyProvider authStrategies = m.mock(KubeAuthStrategyProvider.class);
-        myDeploymentContentProvider = m.mock(DeploymentContentProvider.class);
         final ExecutorServices executorServices = m.mock(ExecutorServices.class);
         m.checking(new Expectations(){{
             allowing(serverSettings).getServerUUID(); will(returnValue("server uuid"));
@@ -76,9 +74,9 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
         m.checking(new Expectations(){{
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
             allowing(image).getAgentNamePrefix(); will(returnValue("agent-name-prefix"));
+            allowing(image).isReusingNames(); will(returnValue(false));
             allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(apiConnector).getDeployment(with(any(String.class))); will(returnValue(null));
-            //allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(null));
         }});
         assertExceptionThrown(() -> myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, apiConnector), KubeCloudException.class);
     }
@@ -108,15 +106,14 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
                 .build();
         m.checking(new Expectations(){{
             allowing(apiConnector).getNamespace(); will(returnValue("custom namespace"));
-            //allowing(clientParams).getAuthStrategy(); will(returnValue(UnauthorizedAccessStrategy.ID));
             allowing(image).getId(); will(returnValue("my image id"));
             allowing(image).getName(); will(returnValue("my image name"));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
             allowing(image).getAgentNamePrefix(); will(returnValue("agent-name-prefix"));
             allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
+            allowing(image).isReusingNames(); will(returnValue(false));
             allowing(apiConnector).getDeployment(with(any(String.class))); will(returnValue(deployment));
-            //allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
         Pod podTemplate = myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, apiConnector);
         assertNotNull(podTemplate);
@@ -155,8 +152,8 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
+            allowing(image).isReusingNames(); will(returnValue(false));
             allowing(apiConnector).getDeployment(with(any(String.class))); will(returnValue(deployment));
-            //allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
         Pod podTemplate = myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, apiConnector);
         for(Container container : podTemplate.getSpec().getContainers()){
@@ -199,8 +196,8 @@ public class DeploymentBuildAgentPodTemplateProviderTest extends BaseTestCase {
             allowing(image).findInstanceById(with("agent-name-prefix-1")); will(returnValue(null));
             allowing(image).getSourceDeploymentName(); will(returnValue("deploymentFoo"));
             allowing(image).getAgentName(with("agent name")); will(returnValue("prefix agent name"));
+            allowing(image).isReusingNames(); will(returnValue(false));
             allowing(apiConnector).getDeployment(with(any(String.class))); will(returnValue(deployment));
-            //allowing(myDeploymentContentProvider).findDeployment(with(any(String.class)), with(any(KubeCloudClientParameters.class))); will(returnValue(deployment));
         }});
 
         Pod podTemplate = myPodTemplateProvider.getPodTemplate(myNameGenerator.generateNewVmName(image), instanceTag, image, apiConnector);
