@@ -17,9 +17,11 @@ import jetbrains.buildServer.clouds.server.impl.profile.CloudImageDataImpl;
 import jetbrains.buildServer.clouds.server.impl.profile.CloudImageParametersImpl;
 import jetbrains.buildServer.serverSide.BuildServerListener;
 import jetbrains.buildServer.serverSide.ServerPaths;
+import jetbrains.buildServer.serverSide.ServerResponsibilityImpl;
 import jetbrains.buildServer.serverSide.ServerSettings;
 import jetbrains.buildServer.serverSide.executors.ExecutorServices;
 import jetbrains.buildServer.serverSide.impl.ServerSettingsImpl;
+import jetbrains.buildServer.serverSide.impl.auth.SecurityContextImpl;
 import jetbrains.buildServer.serverSide.impl.executors.SimpleExecutorServices;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.EventDispatcher;
@@ -50,7 +52,7 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
   @BeforeMethod
   public void setUp() throws Exception {
     super.setUp();
-    myServerSettings = new ServerSettingsImpl(){
+    myServerSettings = new ServerSettingsImpl(new SecurityContextImpl(new ServerResponsibilityImpl())){
       @NotNull
       @Override
       public String getServerUUID() {
