@@ -11,8 +11,10 @@ import io.fabric8.kubernetes.api.model.PodTemplateSpec
 import io.fabric8.kubernetes.client.utils.Serialization
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudInstanceUserData
+import jetbrains.buildServer.serverSide.ServerResponsibilityImpl
 import jetbrains.buildServer.serverSide.ServerSettings
 import jetbrains.buildServer.serverSide.impl.ServerSettingsImpl
+import jetbrains.buildServer.serverSide.impl.auth.SecurityContextImpl
 import jetbrains.buildServer.util.TestFor
 import org.assertj.core.api.BDDAssertions.then
 import org.testng.annotations.BeforeMethod
@@ -27,7 +29,7 @@ class CustomTemplatePodTemplateProviderTest : BaseTestCase() {
     @BeforeMethod
     override fun setUp() {
         super.setUp()
-        myServerSettings = object : ServerSettingsImpl() {
+        myServerSettings = object : ServerSettingsImpl(SecurityContextImpl(ServerResponsibilityImpl())) {
             override fun getServerUUID(): String? {
                 return "SERVER-UUID"
             }
