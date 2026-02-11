@@ -6,15 +6,14 @@ import io.fabric8.kubernetes.api.model.*;
 import java.util.*;
 import java.util.regex.Pattern;
 import jetbrains.buildServer.clouds.CloudInstanceUserData;
-import jetbrains.buildServer.clouds.kubernetes.*;
-import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
+import jetbrains.buildServer.clouds.kubernetes.KubeTeamCityLabels;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jetbrains.buildServer.clouds.kubernetes.KubeContainerEnvironment.*;
-import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
+import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.RUN_IN_KUBE_FEATURE;
 
 public abstract class AbstractPodTemplateProvider implements BuildAgentPodTemplateProvider {
   private static final Pattern ENV_VAR_NAME = Pattern.compile("([A-Z]+[_])*[A-Z]+");
@@ -22,7 +21,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
   protected Pod patchedPodTemplateSpec(@NotNull PodTemplateSpec podTemplateSpec,
                                        @NotNull String instanceName,
                                        @NotNull String namespace,
-                                       @NotNull String serverUUID,
+                                       @Nullable String serverUUID,
                                        @NotNull String imageId,
                                        @NotNull CloudInstanceUserData cloudInstanceUserData
                                       ) {
@@ -46,7 +45,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
   @NotNull
   protected List<EnvVar> getPatchedEnvVars(@NotNull final String instanceName,
-                                           @NotNull final String serverUUID,
+                                           @Nullable final String serverUUID,
                                            @NotNull final String imageId,
                                            @NotNull final CloudInstanceUserData cloudInstanceUserData,
                                            @NotNull final List<EnvVar> initialEnvData) {
@@ -85,7 +84,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
       new Pair<>(IMAGE_NAME, imageId),
       new Pair<>(INSTANCE_NAME, instanceName))
     ) {
-      if (!envNamesSet.contains(env.first)) {
+      if (!envNamesSet.contains(env.first) && env.second != null) {
         retval.add(new EnvVar(env.first, env.second, null));
       }
     }
@@ -102,7 +101,7 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
 
   private void patchMetadata(@NotNull final String instanceName,
                              @NotNull final String namespace,
-                             @NotNull final String serverUUID,
+                             @Nullable final String serverUUID,
                              @NotNull final String imageId,
                              @NotNull final CloudInstanceUserData cloudInstanceUserData,
                              @NotNull final ObjectMeta metadata) {
@@ -119,19 +118,5 @@ public abstract class AbstractPodTemplateProvider implements BuildAgentPodTempla
       KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, cloudInstanceUserData.getProfileId(),
       KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, imageId));
     metadata.setLabels(patchedLabels);
-  }
-
-  @NotNull
-  @Override
-  public abstract Pod getPodTemplate(@NotNull String kubeInstanceName,
-                                    @NotNull final CloudInstanceUserData cloudInstanceUserData,
-                                    @NotNull final KubeCloudImage kubeCloudImage,
-                                    @NotNull final KubeApiConnector apiConnector);
-
-  @Nullable
-  @Override
-  public PersistentVolumeClaim getPVC(@NotNull final String instanceName,
-                                      @NotNull final KubeCloudImage kubeCloudImage) {
-    return null;
   }
 }

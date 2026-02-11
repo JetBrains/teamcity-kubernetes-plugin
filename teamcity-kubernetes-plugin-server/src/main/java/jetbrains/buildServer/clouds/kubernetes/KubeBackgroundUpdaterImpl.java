@@ -37,7 +37,7 @@ public class KubeBackgroundUpdaterImpl implements KubeBackgroundUpdater {
     }
 
     private void populateInstances() {
-        long populateInstancesStartTime = System.currentTimeMillis();
+        long populateInstancesStartTime = System.nanoTime();
         try {
             for (KubeCloudClient client : myRegisteredClients) {
                 for (CloudImage image : client.getImages()) {
@@ -52,7 +52,7 @@ public class KubeBackgroundUpdaterImpl implements KubeBackgroundUpdater {
                     }
                 }
             }
-            LOG.debug("Populate instances task finished in " + TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - populateInstancesStartTime) + " seconds");
+            LOG.debug("Populate instances task finished in " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - populateInstancesStartTime) + " seconds");
         } catch (Exception ex) {
             LOG.warnAndDebugDetails("An error occurred while populating kube instances", ex);
         }

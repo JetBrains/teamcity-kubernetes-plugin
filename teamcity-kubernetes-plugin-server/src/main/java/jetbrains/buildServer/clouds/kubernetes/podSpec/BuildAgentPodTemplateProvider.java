@@ -20,7 +20,10 @@ import org.jetbrains.annotations.Nullable;
 public interface BuildAgentPodTemplateProvider {
     @NotNull String getId();
     @NotNull String getDisplayName();
-    @Nullable String getDescription();
+
+    default @Nullable String getDescription() {
+        return null;
+    }
 
     @NotNull
     Pod getPodTemplate(@NotNull String instanceName,
@@ -40,6 +43,8 @@ public interface BuildAgentPodTemplateProvider {
     }
 
     @Nullable
-    PersistentVolumeClaim getPVC(@NotNull String instanceName,
-                                 @NotNull KubeCloudImage kubeCloudImage);
+    default PersistentVolumeClaim getPVC(@NotNull String instanceName,
+                                         @NotNull KubeCloudImage kubeCloudImage) {
+        return null;
+    }
 }
