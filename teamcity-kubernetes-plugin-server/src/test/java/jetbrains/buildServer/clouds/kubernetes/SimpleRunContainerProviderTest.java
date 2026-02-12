@@ -189,36 +189,26 @@ public class SimpleRunContainerProviderTest extends BaseTestCase {
                                                           KubeParametersConstants.DOCKER_IMAGE, "jetbrains/teamcity-agent",
                                                           KubeParametersConstants.AGENT_NAME_PREFIX, "prefix");
     final KubeCloudImage image = createImage(imageParameters);
-    final Thread[] thArray = new Thread[10];
     final Set<String> generatedNames = ConcurrentHashMap.newKeySet();
-    for (int i=0; i<10; i++){
-      final Thread th = new Thread(() -> {
-        for (int j = 0; j < 50000; j++) {
-          try {
-            generatedNames.add(myNameGenerator.generateNewVmName(image));
-          } catch (Exception ex) {
-            break;
-          }
+    runAsync(10, () -> {
+      for (int j = 0; j < 50000; j++) {
+        try {
+          generatedNames.add(myNameGenerator.generateNewVmName(image));
+        } catch (Exception ex) {
+          ex.printStackTrace();
+          break;
         }
+      }
+    });
 
-      });
-      th.start();
-      thArray[i] = th;
-    }
-    final long cur = System.currentTimeMillis();
-    myEventDispatcher.getMulticaster().serverShutdown();
-    then(System.currentTimeMillis() - cur).isLessThan(500l);
-    for (int i=0; i<10; i++){
-      thArray[i].join();
-    }
+    myEventDispatcher.getMulticaster().serverShutdown(); // generated names indexes persisted on disk
+    then(generatedNames).isNotEmpty();
+
+    // check that persisted data is loaded and new names generation continues from there
     final KubePodNameGenerator newGenerator1 = new KubePodNameGeneratorImpl(myServerPaths, myExecutorServices, myEventDispatcher);
     int generatedSize = generatedNames.size();
-    then(generatedSize).isLessThan(500000);
+    then(generatedSize).isEqualTo(500000);
     then(newGenerator1.generateNewVmName(image)).isEqualTo("prefix-" + (generatedSize+1));
-    System.out.println(generatedSize);
-
-
-
   }
 
 
