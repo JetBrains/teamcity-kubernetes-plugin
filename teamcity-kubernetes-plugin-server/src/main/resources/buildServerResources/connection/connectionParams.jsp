@@ -230,28 +230,26 @@
       <th><label for="${cons.proxyServer}">Proxy server URL:<l:star/></label></th>
       <td><props:textProperty name="${cons.proxyServer}" className="longField"/>
         <span id="error_${cons.apiServerUrl}" class="error"></span>
-        <span class="smallNote">Target Kubernetes Proxy server URL</span>
+        <span class="smallNote">The proxy server URL in the protocol://address:port format</span>
       </td>
     </tr>
     <tr class="common-settings hide-kubeconfig">
       <th><label for="${cons.proxyLogin}">Proxy server login:<l:star/></label></th>
       <td><props:textProperty name="${cons.proxyLogin}" className="longField"/>
         <span id="error_${cons.proxyLogin}" class="error"></span>
-        <span class="smallNote">Proxy Server Login</span>
       </td>
     </tr>
     <tr class="common-settings hide-kubeconfig">
       <th><label for="${cons.proxyPassword}">Proxy server password:<l:star/></label></th>
       <td><props:textProperty name="${cons.proxyPassword}" className="longField"/>
         <span id="error_${cons.proxyPassword}" class="error"></span>
-        <span class="smallNote">Proxy Server Password</span>
       </td>
     </tr>
     <tr class="common-settings hide-kubeconfig">
       <th><label for="${cons.nonProxyHosts}"> No Proxy Hosts:<l:star/></label></th>
       <td><props:textProperty name="${cons.nonProxyHosts}" className="longField"/>
         <span id="error_${cons.nonProxyHosts}" class="error"></span>
-        <span class="smallNote">No Proxy Hosts. Hosts should be written in a comma-separated lists. e.g. http://host1,http://host2</span>
+        <span class="smallNote">The comma-separated list of hosts that TeamCity should access without routing through the proxy. For example, http://host1,http://host2.</span>
       </td>
     </tr>
   </l:settingsGroup>
