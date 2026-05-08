@@ -1,12 +1,14 @@
 package jetbrains.buildServer.clouds.kubernetes;
 
 import java.util.Map;
+import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiProxySettings;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jetbrains.buildServer.agent.Constants.SECURE_PROPERTY_PREFIX;
 import static jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.*;
 
 public class ParametersKubeApiConnection implements KubeApiConnection {
@@ -67,7 +69,7 @@ public class ParametersKubeApiConnection implements KubeApiConnection {
     return new KubeApiProxySettingsImpl(
       proxyHost,
       myParameters.get(PROXY_LOGIN),
-      myParameters.get(PROXY_PASSWORD),
+      myParameters.get(SECURE_PROPERTY_PREFIX + PROXY_PASSWORD),
       nonProxyHosts
     );
   }

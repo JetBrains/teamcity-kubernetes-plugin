@@ -241,9 +241,9 @@
       </td>
     </tr>
     <tr class="common-settings hide-kubeconfig">
-      <th><label for="${cons.proxyPassword}">Proxy server password:<l:star/></label></th>
-      <td><props:textProperty name="${cons.proxyPassword}" className="longField"/>
-        <span id="error_${cons.proxyPassword}" class="error"></span>
+      <th><label for="secure:${cons.proxyPassword}">Proxy server password:<l:star/></label></th>
+      <td><props:passwordProperty name="secure:${cons.proxyPassword}" className="longField"/>
+        <span id="error_secure:${cons.proxyPassword}" class="error"></span>
         <span class="smallNote">Proxy Server Password</span>
       </td>
     </tr>
