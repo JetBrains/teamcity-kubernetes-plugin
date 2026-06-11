@@ -20,6 +20,7 @@ public class BuildAgentPodTemplateProvidersImpl implements BuildAgentPodTemplate
         registerProvider(new SimpleRunContainerProvider(serverSettings));
         registerProvider(new DeploymentBuildAgentPodTemplateProvider(serverSettings));
         registerProvider(new CustomTemplatePodTemplateProvider(serverSettings));
+        registerProvider(new CustomResourceTemplateProvider(serverSettings));
     }
 
     @NotNull

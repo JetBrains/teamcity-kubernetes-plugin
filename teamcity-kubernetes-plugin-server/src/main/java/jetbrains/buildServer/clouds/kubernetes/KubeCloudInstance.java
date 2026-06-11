@@ -1,7 +1,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes;
 
-import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.InstanceStatus;
@@ -18,7 +18,11 @@ public interface KubeCloudInstance extends CloudInstance {
 
     void setStatus(final InstanceStatus status);
 
-    void updateState(Pod pod);
+    /**
+     * Updates the instance from the actual state of its backing resource
+     * (a Pod for pod-based deploy modes, a custom resource for the custom-resource mode).
+     */
+    void updateState(HasMetadata resource);
 
     void setError(@Nullable CloudErrorInfo errorInfo);
 

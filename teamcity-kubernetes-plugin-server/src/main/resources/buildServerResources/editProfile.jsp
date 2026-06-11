@@ -159,6 +159,34 @@
                 <span class="error option-error option-error_${cons.customPodTemplate}"></span>
             </td>
         </tr>
+        <tr class="hidden custom-resource pod-spec-ui">
+            <th><label for="${cons.customResourceTemplate}">Custom resource manifest:<l:star/></label></th>
+            <td class="codeHighlightTD">
+                <props:multilineProperty highlight="yaml" expanded="${true}" name="${cons.customResourceTemplate}" rows="10" cols="30"
+                                         linkTitle="Edit the custom resource YAML manifest" className="longField"/>
+                <div class="smallNoteAttention">YAML manifest of the custom resource (e.g. an XSmogVM) that provisions a self-registering VM build agent.
+                    Supported placeholders: %instance.id%, %agent.name%, %server.url%, %server.uuid%, %profile.id%, %image.id%</div>
+                <span class="error option-error option-error_${cons.customResourceTemplate}"></span>
+            </td>
+        </tr>
+        <tr class="hidden custom-resource pod-spec-ui">
+            <th><label for="${cons.customResourceClusterScoped}">Cluster-scoped resource:</label></th>
+            <td>
+                <input type="checkbox" id="${cons.customResourceClusterScoped}"/>
+                <div class="smallNoteAttention">Check if the resource is cluster-scoped (e.g. a Crossplane composite/XR). Leave unchecked for namespaced resources (claims) - the profile namespace is used.</div>
+                <span class="error option-error option-error_${cons.customResourceClusterScoped}"></span>
+            </td>
+        </tr>
+        <tr class="hidden custom-resource pod-spec-ui">
+            <th><label for="${cons.customResourcePlural}">Resource plural:</label></th>
+            <td>
+                <div>
+                    <input type="text" id="${cons.customResourcePlural}" value="" class="longField" data-id="${cons.customResourcePlural}" data-err-id="${cons.customResourcePlural}"/>
+                    <div class="smallNoteAttention">Lowercase plural of the resource kind as registered in the API (e.g. xsmogvms). Leave empty to derive it from the kind.</div>
+                    <span class="error option-error option-error_${cons.customResourcePlural}"></span>
+                </div>
+            </td>
+        </tr>
         <tr class="hidden deployment-base pod-spec-ui">
             <th>Deployment name:&nbsp;<l:star/></th>
             <td>

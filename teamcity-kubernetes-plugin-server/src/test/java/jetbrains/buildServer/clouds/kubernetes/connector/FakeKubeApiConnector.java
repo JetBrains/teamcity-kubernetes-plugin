@@ -1,11 +1,13 @@
 
 package jetbrains.buildServer.clouds.kubernetes.connector;
 
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodStatus;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
@@ -76,6 +78,23 @@ public class FakeKubeApiConnector implements KubeApiConnector {
   @Override
   public boolean deletePVC(@NotNull final String name) {
     return false;
+  }
+
+  @NotNull
+  @Override
+  public GenericKubernetesResource createCustomResource(@NotNull final CustomResourceContext resourceContext, @NotNull final GenericKubernetesResource resource) {
+    return resource;
+  }
+
+  @Override
+  public boolean deleteCustomResource(@NotNull final CustomResourceContext resourceContext, @NotNull final String name) {
+    return false;
+  }
+
+  @NotNull
+  @Override
+  public Collection<GenericKubernetesResource> listCustomResources(@NotNull final CustomResourceContext resourceContext, @NotNull final Map<String, String> labels) {
+    return Collections.emptyList();
   }
 
   @Override

@@ -34,6 +34,9 @@ public class KubeParametersConstants {
     public static final String OIDC_REFRESH_TOKEN = "oidcRefreshToken";
     public static final String OIDC_ISSUER_URL = "idpIssuerUrl";
     public static final String CUSTOM_POD_TEMPLATE = "customPodTemplate";
+    public static final String CUSTOM_RESOURCE_TEMPLATE = "customResourceTemplate";
+    public static final String CUSTOM_RESOURCE_CLUSTER_SCOPED = "customResourceClusterScoped";
+    public static final String CUSTOM_RESOURCE_PLURAL = "customResourcePlural";
     public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
     public static final String AGENT_NAME_PREFIX = "agentNamePrefix";
     public static final String KUBECONFIG_CONTEXT = "kubeconfigContext";
@@ -157,6 +160,18 @@ public class KubeParametersConstants {
 
     public String getCustomPodTemplate() {
         return CUSTOM_POD_TEMPLATE;
+    }
+
+    public String getCustomResourceTemplate() {
+        return CUSTOM_RESOURCE_TEMPLATE;
+    }
+
+    public String getCustomResourceClusterScoped() {
+        return CUSTOM_RESOURCE_CLUSTER_SCOPED;
+    }
+
+    public String getCustomResourcePlural() {
+        return CUSTOM_RESOURCE_PLURAL;
     }
 
     public String getMaxInstances() {

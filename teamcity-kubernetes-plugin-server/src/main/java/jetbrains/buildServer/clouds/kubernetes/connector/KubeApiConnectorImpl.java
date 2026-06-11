@@ -2,6 +2,8 @@
 package jetbrains.buildServer.clouds.kubernetes.connector;
 
 import com.intellij.openapi.diagnostic.Logger;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -11,6 +13,8 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -62,6 +66,21 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
     @Override
     public KubeApiConnectionCheckResult testConnection() {
         try {
+            // When no namespace is configured explicitly (e.g. a KCP workspace hosting only
+            // cluster-scoped custom resources), checking the implicit "default" namespace is
+            // meaningless - verify API reachability and authentication instead.
+            if (StringUtil.isEmptyOrSpaces(myConnectionSettings.getCustomParameter(jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.KUBERNETES_NAMESPACE))) {
+                try {
+                    myKubernetesClient.namespaces().list();
+                    return KubeApiConnectionCheckResult.ok("Connection successful");
+                } catch (KubernetesClientException e) {
+                    if (e.getCode() == 403) {
+                        // authenticated but not allowed to list namespaces - the connection itself works
+                        return KubeApiConnectionCheckResult.ok("Connection successful (token is not allowed to list namespaces)");
+                    }
+                    throw e;
+                }
+            }
             String currentNamespaceName = myConfig.getNamespace();
             Namespace currentNamespace = myKubernetesClient.namespaces().withName(currentNamespaceName).get();
             return currentNamespace != null
@@ -140,6 +159,41 @@ public class KubeApiConnectorImpl implements KubeApiConnector {
 
     public boolean deletePVC(@NotNull String name){
         return withKubernetesClient(kubernetesClient -> kubernetesClient.persistentVolumeClaims().withName(name).delete());
+    }
+
+    @NotNull
+    @Override
+    public GenericKubernetesResource createCustomResource(@NotNull CustomResourceContext resourceContext, @NotNull GenericKubernetesResource resource) {
+        return withKubernetesClient(kubernetesClient -> {
+            final MixedOperation<GenericKubernetesResource, GenericKubernetesResourceList, Resource<GenericKubernetesResource>> operation =
+              kubernetesClient.genericKubernetesResources(resourceContext.toResourceDefinitionContext());
+            return resourceContext.isClusterScoped()
+                   ? operation.create(resource)
+                   : operation.inNamespace(getNamespace()).create(resource);
+        });
+    }
+
+    @Override
+    public boolean deleteCustomResource(@NotNull CustomResourceContext resourceContext, @NotNull String name) {
+        return withKubernetesClient(kubernetesClient -> {
+            final MixedOperation<GenericKubernetesResource, GenericKubernetesResourceList, Resource<GenericKubernetesResource>> operation =
+              kubernetesClient.genericKubernetesResources(resourceContext.toResourceDefinitionContext());
+            return resourceContext.isClusterScoped()
+                   ? operation.withName(name).delete()
+                   : operation.inNamespace(getNamespace()).withName(name).delete();
+        });
+    }
+
+    @NotNull
+    @Override
+    public Collection<GenericKubernetesResource> listCustomResources(@NotNull CustomResourceContext resourceContext, @NotNull Map<String, String> labels) {
+        return withKubernetesClient(kubernetesClient -> {
+            final MixedOperation<GenericKubernetesResource, GenericKubernetesResourceList, Resource<GenericKubernetesResource>> operation =
+              kubernetesClient.genericKubernetesResources(resourceContext.toResourceDefinitionContext());
+            return resourceContext.isClusterScoped()
+                   ? operation.withLabels(labels).list().getItems()
+                   : operation.inNamespace(getNamespace()).withLabels(labels).list().getItems();
+        });
     }
 
     @Override

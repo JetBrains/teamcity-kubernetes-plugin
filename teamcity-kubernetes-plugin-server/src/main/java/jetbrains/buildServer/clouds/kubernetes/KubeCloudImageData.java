@@ -54,6 +54,18 @@ public class KubeCloudImageData {
         return myRawImageData.getParameter(KubeParametersConstants.CUSTOM_POD_TEMPLATE);
     }
 
+    public String getCustomResourceTemplateContent() {
+        return myRawImageData.getParameter(KubeParametersConstants.CUSTOM_RESOURCE_TEMPLATE);
+    }
+
+    public boolean isCustomResourceClusterScoped() {
+        return Boolean.parseBoolean(myRawImageData.getParameter(KubeParametersConstants.CUSTOM_RESOURCE_CLUSTER_SCOPED));
+    }
+
+    public String getCustomResourcePlural() {
+        return myRawImageData.getParameter(KubeParametersConstants.CUSTOM_RESOURCE_PLURAL);
+    }
+
     public String getDeploymentName() {
         return myRawImageData.getParameter(KubeParametersConstants.SOURCE_DEPLOYMENT);
     }

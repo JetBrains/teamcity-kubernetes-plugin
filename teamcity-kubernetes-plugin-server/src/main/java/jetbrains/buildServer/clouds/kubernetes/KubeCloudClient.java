@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
@@ -14,9 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import jetbrains.buildServer.agent.Constants;
 import jetbrains.buildServer.clouds.*;
+import jetbrains.buildServer.clouds.kubernetes.connector.CustomResourceContext;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProvider;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.CustomResourceTemplateProvider;
 import jetbrains.buildServer.serverSide.AgentDescription;
 import jetbrains.buildServer.serverSide.TeamCityProperties;
 import jetbrains.buildServer.util.FileUtil;
@@ -88,6 +91,9 @@ public class KubeCloudClient implements CloudClientEx {
         final KubeCloudImage kubeCloudImage = (KubeCloudImage)cloudImage;
         BuildAgentPodTemplateProvider podTemplateProvider = myPodTemplateProviders.get(kubeCloudImage.getPodSpecMode());
         final String instanceName = myNameGenerator.generateNewVmName(kubeCloudImage);
+        if (podTemplateProvider instanceof CustomResourceTemplateProvider) {
+            return startNewCustomResourceInstance((CustomResourceTemplateProvider)podTemplateProvider, instanceName, cloudInstanceUserData, kubeCloudImage);
+        }
         final Pod podTemplate = podTemplateProvider.getPodTemplate(instanceName, cloudInstanceUserData, kubeCloudImage, myApiConnector);
         final PersistentVolumeClaim pvc = podTemplateProvider.getPVC(instanceName, kubeCloudImage);
         if (pvc != null){
@@ -120,6 +126,31 @@ public class KubeCloudClient implements CloudClientEx {
         return instance;
     }
 
+    @NotNull
+    private CloudInstance startNewCustomResourceInstance(@NotNull CustomResourceTemplateProvider provider,
+                                                         @NotNull String instanceName,
+                                                         @NotNull CloudInstanceUserData cloudInstanceUserData,
+                                                         @NotNull KubeCloudImage kubeCloudImage) {
+        final GenericKubernetesResource resourceTemplate = provider.getResourceTemplate(instanceName, cloudInstanceUserData, kubeCloudImage, myApiConnector);
+        final CustomResourceContext resourceContext = kubeCloudImage.getCustomResourceContext();
+        final KubeCloudInstance instance = new KubeCloudCustomResourceInstance(kubeCloudImage, resourceTemplate);
+        kubeCloudImage.addStartedInstance(instance);
+        // Once instance added to the kubeCloudImage, we could unlock name from name generator.
+        myNameGenerator.vmNameSaved(instanceName);
+        myExecutorService.submit(() -> {
+            try {
+                final GenericKubernetesResource newResource = myApiConnector.createCustomResource(resourceContext, resourceTemplate);
+                instance.updateState(newResource);
+            } catch (KubeCloudException | KubernetesClientException ex) {
+                LOG.warnAndDebugDetails("An error occurred while starting new custom resource instance", ex);
+                instance.setStatus(InstanceStatus.ERROR);
+                instance.setError(new CloudErrorInfo("Instance cannot be started", ex.getMessage(), ex));
+                throw ex;
+            }
+        });
+        return instance;
+    }
+
     @Override
     public void restartInstance(@NotNull CloudInstance cloudInstance) {
         throw new UnsupportedOperationException("Restart not implemented");
@@ -134,6 +165,17 @@ public class KubeCloudClient implements CloudClientEx {
             kubeCloudInstance.setStatus(InstanceStatus.STOPPING);
             try{
                 int failedDeleteAttempts = 0;
+                if (kubeCloudInstance instanceof KubeCloudCustomResourceInstance){
+                    final CustomResourceContext resourceContext = kubeCloudInstance.getImage().getCustomResourceContext();
+                    while (!myApiConnector.deleteCustomResource(resourceContext, kubeCloudInstance.getName())){
+                        failedDeleteAttempts++;
+                        if(failedDeleteAttempts == 3) throw new KubeCloudException("Failed to delete custom resource " + kubeCloudInstance.getName());
+                    }
+                    kubeCloudInstance.setError(null);
+                    kubeCloudInstance.setStatus(InstanceStatus.STOPPED);
+                    kubeCloudInstance.getImage().populateInstances();
+                    return;
+                }
                 final String pvcName = kubeCloudInstance.getPVCName();
                 while (!myApiConnector.deletePod(kubeCloudInstance.getName(), gracePeriod)){
                     failedDeleteAttempts++;

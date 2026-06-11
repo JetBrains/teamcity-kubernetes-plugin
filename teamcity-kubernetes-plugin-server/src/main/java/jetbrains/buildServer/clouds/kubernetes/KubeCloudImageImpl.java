@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import com.intellij.openapi.diagnostic.Logger;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.io.IOException;
@@ -17,8 +18,10 @@ import java.util.stream.Collectors;
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.InstanceStatus;
+import jetbrains.buildServer.clouds.kubernetes.connector.CustomResourceContext;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnector;
+import jetbrains.buildServer.clouds.kubernetes.podSpec.CustomResourceTemplateProvider;
 import jetbrains.buildServer.util.CollectionsUtil;
 import jetbrains.buildServer.util.ExceptionUtil;
 import jetbrains.buildServer.util.StringUtil;
@@ -37,6 +40,7 @@ public class KubeCloudImageImpl implements KubeCloudImage {
 
     private final ConcurrentMap<String, KubeCloudInstance> myIdToInstanceMap = new ConcurrentHashMap<>();
     private CloudErrorInfo myCurrentError;
+    private volatile CustomResourceContext myCustomResourceContext;
 
     KubeCloudImageImpl(@NotNull final KubeCloudImageData kubeCloudImageData,
                        @NotNull final KubeApiConnector apiConnector) {
@@ -103,6 +107,45 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     @Override
     public String getPVCTemplate() {
         return myPVCTemplate;
+    }
+
+    @Nullable
+    @Override
+    public String getCustomResourceTemplate() {
+        return myImageData.getCustomResourceTemplateContent();
+    }
+
+    @Override
+    public boolean isCustomResourceClusterScoped() {
+        return myImageData.isCustomResourceClusterScoped();
+    }
+
+    @Nullable
+    @Override
+    public String getCustomResourcePlural() {
+        return myImageData.getCustomResourcePlural();
+    }
+
+    @Nullable
+    @Override
+    public CustomResourceContext getCustomResourceContext() {
+        if (!isCustomResourceImage()) {
+            return null;
+        }
+        CustomResourceContext context = myCustomResourceContext;
+        if (context == null) {
+            final String template = getCustomResourceTemplate();
+            if (StringUtil.isEmpty(template)) {
+                throw new KubeCloudException("Custom resource template is not specified for image " + getId());
+            }
+            context = CustomResourceContext.fromTemplate(template, isCustomResourceClusterScoped(), getCustomResourcePlural());
+            myCustomResourceContext = context;
+        }
+        return context;
+    }
+
+    private boolean isCustomResourceImage() {
+        return CustomResourceTemplateProvider.ID.equals(getPodSpecMode());
     }
 
     @Nullable
@@ -213,6 +256,10 @@ public class KubeCloudImageImpl implements KubeCloudImage {
     //TODO: synchronize access to myIdToInstanceMap
     //TODO: filter pods more carefully using all setted labels
     public void populateInstances(){
+        if (isCustomResourceImage()){
+            populateCustomResourceInstances();
+            return;
+        }
         try{
             final Collection<Pod> pods = myApiConnector.listPods(CollectionsUtil.asMap(
               KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId(),
@@ -262,6 +309,70 @@ public class KubeCloudImageImpl implements KubeCloudImage {
                 newPods.forEach(pod->{
                     final String podName = pod.getMetadata().getName();
                     myIdToInstanceMap.putIfAbsent(podName, new KubeCloudInstanceImpl(this, pod));
+                });
+            }
+            myCurrentError = null;
+        } catch (KubernetesClientException ex){
+            myCurrentError = new CloudErrorInfo("Failed populate instances", ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    private void populateCustomResourceInstances(){
+        try{
+            final Collection<GenericKubernetesResource> resources = myApiConnector.listCustomResources(
+              getCustomResourceContext(),
+              CollectionsUtil.asMap(
+                KubeTeamCityLabels.TEAMCITY_CLOUD_IMAGE, myImageData.getId(),
+                KubeTeamCityLabels.TEAMCITY_CLOUD_PROFILE, myImageData.getProfileId()
+              ));
+            final Set<String> keys = new HashSet<>(myIdToInstanceMap.keySet());
+            final List<GenericKubernetesResource> newResources = new ArrayList<>();
+            for (GenericKubernetesResource resource : resources){
+                if (resource.getMetadata() == null){
+                    LOG.debug("Found custom resource without metadata...");
+                    continue;
+                }
+                final String resourceName = resource.getMetadata().getName();
+                if (keys.remove(resourceName)){
+                    LOG.debug(String.format("Found known custom resource '%s'", resourceName));
+                    final KubeCloudInstance instance = myIdToInstanceMap.get(resourceName);
+                    if (instance == null){
+                        LOG.warn(String.format("Instance '%s' was removed?!", resourceName));
+                        continue;
+                    }
+                    instance.updateState(resource);
+                } else {
+                    LOG.debug(String.format("Found new custom resource '%s'", resourceName));
+                    newResources.add(resource);
+                }
+            }
+            keys.removeIf(instanceId->{
+                KubeCloudInstance instance = myIdToInstanceMap.get(instanceId);
+                return instance != null && instance.getStatus() == InstanceStatus.SCHEDULED_TO_START;
+            });
+            if (keys.size() > 0) {
+                LOG.info(String.format("The following %d custom %s %s deleted: %s",
+                                       keys.size(), StringUtil.pluralize("resource", keys.size()),
+                                       keys.size() == 1 ? "was" : "were",
+                                       String.join(", ", keys))
+                );
+                keys.forEach(myIdToInstanceMap::remove);
+            }
+            if (newResources.size() > 0){
+                final List<String> resourceNames = newResources.stream().map(resource -> resource.getMetadata().getName()).collect(Collectors.toList());
+                LOG.info(String.format(
+                  "Found %d new custom %s: %s",
+                  newResources.size(),
+                  StringUtil.pluralize("resource", newResources.size()),
+                  String.join(", ", resourceNames)
+                ));
+                newResources.forEach(resource->{
+                    final String resourceName = resource.getMetadata().getName();
+                    final KubeCloudInstance instance = new KubeCloudCustomResourceInstance(this, resource);
+                    if (myIdToInstanceMap.putIfAbsent(resourceName, instance) == null) {
+                        instance.updateState(resource);
+                    }
                 });
             }
             myCurrentError = null;

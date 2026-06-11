@@ -1,6 +1,7 @@
 
 package jetbrains.buildServer.clouds.kubernetes;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodCondition;
 import io.fabric8.kubernetes.api.model.PodStatus;
@@ -124,7 +125,11 @@ public class KubeCloudInstanceImpl implements KubeCloudInstance {
         return getName().equals(buildParams.get("env."+INSTANCE_NAME));
     }
 
-    public void updateState(@NotNull Pod actualPod){
+    public void updateState(@NotNull HasMetadata resource){
+        if (!(resource instanceof Pod)) {
+            throw new KubeCloudException("Pod-based instance '" + getName() + "' cannot be updated from a " + resource.getKind());
+        }
+        final Pod actualPod = (Pod)resource;
         myPod = actualPod;
         InstanceStatus podStatus = KubeUtils.mapPodPhase(actualPod.getStatus());
         myCurrentError = KubeUtils.getErrorMessage(myPod.getStatus());

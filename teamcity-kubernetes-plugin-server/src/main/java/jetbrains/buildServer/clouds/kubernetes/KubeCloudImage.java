@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.kubernetes;
 
 import jetbrains.buildServer.clouds.CloudErrorInfo;
 import jetbrains.buildServer.clouds.CloudImage;
+import jetbrains.buildServer.clouds.kubernetes.connector.CustomResourceContext;
 import jetbrains.buildServer.clouds.kubernetes.connector.ImagePullPolicy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,24 @@ public interface KubeCloudImage extends CloudImage {
 
     @Nullable
     String getPVCTemplate();
+
+    /**
+     * Raw YAML manifest of the custom resource (e.g. XSmogVM) for the custom-resource deploy mode.
+     */
+    @Nullable
+    String getCustomResourceTemplate();
+
+    boolean isCustomResourceClusterScoped();
+
+    @Nullable
+    String getCustomResourcePlural();
+
+    /**
+     * Resource type derived from {@link #getCustomResourceTemplate()}, or null when this image
+     * does not use the custom-resource deploy mode.
+     */
+    @Nullable
+    CustomResourceContext getCustomResourceContext();
 
     @Nullable
     String getSourceDeploymentName();

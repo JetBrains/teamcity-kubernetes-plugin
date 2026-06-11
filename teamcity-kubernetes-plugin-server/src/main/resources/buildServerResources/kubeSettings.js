@@ -47,7 +47,8 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
         </tr>')
     },
 
-    _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix' ],
+    _dataKeys: [ 'imageDescription', 'dockerImage', 'agent_pool_id', 'imageInstanceLimit', 'customPodTemplate', 'podTemplateMode', 'sourceDeployment', 'agentNamePrefix',
+                 'customResourceTemplate', 'customResourceClusterScoped', 'customResourcePlural' ],
 
     selectors: {
         rmImageLink: '.removeVmImageLink',
@@ -95,6 +96,9 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
         this.$dockerArgs = $j('#dockerArgs');
         this.$deploymentName = $j('#sourceDeployment');
         this.$customPodTemplate = $j('#customPodTemplate');
+        this.$customResourceTemplate = $j('#customResourceTemplate');
+        this.$customResourceClusterScoped = $j('#customResourceClusterScoped');
+        this.$customResourcePlural = $j('#customResourcePlural');
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$imageInstanceLimit = $j('#imageInstanceLimit');
         this.$agentPoolSelector = $j('#agent_pool_id');
@@ -245,6 +249,36 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
         .on('cm-change', function(e, value){
             self._image[this.getAttribute('id')] = value;
         });
+
+        this.$customResourceTemplate
+        .on('change', function(e, data){
+            var val = e.target.value;
+            if (arguments.length === 1) {
+                self._image[this.getAttribute('id')] = val;
+            } else {
+                this.value = data;
+                $j(this).trigger('cm-set-value', data);
+            }
+        })
+        .on('cm-change', function(e, value){
+            self._image[this.getAttribute('id')] = value;
+        });
+
+        this.$customResourceClusterScoped.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['customResourceClusterScoped'] = this.$customResourceClusterScoped.is(':checked') ? 'true' : '';
+            } else {
+                this.$customResourceClusterScoped.prop('checked', value === 'true');
+            }
+        }.bind(this));
+
+        this.$customResourcePlural.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['customResourcePlural'] = this.$customResourcePlural.val();
+            } else {
+                this.$customResourcePlural.val(value);
+            }
+        }.bind(this));
     },
 
     _updateImageDescription: function (image) {
@@ -254,6 +288,9 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
             switch (podSpecMode){
                 case 'custom-pod-template':
                     imageDescription = 'Custom pod template: ' + image['agentNamePrefix'];
+                    break;
+                case 'custom-resource':
+                    imageDescription = 'Custom resource (VM): ' + image['agentNamePrefix'];
                     break;
                 case 'deployment-base':
                     imageDescription = 'Use deployment: ' + image['sourceDeployment'];
@@ -426,7 +463,7 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
             }.bind(this),
 
             agentNamePrefix: function(){
-                if (this._image['podTemplateMode'] === 'custom-pod-template' && !this._image['agentNamePrefix']) {
+                if ((this._image['podTemplateMode'] === 'custom-pod-template' || this._image['podTemplateMode'] === 'custom-resource') && !this._image['agentNamePrefix']) {
                     this.addOptionError('required', 'agentNamePrefix');
                     isValid = false;
                 } else if (this._image['agentNamePrefix']){
@@ -457,6 +494,14 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
                 var valueToValidate = this._image['customPodTemplate'];
                 if (this._image['podTemplateMode'] === 'custom-pod-template' && (!valueToValidate || valueToValidate === '')) {
                     this.addOptionError('required', 'customPodTemplate');
+                    isValid = false;
+                }
+            }.bind(this),
+
+            customResourceTemplate : function () {
+                var valueToValidate = this._image['customResourceTemplate'];
+                if (this._image['podTemplateMode'] === 'custom-resource' && (!valueToValidate || valueToValidate === '')) {
+                    this.addOptionError('required', 'customResourceTemplate');
                     isValid = false;
                 }
             }.bind(this)
@@ -571,6 +616,8 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$imageInstanceLimit.trigger('change', image['imageInstanceLimit'] || '');
         this.$agentPoolSelector.trigger('change', image['agent_pool_id'] || '');
+        this.$customResourceClusterScoped.trigger('change', image['customResourceClusterScoped'] || '');
+        this.$customResourcePlural.trigger('change', image['customResourcePlural'] || '');
 
         BS.Kube.ImageDialog.showCentered();
         this._resetCodeMirrorValues();
@@ -664,6 +711,9 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
         this.$imageInstanceLimit.trigger('change', '');
         this.$agentPoolSelector.trigger('change', '');
         this.$customPodTemplate.trigger('change', '');
+        this.$customResourceTemplate.trigger('change', '');
+        this.$customResourceClusterScoped.trigger('change', '');
+        this.$customResourcePlural.trigger('change', '');
     },
 
     _resetCodeMirrorValues: function () {
@@ -671,6 +721,7 @@ BS.Kube.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
       // waiting for CodeMirror to be attached
       setTimeout(() => {
         this.$customPodTemplate.trigger('change', this._image['customPodTemplate'] || '');
+        this.$customResourceTemplate.trigger('change', this._image['customResourceTemplate'] || '');
       }, 0);
     }
 });
