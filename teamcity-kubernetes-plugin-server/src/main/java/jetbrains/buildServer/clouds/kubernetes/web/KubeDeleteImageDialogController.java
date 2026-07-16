@@ -1,14 +1,21 @@
 
 package jetbrains.buildServer.clouds.kubernetes.web;
 
+import java.io.IOException;
 import jetbrains.buildServer.clouds.CloudClientEx;
 import jetbrains.buildServer.clouds.CloudImage;
 import jetbrains.buildServer.clouds.CloudInstance;
 import jetbrains.buildServer.clouds.server.CloudManagerBase;
+import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseController;
+import jetbrains.buildServer.controllers.admin.projects.EditVcsRootsController;
+import jetbrains.buildServer.serverSide.SProject;
+import jetbrains.buildServer.serverSide.auth.Permission;
+import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
+import jetbrains.buildServer.web.util.SessionUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,9 +41,35 @@ public class KubeDeleteImageDialogController extends BaseController {
         web.registerController(myPluginDescriptor.getPluginResourcesPath(URL), this);
     }
 
+    private boolean checkHasAccess(
+      HttpServletRequest request,
+      HttpServletResponse xmlResponse
+    ) throws IOException {
+      SProject project = myServer.getProjectManager().findProjectByExternalId(request.getParameter("projectId"));
+        if (project == null) {
+            xmlResponse.sendError(404, "Project not found");
+            return false;
+        }
+
+        SUser user = SessionUser.getUser(request);
+
+        boolean hasAccess = user.isPermissionGrantedForProject(project.getProjectId(), Permission.EDIT_PROJECT);
+
+        if (!hasAccess) {
+            xmlResponse.sendError(401, "Authorised user lacks permissions for the project: " + project.getExternalId());
+            return false;
+        }
+
+        return true;
+    }
+
     @Nullable
     @Override
-    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) {
+    protected ModelAndView doHandle(@NotNull HttpServletRequest httpServletRequest, @NotNull HttpServletResponse httpServletResponse) throws IOException {
+        if (!checkHasAccess(httpServletRequest, httpServletResponse)){
+            return null;
+        }
+
         String projectId = httpServletRequest.getParameter("projectId");
         String profileId = httpServletRequest.getParameter("profileId");
         String imageId = httpServletRequest.getParameter("imageId");
