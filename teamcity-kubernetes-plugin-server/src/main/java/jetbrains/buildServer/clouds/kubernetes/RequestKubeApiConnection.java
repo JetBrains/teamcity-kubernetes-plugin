@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection;
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiProxySettings;
 import jetbrains.buildServer.controllers.BasePropertiesBean;
-import jetbrains.buildServer.internal.PluginPropertiesUtil;
+import jetbrains.buildServer.controllers.admin.projects.PluginPropertiesUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
