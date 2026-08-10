@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import jetbrains.buildServer.BuildProject;
@@ -18,9 +17,7 @@ import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectionCheckR
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnectorImpl;
 import jetbrains.buildServer.clouds.kubernetes.podSpec.BuildAgentPodTemplateProviders;
 import jetbrains.buildServer.controllers.ActionErrors;
-import jetbrains.buildServer.controllers.AuthorizationInterceptor;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
-import jetbrains.buildServer.controllers.RequestPermissionsCheckerEx;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.agentPools.AgentPool;
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager;
@@ -47,6 +44,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
     private final KubeAuthStrategyProvider myAuthStrategyProvider;
     private final BuildAgentPodTemplateProviders myPodTemplateProviders;
     private final ProjectIdentifiersManager myIdentifiersManager;
+    private final ProjectManager myProjectManager;
+    private final SecurityContextEx mySecurityContext;
 
     static {
         try {
@@ -63,8 +62,8 @@ public class KubeProfileEditController extends BaseFormXmlController {
                                      @NotNull final KubeAuthStrategyProvider authStrategyProvider,
                                      @NotNull final BuildAgentPodTemplateProviders podTemplateProviders,
                                      @NotNull final KubernetesCredentialsFactory credentialsFactory,
-                                     @NotNull final AuthorizationInterceptor authInterceptor,
                                      @NotNull final ProjectManager projectManager,
+                                     @NotNull final SecurityContextEx securityContext,
                                      @NotNull final ProjectIdentifiersManager identifiersManager){
         super(server);
         myPluginDescriptor = pluginDescriptor;
@@ -74,23 +73,9 @@ public class KubeProfileEditController extends BaseFormXmlController {
         myAuthStrategyProvider = authStrategyProvider;
         myPodTemplateProviders = podTemplateProviders;
         myIdentifiersManager = identifiersManager;
+        myProjectManager = projectManager;
+        mySecurityContext = securityContext;
         web.registerController(path, this);
-        authInterceptor.addPathBasedPermissionsChecker(path, new RequestPermissionsCheckerEx() {
-            @Override
-            public void checkPermissions(@NotNull SecurityContextEx securityContext, @NotNull HttpServletRequest request) {
-                if (!isTestConnection(request)) {
-                    return;
-                }
-
-                final String projectId = request.getParameter("projectId");
-                final SProject project = projectManager.findProjectByExternalId(projectId);
-                if (project == null) {
-                    throw new AccessDeniedException(securityContext.getAuthorityHolder(), String.format("No project with id '%s' found", projectId));
-                } else {
-                    securityContext.getAccessChecker().checkCanEditProject(project);
-                }
-            }
-        });
     }
 
     @Override
@@ -117,6 +102,7 @@ public class KubeProfileEditController extends BaseFormXmlController {
     protected void doPost(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Element xmlResponse) {
 
         if(isTestConnection(request)){
+            checkPermissions(request);
             final KubeApiConnection connectionSettings = new RequestKubeApiConnection(request);
 
             final KubeAuthStrategy strategy = myAuthStrategyProvider.get(connectionSettings.getAuthStrategy());
@@ -155,6 +141,15 @@ public class KubeProfileEditController extends BaseFormXmlController {
 
     private String getProfileId(@NotNull HttpServletRequest request) {
       return request.getParameter("profileId");
+    }
+
+    private void checkPermissions(@NotNull HttpServletRequest request) {
+        final String projectId = request.getParameter("projectId");
+        final SProject project = myProjectManager.findProjectByExternalId(projectId);
+        if (project == null) {
+            throw new AccessDeniedException(mySecurityContext.getAuthorityHolder(), String.format("No project with id '%s' found", projectId));
+        }
+        mySecurityContext.getAccessChecker().checkCanEditProject(project);
     }
 
     private static boolean isTestConnection(@NotNull HttpServletRequest request) {
