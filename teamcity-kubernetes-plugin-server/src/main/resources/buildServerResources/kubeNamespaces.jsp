@@ -23,7 +23,7 @@
             <c:otherwise>
                 <ul class="chooser">
                     <c:forEach var="namespace" items="${namespaces}">
-                        <li><a style="cursor:pointer;" onclick="BS.Kube.NamespaceChooser.selectNamespace('${namespace}')"><c:out value="${namespace}"/></a></li>
+                        <li><a style="cursor:pointer;" onclick="BS.Kube.NamespaceChooser.selectNamespace(this.textContent)"><c:out value="${namespace}"/></a></li>
                     </c:forEach>
                 </ul>
             </c:otherwise>

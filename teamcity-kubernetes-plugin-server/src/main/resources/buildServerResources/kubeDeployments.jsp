@@ -23,7 +23,7 @@
             <c:otherwise>
                 <ul class="chooser">
                     <c:forEach var="deployment" items="${deployments}">
-                        <li><a style="cursor:pointer;" onclick="BS.Kube.DeploymentChooser.selectDeployment('${deployment}')"><c:out value="${deployment}"/></a></li>
+                        <li><a style="cursor:pointer;" onclick="BS.Kube.DeploymentChooser.selectDeployment(this.textContent)"><c:out value="${deployment}"/></a></li>
                     </c:forEach>
                 </ul>
             </c:otherwise>
