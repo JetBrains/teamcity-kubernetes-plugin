@@ -118,6 +118,10 @@ class EKSAuthStrategy(myTimeService: TimeService, private val projectManager: Pr
 
     override fun createData(connection: KubeApiConnection): EKSData {
         val useInstanceProfile = (connection.getCustomParameter(EKS_USE_INSTANCE_PROFILE) ?: "false").toBoolean()
+        if (useInstanceProfile && !isInstanceProfileEnabled()) {
+            LOG.info { "$INSTANCE_PROFILE_DISABLED_MESSAGE To enable it, set the $ENABLE_LOCAL_AWS_ACCOUNT internal property to true." }
+            throw KubeCloudException("$INSTANCE_PROFILE_DISABLED_MESSAGE Refer to teamcity-clouds.log for details.")
+        }
         var accessId: String? = null
         var secretKey: String? = null
         if (!useInstanceProfile) {
@@ -143,7 +147,11 @@ class EKSAuthStrategy(myTimeService: TimeService, private val projectManager: Pr
             retval.add(InvalidProperty(EKS_CLUSTER_NAME, "Cluster name is required"))
         }
 
-        if (props[EKS_USE_INSTANCE_PROFILE].isNullOrEmpty() || !props[EKS_USE_INSTANCE_PROFILE]!!.toBoolean()) {
+        if (props[EKS_USE_INSTANCE_PROFILE].toBoolean()) {
+            if (!isInstanceProfileEnabled()) {
+                retval.add(InvalidProperty(EKS_USE_INSTANCE_PROFILE, INSTANCE_PROFILE_DISABLED_MESSAGE))
+            }
+        } else {
             if (props[EKS_ACCESS_ID].isNullOrEmpty()) {
                 retval.add(InvalidProperty(EKS_ACCESS_ID, "Access ID is required if instance profile is not used"))
             }
@@ -158,8 +166,10 @@ class EKSAuthStrategy(myTimeService: TimeService, private val projectManager: Pr
         mv.put(EKS_USE_INSTANCE_PROFILE_ENABLED, isEksLocalAvailable(projectId))
     }
 
+    private fun isInstanceProfileEnabled() = TeamCityProperties.getBoolean(ENABLE_LOCAL_AWS_ACCOUNT)
+
     private fun isEksLocalAvailable(projectId: String): Boolean {
-        if (TeamCityProperties.getBoolean(EKSAuthStrategy.ENABLE_LOCAL_AWS_ACCOUNT)) {
+        if (isInstanceProfileEnabled()) {
             return true
         }
         val project = projectManager.findProjectById(projectId)
@@ -171,7 +181,8 @@ class EKSAuthStrategy(myTimeService: TimeService, private val projectManager: Pr
     }
 
     private fun isAuthStrategyUsed(project: SProject): Boolean {
-        //TW-91106 The local instance profile strategy is disabled by default but enabled for whoever was already using it
+        //TW-91106 The local instance profile strategy is disabled by default. The checkbox stays visible where a project already uses it,
+        //so that the form keeps the saved value and shows the error from process() instead of silently switching to access keys
         return (
                 project.getOwnFeaturesOfType(CloudConstants.CLOUD_PROFILE_FEATURE_TYPE) +
                         project.getOwnFeaturesOfType(OAuthConstants.FEATURE_TYPE))
@@ -182,6 +193,7 @@ class EKSAuthStrategy(myTimeService: TimeService, private val projectManager: Pr
 
     companion object {
         const val ENABLE_LOCAL_AWS_ACCOUNT = "teamcity.kubernetes.localAwsAccount.enable"
+        const val INSTANCE_PROFILE_DISABLED_MESSAGE = "Using the server instance profile for Amazon EKS is disabled on this server."
     }
 }
 

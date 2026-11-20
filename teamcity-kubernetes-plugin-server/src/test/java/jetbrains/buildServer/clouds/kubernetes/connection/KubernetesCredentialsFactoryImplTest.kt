@@ -3,11 +3,13 @@ package jetbrains.buildServer.clouds.kubernetes.connection
 import io.fabric8.kubernetes.client.Config
 import jetbrains.buildServer.MockTimeService
 import jetbrains.buildServer.clouds.kubernetes.KubeApiProxySettingsImpl
+import jetbrains.buildServer.clouds.kubernetes.KubeCloudException
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants
 import jetbrains.buildServer.clouds.kubernetes.KubeParametersConstants.PROXY_SERVER
 import jetbrains.buildServer.clouds.kubernetes.KubeUtils
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategy
 import jetbrains.buildServer.clouds.kubernetes.auth.KubeAuthStrategyProviderImpl
+import jetbrains.buildServer.clouds.kubernetes.auth.UnauthorizedAccessStrategy
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiConnection
 import jetbrains.buildServer.clouds.kubernetes.connector.KubeApiProxySettings
 import jetbrains.buildServer.serverSide.ProjectManager
@@ -15,20 +17,23 @@ import jetbrains.buildServer.serverSide.connections.ConnectionDescriptor
 import jetbrains.buildServer.serverSide.connections.credentials.ConnectionCredentialsException
 import jetbrains.buildServer.serverSide.impl.BaseServerTestCase
 import jetbrains.buildServer.util.StringUtil
+import jetbrains.buildServer.util.TestFor
 import org.assertj.core.api.BDDAssertions.then
+import org.assertj.core.api.BDDAssertions.thenThrownBy
 import org.junit.Assert
 import org.mockito.Mockito
 import org.testng.annotations.AfterMethod
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
+import software.amazon.awssdk.core.exception.SdkClientException
 
 class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
     private lateinit var authStrategy: KubeAuthStrategy
     private lateinit var kubeAuthStrategyProvider: KubeAuthStrategyProviderImpl
     private lateinit var credentialsFactoryImpl: KubernetesCredentialsFactoryImpl
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     override fun setUp() {
         super.setUp()
         authStrategy = Mockito.mock(KubeAuthStrategy::class.java)
@@ -40,7 +45,7 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
         credentialsFactoryImpl = KubernetesCredentialsFactoryImpl(kubeAuthStrategyProvider, myProjectManager)
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     override fun tearDown() {
         super.tearDown()
         Mockito.validateMockitoUsage()
@@ -64,14 +69,20 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
     }
 
 
-    private fun getConnectionDescriptor(namespace: String = NAMESPACE, apiServerUrl: String? = null, caCertData: String? = null, authStrategy: String = STRAGEGY_NAME): ConnectionDescriptor {
+    private fun getConnectionDescriptor(
+        namespace: String = NAMESPACE,
+        apiServerUrl: String? = null,
+        caCertData: String? = null,
+        authStrategy: String = STRAGEGY_NAME,
+        strategyParameters: Map<String, String> = emptyMap()
+    ): ConnectionDescriptor {
         val connection = Mockito.mock(ConnectionDescriptor::class.java)
         val parameters = mapOf(
             KubeParametersConstants.API_SERVER_URL to apiServerUrl,
             KubeParametersConstants.KUBERNETES_NAMESPACE to namespace,
             KubeParametersConstants.CA_CERT_DATA to caCertData,
             KubeParametersConstants.AUTH_STRATEGY to authStrategy,
-        )
+        ) + strategyParameters
         Mockito.`when`(connection.parameters).thenReturn(parameters)
         Mockito.`when`(connection.projectId).thenReturn(myProject.projectId)
         Mockito.`when`(connection.id).thenReturn(PROFILE_ID)
@@ -105,6 +116,51 @@ class KubernetesCredentialsFactoryImplTest : BaseServerTestCase() {
     fun `testRequestCredentials with no auth strategy`(){
         val descriptor = getConnectionDescriptor(authStrategy = "fake one")
         credentialsFactoryImpl.requestCredentials(descriptor)
+    }
+
+    @DataProvider(name = "disabledStrategies")
+    fun disabledStrategies() = arrayOf(
+        arrayOf<Any>("service-account", emptyMap<String, String>()),
+        arrayOf<Any>("eks", mapOf(
+            KubeParametersConstants.EKS_CLUSTER_NAME to "cluster",
+            KubeParametersConstants.EKS_USE_INSTANCE_PROFILE to "true"
+        )),
+    )
+
+    @Test(dataProvider = "disabledStrategies")
+    @TestFor(issues = ["TW-103850"])
+    fun testRequestCredentialsReportsDisabledStrategyAsCredentialsException(authStrategy: String, strategyParameters: Map<String, String>) {
+        val descriptor = getConnectionDescriptor(apiServerUrl = API_SERVER_URL, authStrategy = authStrategy, strategyParameters = strategyParameters)
+
+        thenThrownBy { credentialsFactoryImpl.requestCredentials(descriptor) }
+            .isInstanceOf(ConnectionCredentialsException::class.java)
+            .cause()
+            .isInstanceOf(KubeCloudException::class.java)
+            .hasMessageContaining("disabled on this server")
+    }
+
+    @Test
+    @TestFor(issues = ["TW-103850"])
+    fun testRequestCredentialsReportsUncheckedStrategyFailureAsCredentialsException() {
+        // EKS resolves AWS credentials inside apply(), and the AWS SDK reports failures as unchecked exceptions
+        val awsFailure = SdkClientException.create("Unable to load credentials from any of the providers in the chain")
+        Mockito.`when`(authStrategy.apply(Mockito.any(), Mockito.any())).thenThrow(awsFailure)
+
+        thenThrownBy { credentialsFactoryImpl.requestCredentials(getConnectionDescriptor(apiServerUrl = API_SERVER_URL)) }
+            .isInstanceOf(ConnectionCredentialsException::class.java)
+            .hasCause(awsFailure)
+    }
+
+    @Test
+    @TestFor(issues = ["TW-103850"])
+    fun testCreateConfigDoesNotPickUpServerServiceAccountToken() {
+        setInternalProperty(Config.KUBERNETES_AUTH_SERVICEACCOUNT_TOKEN_FILE_SYSTEM_PROPERTY, createTempFile("server-service-account-token").absolutePath)
+        setInternalProperty(Config.KUBERNETES_AUTH_TRYKUBECONFIG_SYSTEM_PROPERTY, false)
+        val connectionSettings = getConnectionSettings(apiServerUrl = API_SERVER_URL, caCertData = CA_CERT_DATA)
+
+        val config = credentialsFactoryImpl.createConfig(connectionSettings, UnauthorizedAccessStrategy())
+
+        then(config.oauthToken).isNull()
     }
 
     @Test

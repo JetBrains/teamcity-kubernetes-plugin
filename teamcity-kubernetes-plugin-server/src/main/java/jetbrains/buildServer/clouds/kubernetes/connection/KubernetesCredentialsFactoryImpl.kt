@@ -19,7 +19,9 @@ import jetbrains.buildServer.util.StringUtil
 
 class KubernetesCredentialsFactoryImpl(private val myAuthStrategyProvider: KubeAuthStrategyProvider, private val projectManager: ProjectManager) : KubernetesCredentialsFactory {
     public override fun createConfig(connectionSettings: KubeApiConnection, authStrategy: KubeAuthStrategy): Config {
-        var configBuilder = ConfigBuilder()
+        // using a non-empty config might autoconfigure `new ConfigBuilder()` from the server's
+        // kubeconfig and service-account token, which would send them to the profile's API server whatever the strategy is.
+        var configBuilder = ConfigBuilder(Config.empty())
             .withNamespace(connectionSettings.namespace)
             .withRequestTimeout(DEFAULT_REQUEST_TIMEOUT_MS)
             .withHttp2Disable(true)
@@ -93,7 +95,13 @@ class KubernetesCredentialsFactoryImpl(private val myAuthStrategyProvider: KubeA
         val authStrategy =
             myAuthStrategyProvider.find(kubeApiConnection.authStrategy) ?: throw ConnectionCredentialsException("Received unknown auth strategy " + kubeApiConnection.authStrategy)
 
-        return KubernetesConnectionCredentialsImpl(createConfig(kubeApiConnection, authStrategy), connectionDescriptor.parameters)
+        // any exception other than ConnectionCredentialsException stops processing of other credentials too, so wrap them here into a generic exception
+        val config = try {
+            createConfig(kubeApiConnection, authStrategy)
+        } catch (e: Exception) {
+            throw ConnectionCredentialsException("Failed to create Kubernetes connection configuration", e)
+        }
+        return KubernetesConnectionCredentialsImpl(config, connectionDescriptor.parameters)
     }
 
     @Throws(ConnectionCredentialsException::class)
